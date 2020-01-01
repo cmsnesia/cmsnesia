@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    active:
+      - local
+    include:
+      - common
+#  data:
+#    mongodb:
+#      host: localhost
+#      port: 27117
+#      username: ardikars
+#      password: 123456
+
+
+management:
+  metrics:
+    export:
+      influx:
+        db: ardikars
+        user-name: ardikars
+        password: 123456
+        uri: http://localhost:80862
+        enabled: false
+
+gri:
+  token:
+    issuer: ardikars
+    accessTokenExparation: 288000
+    refreshTokenExparation: 588000
+    secret: 123456

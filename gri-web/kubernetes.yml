@@ -1,0 +1,57 @@
+---
+apiVersion: "v1"
+kind: "List"
+items:
+  - apiVersion: "v1"
+    kind: "Service"
+    metadata:
+      labels:
+        app: "gri-web"
+        version: "1.0.0-SNAPSHOT"
+        group: "id.or.gri"
+      name: "gri-web"
+    spec:
+      ports:
+        - name: "http"
+          port: 8080
+          targetPort: 8080
+      selector:
+        app: "gri-web-exposed"
+        version: "1.0.0-SNAPSHOT"
+        group: "id.or.gri"
+      type: "LoadBalancer"
+  - apiVersion: "apps/v1"
+    kind: "Deployment"
+    metadata:
+      labels:
+        app: "gri-web"
+        version: "1.0.0-SNAPSHOT"
+        group: "id.or.gri"
+      name: "gri-web"
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "gri-web-exposed"
+          version: "1.0.0-SNAPSHOT"
+          group: "id.or.gri"
+      template:
+        metadata:
+          labels:
+            app: "gri-web-exposed"
+            version: "1.0.0-SNAPSHOT"
+            group: "id.or.gri"
+        spec:
+          containers:
+            - env:
+                - name: "KUBERNETES_NAMESPACE"
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: "metadata.namespace"
+              image: "ardikars/gri-web:1.0.0-SNAPSHOT"
+              imagePullPolicy: "IfNotPresent"
+              name: "gri-web"
+              ports:
+                - containerPort: 8080
+                  name: "http"
+                  protocol: "TCP"
