@@ -4,6 +4,7 @@ import id.or.gri.domain.Auth;
 import id.or.gri.model.AuthDto;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -27,7 +28,7 @@ public class AuthAssembler implements Assembler<Auth, AuthDto> {
                 .password(dto.getPassword())
                 .roles(dto.getRoles())
                 .fullName(dto.getFullName())
-                .emails(emailAssembler.fromDto(dto.getEmails()))
+                .emails(dto.getEmails() == null ? new HashSet<>() : emailAssembler.fromDto(dto.getEmails()))
                 .build();
     }
 
@@ -48,7 +49,7 @@ public class AuthAssembler implements Assembler<Auth, AuthDto> {
                 .password("******")
                 .roles(entity.getRoles())
                 .fullName(entity.getFullName())
-                .emails(emailAssembler.fromEntity(entity.getEmails()))
+                .emails(entity.getEmails() == null ? new HashSet<>() : emailAssembler.fromEntity(entity.getEmails()))
                 .build();
     }
 

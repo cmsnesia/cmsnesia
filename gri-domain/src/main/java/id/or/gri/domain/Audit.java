@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,7 +38,7 @@ public abstract class Audit<T> implements Serializable {
 
     private String deletedBy;
 
-    private String status;
+    private Set<String> status;
 
     public void audit(Audit audit) {
         if (Objects.nonNull(audit.getCreatedAt())) {

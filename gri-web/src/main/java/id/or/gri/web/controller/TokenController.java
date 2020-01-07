@@ -6,6 +6,7 @@ import id.or.gri.model.EmailDto;
 import id.or.gri.model.TagDto;
 import id.or.gri.model.request.RefreshTokenRequest;
 import id.or.gri.model.request.TokenRequest;
+import id.or.gri.model.response.TokenResponse;
 import id.or.gri.service.AuthService;
 import id.or.gri.service.CategoryService;
 import id.or.gri.service.TagService;
@@ -52,6 +53,11 @@ public class TokenController {
     @PutMapping("/refresh")
     public Mono<ResponseEntity<?>> refresh(@RequestBody RefreshTokenRequest request) {
         return Mono.just(ResponseEntity.ok(tokenService.refresh(request)));
+    }
+
+    @PutMapping("/destroy")
+    public Mono<ResponseEntity<?>> destroy(@RequestBody TokenResponse tokenResponse) {
+        return Mono.just(ResponseEntity.ok(tokenService.destroy(tokenResponse)));
     }
 
 

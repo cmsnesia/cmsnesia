@@ -4,13 +4,9 @@ spring:
       - local
     include:
       - common
-#  data:
-#    mongodb:
-#      host: localhost
-#      port: 27117
-#      username: ardikars
-#      password: 123456
-
+  data:
+    mongodb:
+      uri: mongodb://auth_user:auth_user@cluster0-shard-00-00-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-01-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-02-fjlws.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority
 
 management:
   metrics:
@@ -28,3 +24,4 @@ gri:
     accessTokenExparation: 288000
     refreshTokenExparation: 588000
     secret: 123456
+    max: 2

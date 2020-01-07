@@ -1,4 +1,4 @@
-FROM harisekhon/ubuntu-java
+FROM openjdk:8-jre-alpine
 ARG SERVICE_NAME
 ARG JAR_FILE
 

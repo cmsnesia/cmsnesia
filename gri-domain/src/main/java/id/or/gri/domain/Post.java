@@ -4,6 +4,7 @@ import id.or.gri.domain.model.Author;
 import id.or.gri.domain.model.Media;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.*;
@@ -19,6 +20,9 @@ public class Post extends Audit {
 
     @Id
     private String id;
+
+    @Indexed(unique = true)
+    private Set<String> draftIds;
 
     @NotBlank(message = "Post title must be not blank")
     @Size(max = 100, message = "Maximum size of post title is 100")

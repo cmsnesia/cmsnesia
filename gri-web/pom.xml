@@ -34,10 +34,10 @@
 <!--            <version></version>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>de.flapdoodle.embed</groupId>-->
+<!--            <artifactId>de.flapdoodle.embed.mongo</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>id.or.gri</groupId>
@@ -89,6 +89,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
+                <version>0.31.0</version>
             </plugin>
         </plugins>
     </build>

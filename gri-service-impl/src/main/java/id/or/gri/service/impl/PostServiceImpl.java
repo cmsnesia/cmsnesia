@@ -2,112 +2,151 @@ package id.or.gri.service.impl;
 
 import id.or.gri.assembler.PostAssembler;
 import id.or.gri.domain.Post;
+import id.or.gri.domain.PostDraft;
 import id.or.gri.domain.model.Author;
 import id.or.gri.model.AuthDto;
 import id.or.gri.model.CategoryDto;
 import id.or.gri.model.PostDto;
 import id.or.gri.model.TagDto;
+import id.or.gri.model.request.IdRequest;
 import id.or.gri.service.CategoryService;
 import id.or.gri.service.PostService;
 import id.or.gri.service.TagService;
+import id.or.gri.service.repository.PostDraftRepo;
 import id.or.gri.service.repository.PostRepo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
 public class PostServiceImpl implements PostService {
 
+    private static String UNPUBLISHED = "UNPUBLISHED";
+    private static String PUBLISHED = "PUBLISHED";
+
     private final PostAssembler postAssembler;
     private final PostRepo postRepo;
+    private final PostDraftRepo postDraftRepo;
     private final TagService tagService;
     private final CategoryService categoryService;
 
-    public PostServiceImpl(PostAssembler postAssembler, PostRepo postRepo, TagService tagService, CategoryService categoryService) {
+    public PostServiceImpl(PostAssembler postAssembler, PostRepo postRepo, PostDraftRepo postDraftRepo, TagService tagService, CategoryService categoryService) {
         this.postAssembler = postAssembler;
         this.postRepo = postRepo;
+        this.postDraftRepo = postDraftRepo;
         this.tagService = tagService;
         this.categoryService = categoryService;
     }
 
     @Override
     public Mono<PostDto> add(AuthDto authDto, PostDto dto) {
-        Post post = postAssembler.fromDto(dto);
-
-        Author author = new Author();
-        author.setName(authDto.getFullName());
-        author.setModifiedAt(new Date());
+        PostDraft post = postAssembler.fromPostDto(dto);
 
         post.setId(UUID.randomUUID().toString());
-        post.setAuthors(Arrays.asList(author).stream().collect(Collectors.toSet()));
-
-        post.setViewCount(0L);
-        post.setLikeCount(0L);
-        post.setDislikeCount(0L);
-        post.setShareCount(0L);
 
         post.setCreatedBy(authDto.getId());
         post.setCreatedAt(new Date());
+        post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
 
-        Boolean tagIsExist = tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet())).block();
-        Boolean categoryIsExist = categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet())).block();
-        if (tagIsExist != null && categoryIsExist != null && tagIsExist && categoryIsExist) {
-            return postRepo.save(post).map(postAssembler::fromEntity);
-        }
-        return Mono.empty();
+        return tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet()))
+                .flatMap(tagIsExist -> {
+                    if (tagIsExist != null && tagIsExist) {
+                        return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+                                .flatMap(categotyIsExist -> {
+                                    if (categotyIsExist != null && categotyIsExist) {
+                                        return postDraftRepo.save(post).map(postAssembler::fromDraft);
+                                    } else {
+                                        return Mono.empty();
+                                    }
+                                });
+                    } else {
+                        return Mono.empty();
+                    }
+                });
     }
 
     @Override
     public Mono<PostDto> edit(AuthDto authDto, PostDto dto) {
-        return postRepo.findById(dto.getId())
-                .flatMap((Function<Post, Mono<PostDto>>) post -> {
-                    Post save = postAssembler.fromDto(dto);
+        return postDraftRepo.findById(dto.getId())
+                .flatMap((Function<PostDraft, Mono<PostDto>>) post -> {
+                    PostDraft save = postAssembler.fromPostDto(dto);
+                    post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
                     save.audit(post);
-
-                    if (!post.getAuthors().stream().map(Author::getName)
-                            .collect(Collectors.toSet()).contains(authDto.getFullName())) {
-                        Author author = new Author();
-                        author.setName(authDto.getFullName());
-                        author.setModifiedAt(new Date());
-                        post.getAuthors().add(author);
-                    }
 
                     save.setModifiedBy(authDto.getId());
                     save.setModifiedAt(new Date());
 
-                    Boolean tagIsExist = tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet())).block();
-                    Boolean categoryIsExist = categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet())).block();
-                    if (tagIsExist != null && categoryIsExist != null && tagIsExist && categoryIsExist) {
-                        return postRepo
-                                .save(save)
-                                .map(result -> postAssembler.fromEntity(result));
-                    }
-                    return Mono.empty();
+                    return tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet()))
+                            .flatMap(tagIsExist -> {
+                                if (tagIsExist != null && tagIsExist) {
+                                    return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+                                            .flatMap(categotyIsExist -> {
+                                                if (categotyIsExist != null && categotyIsExist) {
+                                                    return postDraftRepo.save(save).map(result -> postAssembler.fromDraft(result));
+                                                } else {
+                                                    return Mono.empty();
+                                                }
+                                            });
+                                } else {
+                                    return Mono.empty();
+                                }
+                            });
                 });
     }
 
     @Override
     public Mono<PostDto> delete(AuthDto authDto, PostDto dto) {
-        return postRepo.findById(dto.getId())
-                .flatMap((Function<Post, Mono<PostDto>>) post -> {
+        return postDraftRepo.findById(dto.getId())
+                .flatMap((Function<PostDraft, Mono<PostDto>>) post -> {
                     post.setDeletedBy(authDto.getId());
                     post.setDeletedAt(new Date());
-                    return postRepo
+                    post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
+                    return postDraftRepo
                             .save(post)
-                            .map(result -> postAssembler.fromEntity(result));
+                            .map(result -> postAssembler.fromDraft(result));
                 });
     }
 
     @Override
     public Flux<PostDto> find(AuthDto authDto, PostDto dto, Pageable pageable) {
-        return postRepo.find(authDto, dto, pageable)
-                .map(post -> postAssembler.fromEntity(post));
+        return postDraftRepo.find(authDto, dto, pageable)
+                .map(post -> postAssembler.fromDraft(post));
+    }
+
+    @Override
+    public Mono<PostDto> publish(AuthDto session, IdRequest id) {
+        return postDraftRepo.findById(id.getId())
+                .flatMap(postDraft -> {
+                    Post newPost = postAssembler.fromDto(postAssembler.fromDraft(postDraft));
+                    newPost.setCreatedAt(new Date());
+                    newPost.setCreatedBy(session.getId());
+                    return postRepo.findById(id.getId())
+                            .defaultIfEmpty(newPost)
+                            .flatMap(post -> {
+                                Set<Author> authors = post.getAuthors() == null ? new HashSet<>() : post.getAuthors();
+                                if (authors.stream().map(Author::getName).noneMatch(name -> name.equals(session.getFullName()))) {
+                                    Author author = new Author();
+                                    author.setName(session.getFullName());
+                                    author.setModifiedAt(new Date());
+                                    authors.add(author);
+                                }
+                                post.setAuthors(authors);
+                                post.setModifiedAt(new Date());
+                                post.setModifiedBy(session.getId());
+                                return postRepo.save(post)
+                                        .flatMap(saved -> {
+                                            postDraft.setStatus(Arrays.asList(PUBLISHED).stream().collect(Collectors.toSet()));
+                                            return postDraftRepo.save(postDraft)
+                                                    .map(result -> {
+                                                        return postAssembler.fromEntity(saved);
+                                                    });
+                                        });
+                            });
+                });
     }
 }

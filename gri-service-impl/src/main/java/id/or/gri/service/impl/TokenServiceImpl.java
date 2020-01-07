@@ -1,12 +1,16 @@
 package id.or.gri.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import id.or.gri.assembler.AuthAssembler;
+import id.or.gri.domain.Auth;
+import id.or.gri.domain.model.Token;
 import id.or.gri.model.AuthDto;
 import id.or.gri.model.request.RefreshTokenRequest;
 import id.or.gri.model.request.TokenRequest;
 import id.or.gri.model.response.TokenResponse;
 import id.or.gri.service.AuthService;
 import id.or.gri.service.TokenService;
+import id.or.gri.service.repository.AuthRepo;
 import id.or.gri.service.util.Crypto;
 import id.or.gri.service.util.Json;
 import id.or.gri.service.util.TokenInfo;
@@ -17,9 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -31,12 +34,16 @@ public class TokenServiceImpl implements TokenService {
     private static final String SESSION_ID = "sid";
     private static final String ESID = "esid";
 
+    private final AuthAssembler authAssembler;
+    private final AuthRepo authRepo;
     private final AuthService authService;
     private final TokenInfo tokenInfo;
     private final Json json;
     private final Crypto crypto;
 
-    public TokenServiceImpl(AuthService authService, TokenInfo tokenInfo, Json json, Crypto crypto) {
+    public TokenServiceImpl(AuthAssembler authAssembler, AuthRepo authRepo, AuthService authService, TokenInfo tokenInfo, Json json, Crypto crypto) {
+        this.authAssembler = authAssembler;
+        this.authRepo = authRepo;
         this.authService = authService;
         this.tokenInfo = tokenInfo;
         this.json = json;
@@ -49,32 +56,51 @@ public class TokenServiceImpl implements TokenService {
         if (token == null) {
             return Mono.empty();
         }
-        Claims claims = getClaims(token);
-        if (claims == null) {
+        return getAccessTokenClaims(token).flatMap(claims -> {
+            if (claims != null) {
+                if (claims.containsKey(USERNAME)) {
+                    log.info("You are using refresh token, please provide access token instead.");
+                    return Mono.empty();
+                }
+                try {
+                    String base64Json = claims.get(SESSION_ATTRIBUTE, String.class);
+                    String jsonString = new String(Base64.getDecoder().decode(base64Json));
+                    AuthDto authDto = json.readValue(jsonString, new TypeReference<AuthDto>() {
+                    });
+                    return Mono.just(authDto);
+                } catch (Exception e) {
+                    return Mono.empty();
+                }
+            }
             return Mono.empty();
-        }
-
-        if (claims.containsKey(USERNAME)) {
-            log.info("You are using refresh token, please provide access token instead.");
-            return Mono.empty();
-        }
-
-        try {
-            String base64Json = claims.get(SESSION_ATTRIBUTE, String.class);
-            String jsonString = new String(Base64.getDecoder().decode(base64Json));
-            AuthDto authDto = json.readValue(jsonString, new TypeReference<AuthDto>() {
-            });
-            return Mono.just(authDto);
-        } catch (Exception e) {
-            return Mono.empty();
-        }
+        });
     }
 
     @Override
     public Mono<TokenResponse> encode(TokenRequest tokenRequest) {
-        return authService.findByUsername(tokenRequest.getUsername()).map(authDto -> {
-            return doEncode(authDto);
-        }).defaultIfEmpty(new TokenResponse("", "", ""));
+        return authRepo.findByUsername(tokenRequest.getUsername()).flatMap(auth -> {
+            if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
+                if (auth.getTokens() == null || auth.getTokens().size() < tokenInfo.getMax()) {
+                    return doEncode(authAssembler.fromEntity(auth))
+                            .flatMap(tokenResponse -> {
+                                if (auth.getTokens() == null) {
+                                    auth.setTokens(new HashSet<>());
+                                }
+                                auth.getTokens()
+                                        .add(new Token(tokenResponse.getAccessToken(),
+                                                tokenResponse.getRefreshToken(),
+                                                tokenResponse.getTokenType()));
+                                return authRepo.save(auth).map(response -> {
+                                    return tokenResponse;
+                                });
+                            });
+                } else {
+                    return Mono.empty();
+                }
+            } else {
+                return doEncode(authAssembler.fromEntity(auth));
+            }
+        });
     }
 
     @Override
@@ -83,21 +109,50 @@ public class TokenServiceImpl implements TokenService {
         if (token == null) {
             return Mono.empty();
         }
-
-        Claims claims = getClaims(token);
-        if (claims == null) {
-            return Mono.empty();
-        }
-
-        if (!claims.containsKey(USERNAME)) {
-            log.info("Invalid refresh token, maybe access token.");
-            return Mono.empty();
-        }
-
-        return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
+        return getRefreshTokenClaims(token).flatMap(claims -> {
+            if (claims != null) {
+                if (!claims.containsKey(USERNAME)) {
+                    log.info("Invalid refresh token, maybe access token.");
+                    return Mono.empty();
+                }
+                return authRepo.findByRefreshTokenAndTokenType(AuthDto.builder().build(), token, TOKEN_TYPE)
+                        .flatMap(auth -> {
+                            auth.getTokens().removeIf(o -> {
+                                return o.getRefreshToken().equals(token);
+                            });
+                            return authRepo.save(auth)
+                                    .flatMap(saved -> {
+                                        return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
+                                    });
+                        });
+            } else {
+                return Mono.empty();
+            }
+        });
     }
 
-    private TokenResponse doEncode(AuthDto authDto) {
+    @Override
+    public Mono<String> destroy(TokenResponse tokenResponse) {
+        if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
+            return authRepo.findByAccessTokenAndRefreshTokenAndTokenType(AuthDto.builder().build(), tokenResponse)
+                    .flatMap(auth -> {
+                        auth.getTokens().removeIf(token -> {
+                            if (token.getAccessToken().equals(tokenResponse.getAccessToken())
+                                    && token.getRefreshToken().equals(tokenResponse.getRefreshToken())
+                                    && token.getTokenType().equals(tokenResponse.getTokenType())) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        });
+                        return authRepo.save(auth).map(saved -> "Success");
+                    }).onErrorReturn("Failed");
+        } else {
+            return Mono.just("Not supported");
+        }
+    }
+
+    private Mono<TokenResponse> doEncode(AuthDto authDto) {
         try {
             String base64Json = Base64.getEncoder().encodeToString(json.writeValueAsString(authDto).getBytes("UTF-8"));
             String sessionId = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes("UTF-8"));
@@ -123,15 +178,35 @@ public class TokenServiceImpl implements TokenService {
                     .claim(SESSION_ID, sessionId)
                     .claim(ESID, esid)
                     .compact();
-            return new TokenResponse(accessToken, refreshToken, TOKEN_TYPE);
+            return Mono.just(new TokenResponse(accessToken, refreshToken, TOKEN_TYPE));
         } catch (Exception e) {
-            return new TokenResponse("", "", "");
+            return Mono.empty();
         }
     }
 
-    private Claims getClaims(String token) {
+    private Mono<Claims> getAccessTokenClaims(String token) {
         if (token == null) {
             return null;
+        }
+        if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
+            return validateAccessTokenState(token);
+        }
+        return validate(token);
+    }
+
+    private Mono<Claims> getRefreshTokenClaims(String token) {
+        if (token == null) {
+            return null;
+        }
+        if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
+            return validateRefreshTokenState(token);
+        }
+        return validate(token);
+    }
+
+    private Mono<Claims> validate(String token) {
+        if (token == null) {
+            return Mono.empty();
         }
         Claims claims;
         try {
@@ -141,12 +216,12 @@ public class TokenServiceImpl implements TokenService {
                     .getBody();
         } catch (Exception e) {
             log.info("Invalid token, couldn't extract token: {}", e);
-            return null;
+            return Mono.empty();
         }
 
         if (claims == null) {
             log.info("Invalid token: couldn't extract token");
-            return null;
+            return Mono.empty();
         }
 
         String sessionId = claims.get(SESSION_ID, String.class);
@@ -156,18 +231,18 @@ public class TokenServiceImpl implements TokenService {
             esid = crypto.decrypt(Base64.getDecoder().decode(claims.get(ESID, String.class)));
         } catch (Exception e) {
             log.info("Couldn't decrypt token session ID.");
-            return null;
+            return Mono.empty();
         }
 
         if (!sessionId.equals(esid)) {
             log.info("Invalid token session ID.");
-            return null;
+            return Mono.empty();
         }
 
         String clientIssuer = claims.getIssuer();
         if (!clientIssuer.equals(tokenInfo.getIssuer())) {
             log.info("Invalid issuer: {}", clientIssuer);
-            return null;
+            return Mono.empty();
         }
 
         Date issuedAt = claims.getIssuedAt();
@@ -176,8 +251,38 @@ public class TokenServiceImpl implements TokenService {
 
         if (expiration.after(now) && expiration.before(issuedAt)) {
             log.info("Token expired at {} ", expiration);
-            return null;
+            return Mono.empty();
         }
-        return claims;
+        return Mono.just(claims);
+    }
+
+    private Mono<Claims> validateAccessTokenState(String accessToken) {
+        return authRepo.findByAccessTokenAndType(AuthDto.builder().build(), accessToken, TOKEN_TYPE).flatMap(auth -> {
+            Set<Token> tokens = auth.getTokens().stream().filter(token -> {
+                return validate(token.getAccessToken()) != null;
+            }).collect(Collectors.toSet());
+            if (auth.getTokens().size() == tokens.size()) {
+                return validate(accessToken);
+            }
+            auth.setTokens(tokens);
+            return authRepo.save(auth).map(Auth::getTokens).flatMap(token -> {
+                return validate(accessToken);
+            });
+        });
+    }
+
+    private Mono<Claims> validateRefreshTokenState(String accessToken) {
+        return authRepo.findByRefreshTokenAndTokenType(AuthDto.builder().build(), accessToken, TOKEN_TYPE).flatMap(auth -> {
+            Set<Token> tokens = auth.getTokens().stream().filter(token -> {
+                return validate(token.getAccessToken()) != null;
+            }).collect(Collectors.toSet());
+            if (auth.getTokens().size() == tokens.size()) {
+                return validate(accessToken);
+            }
+            auth.setTokens(tokens);
+            return authRepo.save(auth).map(Auth::getTokens).flatMap(token -> {
+                return validate(accessToken);
+            });
+        });
     }
 }

@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class DateTimeUtils {
 
-    private static final String PATTERN = "dd-MM-yyyy";
+    private static final String PATTERN = "dd-MM-yyyy hh:mm:ss";
 
     public static String toString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat(PATTERN);

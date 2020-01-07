@@ -14,4 +14,6 @@ public interface TokenService {
 
     Mono<TokenResponse> refresh(RefreshTokenRequest tokenResponse);
 
+    Mono<String> destroy(TokenResponse tokenResponse);
+
 }

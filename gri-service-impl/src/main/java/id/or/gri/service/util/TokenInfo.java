@@ -17,5 +17,6 @@ public class TokenInfo {
     private Long accessTokenExparation;
     private Long refreshTokenExparation;
     private String secret;
+    private Long max;
 
 }

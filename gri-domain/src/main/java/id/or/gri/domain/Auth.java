@@ -1,6 +1,7 @@
 package id.or.gri.domain;
 
 import id.or.gri.domain.model.Email;
+import id.or.gri.domain.model.Token;
 import id.or.gri.domain.validator.EmailCollection;
 import id.or.gri.domain.validator.Password;
 import lombok.*;
@@ -43,5 +44,8 @@ public class Auth extends Audit {
     @NotEmpty
     @EmailCollection(message = "Invalid email")
     private Set<Email> emails;
+
+    @NotNull
+    private Set<Token> tokens;
 
 }
