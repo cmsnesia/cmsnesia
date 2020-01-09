@@ -113,7 +113,7 @@
     </springProfile>
 
     <springProfile name="dev">
-        <root level="debug">
+        <root level="warn">
             <appender-ref ref="FILE_ERROR"/>
             <appender-ref ref="FILE_DEBUG"/>
         </root>

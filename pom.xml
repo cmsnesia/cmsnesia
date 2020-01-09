@@ -43,26 +43,26 @@
     </modules>
 
     <repositories>
-        <repository>
-            <id>sinergi-bumn-release</id>
-            <url>http://nexus.doitlab.com/repository/sinergi-bumn-release/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sinergi-bumn-snapshot</id>
-            <url>http://nexus.doitlab.com/repository/sinergi-bumn-snapshot/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+<!--        <repository>-->
+<!--            <id>sinergi-bumn-release</id>-->
+<!--            <url>http://nexus.doitlab.com/repository/sinergi-bumn-release/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>sinergi-bumn-snapshot</id>-->
+<!--            <url>http://nexus.doitlab.com/repository/sinergi-bumn-snapshot/</url>-->
+<!--            <releases>-->
+<!--                <enabled>false</enabled>-->
+<!--            </releases>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
         <repository>
             <id>jforg-snapshot</id>
             <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>

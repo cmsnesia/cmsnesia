@@ -1,3 +1,11 @@
 .idea
 gri.logging.path_IS_UNDEFINED
 *.iml
+target
+gri-model/target
+gri-domain/target
+gri-assembler/target
+gri-service-spec/target
+gri-service-impl/target
+gri-web/target
+gri-tests/target
