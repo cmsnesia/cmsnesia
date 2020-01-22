@@ -12,19 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04]
-        java: [13]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-          architecture: x64
       - name: build
         run: |
-          ./mvnw clean package -DskipTests -Pdocker
+          docker build -t ardikars/gri-web:latest .
           docker image tag ardikars/gri-web:latest registry.heroku.com/gri-web/web:latest
           docker images
       - name: login
