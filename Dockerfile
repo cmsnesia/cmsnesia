@@ -4,8 +4,8 @@ WORKDIR /workspace
 COPY . .
 RUN mvn -e -B clean package -DskipTests
 
-FROM openjdk:14-jdk-alpine
-#FROM openjdk:8-jre-alpine
+#FROM openjdk:14-jdk-alpine
+FROM openjdk:8-jre-alpine
 
 LABEL APP="gri-web"
 LABEL DOMAIN="gri"
@@ -17,4 +17,4 @@ WORKDIR /app
 
 COPY --from=builder /workspace/gri-web/target/gri-web-*.jar /app/gri-web.jar
 
-ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "/app/gri-web.jar"]
+ENTRYPOINT ["java", "-jar", "/app/gri-web.jar"]
