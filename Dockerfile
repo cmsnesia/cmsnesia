@@ -4,8 +4,8 @@ WORKDIR /workspace
 COPY . .
 RUN mvn -e -B clean package -DskipTests
 
-#FROM openjdk:14-jdk-alpine
-FROM openjdk:8-jre-alpine
+FROM openjdk:14-jdk-alpine
+#FROM openjdk:8-jre-alpine
 
 LABEL APP="gri-web"
 LABEL DOMAIN="gri"

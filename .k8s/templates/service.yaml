@@ -1,16 +1,19 @@
 apiVersion: v1
-kind: Service
+
+kind: "Service"
 metadata:
-  name: {{ include ".k8s.fullname" . }}
   labels:
-{{ include ".k8s.labels" . | indent 4 }}
+    app: "gri-web"
+    version: "1.0.0-SNAPSHOT"
+    group: "id.or.gri"
+  name: "gri-web"
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - name: "http"
+      port: 8080
+      targetPort: 8080
   selector:
-    app.kubernetes.io/name: {{ include ".k8s.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app: "gri-web-exposed"
+    version: "1.0.0-SNAPSHOT"
+    group: "id.or.gri"
+  type: "LoadBalancer"

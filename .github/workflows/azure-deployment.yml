@@ -1,0 +1,44 @@
+name: 'Azure deployment'
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy:
+    name: 'Azure deployment'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: build
+        run: |
+          docker build -t ardikars/gri-web:1.0.1-SNAPSHOT .
+          docker image tag ardikars/gri-web:1.0.1-SNAPSHOT ardikarscr.azurecr.io/ardikars/gri-web:latest
+      - name: login
+        run: |
+          docker login --username=${{ secrets.AZURE_CR_USERNAME }} --password=${{ secrets.AZURE_CR_PASSWORD }} ardikarscr.azurecr.io
+      - name: push
+        run: |
+          docker push ardikarscr.azurecr.io/ardikars/gri-web:latest
+      - name: Deploy
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az aks install-cli
+            az aks get-credentials --resource-group ardikars-rg --name ardikars-app
+            kubectl get nodes
+            kubectl apply -f .k8s/templates/deployment.yaml
+            kubectl apply -f .k8s/templates/service.yaml
+

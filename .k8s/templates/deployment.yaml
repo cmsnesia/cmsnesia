@@ -1,52 +1,38 @@
 apiVersion: apps/v1
-kind: Deployment
+
+kind: "Deployment"
 metadata:
-  name: {{ include ".k8s.fullname" . }}
   labels:
-{{ include ".k8s.labels" . | indent 4 }}
+    app: "gri-web"
+    version: "1.0.0-SNAPSHOT"
+    group: "id.or.gri"
+  name: "gri-web"
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include ".k8s.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app: "gri-web-exposed"
+      version: "1.0.0-SNAPSHOT"
+      group: "id.or.gri"
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include ".k8s.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app: "gri-web-exposed"
+        version: "1.0.0-SNAPSHOT"
+        group: "id.or.gri"
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - env:
+            - name: "KUBERNETES_NAMESPACE"
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.namespace"
+          imagePullPolicy: "IfNotPresent"
+          name: "gri-web"
+          image: "ardikarscr.azurecr.io/ardikars/gri-web:latest"
           ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+            - containerPort: 8080
+              name: "http"
+              protocol: "TCP"
+      imagePullSecrets:
+        - name: regcred
