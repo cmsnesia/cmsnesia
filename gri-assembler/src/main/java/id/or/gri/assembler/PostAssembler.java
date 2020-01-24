@@ -2,15 +2,15 @@ package id.or.gri.assembler;
 
 import id.or.gri.domain.Post;
 import id.or.gri.domain.PostDraft;
+import id.or.gri.domain.model.Category;
 import id.or.gri.domain.model.Tag;
+import id.or.gri.model.CategoryDto;
 import id.or.gri.model.PostDto;
 import id.or.gri.model.TagDto;
 import id.or.gri.model.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,13 +22,10 @@ public class PostAssembler implements Assembler<Post, PostDto> {
 
     private final AuthorAssembler authorAssembler;
     private final MediaAssembler mediaAssembler;
-    private final CategoryAssembler categoryAssembler;
 
-    public PostAssembler(AuthorAssembler authorAssembler, MediaAssembler mediaAssembler,
-                         CategoryAssembler categoryAssembler) {
+    public PostAssembler(AuthorAssembler authorAssembler, MediaAssembler mediaAssembler) {
         this.authorAssembler = authorAssembler;
         this.mediaAssembler = mediaAssembler;
-        this.categoryAssembler = categoryAssembler;
     }
 
     @Nonnull
@@ -48,7 +45,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
                 .authors(dto.getAuthors() == null ? new HashSet<>() : authorAssembler.fromDto(dto.getAuthors()))
                 .medias(dto.getMedias() == null ? new HashSet<>() : mediaAssembler.fromDto(dto.getMedias()))
                 .tags(tags)
-                .categories(dto.getCategories() == null ? new HashSet<>() : categoryAssembler.fromDto(dto.getCategories()))
+                .categories(fromDto(dto.getCategories()))
                 .viewCount(dto.getViewCount())
                 .likeCount(dto.getLikeCount())
                 .dislikeCount(dto.getDislikeCount())
@@ -99,7 +96,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
                 .content(postDraft.getContent())
                 .medias(mediaAssembler.fromEntity(postDraft.getMedias()))
                 .tags(tagDtos)
-                .categories(categoryAssembler.fromEntity(postDraft.getCategories()))
+                .categories(fromModel(postDraft.getCategories()))
                 .build();
     }
 
@@ -117,8 +114,26 @@ public class PostAssembler implements Assembler<Post, PostDto> {
                 .content(postDto.getContent())
                 .medias(mediaAssembler.fromDto(postDto.getMedias()))
                 .tags(tags)
-                .categories(categoryAssembler.fromDto(postDto.getCategories()))
+                .categories(fromDto(postDto.getCategories()))
                 .build();
+    }
+
+    private Set<Category> fromDto(Set<CategoryDto> categoryDtos) {
+        return categoryDtos.stream().map(categoryDto -> {
+            return Category.builder()
+                    .id(categoryDto.getId())
+                    .name(categoryDto.getName())
+                    .build();
+        }).collect(Collectors.toSet());
+    }
+
+    private Set<CategoryDto> fromModel(Set<Category> categories) {
+        return categories.stream().map(category -> {
+            return CategoryDto.builder()
+                    .id(category.getId())
+                    .name(category.getName())
+                    .build();
+        }).collect(Collectors.toSet());
     }
 
 //    public PostDraft toDraft(PostDto postDto) {

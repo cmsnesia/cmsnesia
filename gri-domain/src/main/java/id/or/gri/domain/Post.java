@@ -1,6 +1,7 @@
 package id.or.gri.domain;
 
 import id.or.gri.domain.model.Author;
+import id.or.gri.domain.model.Category;
 import id.or.gri.domain.model.Media;
 import id.or.gri.domain.model.Tag;
 import lombok.*;
