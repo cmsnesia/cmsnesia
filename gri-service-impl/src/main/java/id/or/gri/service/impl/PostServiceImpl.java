@@ -4,6 +4,7 @@ import id.or.gri.assembler.PostAssembler;
 import id.or.gri.domain.Post;
 import id.or.gri.domain.PostDraft;
 import id.or.gri.domain.model.Author;
+import id.or.gri.domain.model.enums.PostStatus;
 import id.or.gri.model.AuthDto;
 import id.or.gri.model.CategoryDto;
 import id.or.gri.model.PostDto;
@@ -25,9 +26,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class PostServiceImpl implements PostService {
-
-    private static String UNPUBLISHED = "UNPUBLISHED";
-    private static String PUBLISHED = "PUBLISHED";
 
     private final PostAssembler postAssembler;
     private final PostRepo postRepo;
@@ -51,7 +49,7 @@ public class PostServiceImpl implements PostService {
 
         post.setCreatedBy(authDto.getId());
         post.setCreatedAt(new Date());
-        post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
+        post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
 
         return tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet()))
                 .flatMap(tagIsExist -> {
@@ -75,7 +73,7 @@ public class PostServiceImpl implements PostService {
         return postDraftRepo.findById(dto.getId())
                 .flatMap((Function<PostDraft, Mono<PostDto>>) post -> {
                     PostDraft save = postAssembler.fromPostDto(dto);
-                    post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
+                    post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
                     save.audit(post);
 
                     save.setModifiedBy(authDto.getId());
@@ -105,7 +103,7 @@ public class PostServiceImpl implements PostService {
                 .flatMap((Function<PostDraft, Mono<PostDto>>) post -> {
                     post.setDeletedBy(authDto.getId());
                     post.setDeletedAt(new Date());
-                    post.setStatus(Arrays.asList(UNPUBLISHED).stream().collect(Collectors.toSet()));
+                    post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
                     return postDraftRepo
                             .save(post)
                             .map(result -> postAssembler.fromDraft(result));
@@ -114,8 +112,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Flux<PostDto> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+        return postRepo.find(authDto, dto, pageable)
+                .map(post -> postAssembler.fromEntity(post));
+    }
+
+    @Override
+    public Flux<PostDto> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
         return postDraftRepo.find(authDto, dto, pageable)
-                .map(post -> postAssembler.fromDraft(post));
+                .map(postDraft -> postAssembler.fromDraft(postDraft));
     }
 
     @Override
@@ -142,7 +146,7 @@ public class PostServiceImpl implements PostService {
                                 exitingPost.setModifiedBy(session.getId());
                                 return postRepo.save(exitingPost)
                                         .flatMap(saved -> {
-                                            postDraft.setStatus(Arrays.asList(PUBLISHED).stream().collect(Collectors.toSet()));
+                                            postDraft.setStatus(Arrays.asList(PostStatus.PUBLISHED).stream().collect(Collectors.toSet()));
                                             return postDraftRepo.save(postDraft)
                                                     .map(result -> {
                                                         return postAssembler.fromEntity(saved);

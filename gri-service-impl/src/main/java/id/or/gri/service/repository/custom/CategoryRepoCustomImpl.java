@@ -41,10 +41,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     private Query buildQuery(AuthDto authDto, CategoryDto dto) {
         Query query = new Query();
 
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("deletedAt").exists(false),
-                Criteria.where("deletedAt").is(null)
-        ));
+        query.addCriteria(Criteria.where("deletedAt").exists(false));
 
         if (!StringUtils.isEmpty(dto.getId())) {
             query.addCriteria(Criteria.where("id").is(dto.getId()));

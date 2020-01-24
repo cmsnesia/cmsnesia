@@ -1,6 +1,7 @@
 package id.or.gri.service.repository.custom;
 
 import id.or.gri.domain.PostDraft;
+import id.or.gri.domain.model.enums.PostStatus;
 import id.or.gri.model.AuthDto;
 import id.or.gri.model.PostDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,23 +38,21 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
     private Query buildQuery(AuthDto authDto, PostDto dto) {
         Query query = new Query();
 
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("deletedAt").exists(false),
-                Criteria.where("deletedAt").is(null)
-        ));
+        query.addCriteria(Criteria.where("deletedAt").exists(false));
+        query.addCriteria(Criteria.where("status").is(PostStatus.UNPUBLISHED));
 
         if (!StringUtils.isEmpty(dto.getId())) {
             query.addCriteria(Criteria.where("id").is(dto.getId()));
-        }
+        } else {
+            if (!StringUtils.isEmpty(dto.getTitle())) {
+                Pattern regex = Pattern.compile(dto.getTitle(), Pattern.CASE_INSENSITIVE);
+                query.addCriteria(Criteria.where("title").regex(regex));
+            }
 
-        if (!StringUtils.isEmpty(dto.getTitle())) {
-            Pattern regex = Pattern.compile(dto.getTitle(), Pattern.CASE_INSENSITIVE);
-            query.addCriteria(Criteria.where("title").regex(regex));
-        }
-
-        if (!StringUtils.isEmpty(dto.getContent())) {
-            Pattern regex = Pattern.compile(dto.getContent(), Pattern.CASE_INSENSITIVE);
-            query.addCriteria(Criteria.where("content").regex(regex));
+            if (!StringUtils.isEmpty(dto.getContent())) {
+                Pattern regex = Pattern.compile(dto.getContent(), Pattern.CASE_INSENSITIVE);
+                query.addCriteria(Criteria.where("content").regex(regex));
+            }
         }
 
         return query;

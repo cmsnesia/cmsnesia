@@ -37,27 +37,24 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     private Query buildQuery(AuthDto authDto, PostDto dto) {
         Query query = new Query();
 
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("deletedAt").exists(false),
-                Criteria.where("deletedAt").is(null)
-        ));
+        query.addCriteria(Criteria.where("deletedAt").exists(false));
 
         if (!StringUtils.isEmpty(dto.getId())) {
             query.addCriteria(Criteria.where("id").is(dto.getId()));
-        }
+        } else {
+            if (!StringUtils.isEmpty(dto.getTitle())) {
+                Pattern regex = Pattern.compile(dto.getTitle(), Pattern.CASE_INSENSITIVE);
+                query.addCriteria(Criteria.where("title").regex(regex));
+            }
 
-        if (!StringUtils.isEmpty(dto.getTitle())) {
-            Pattern regex = Pattern.compile(dto.getTitle(), Pattern.CASE_INSENSITIVE);
-            query.addCriteria(Criteria.where("title").regex(regex));
-        }
+            if (!StringUtils.isEmpty(dto.getContent())) {
+                Pattern regex = Pattern.compile(dto.getContent(), Pattern.CASE_INSENSITIVE);
+                query.addCriteria(Criteria.where("content").regex(regex));
+            }
 
-        if (!StringUtils.isEmpty(dto.getContent())) {
-            Pattern regex = Pattern.compile(dto.getContent(), Pattern.CASE_INSENSITIVE);
-            query.addCriteria(Criteria.where("content").regex(regex));
-        }
-
-        if (dto.getAuthors() != null && !dto.getAuthors().isEmpty()) {
-            query.addCriteria(Criteria.where("authors").in(dto.getAuthors()));
+            if (dto.getAuthors() != null && !dto.getAuthors().isEmpty()) {
+                query.addCriteria(Criteria.where("authors").in(dto.getAuthors()));
+            }
         }
 
         return query;

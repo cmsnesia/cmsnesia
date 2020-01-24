@@ -65,6 +65,36 @@ public class PostController {
                 });
     }
 
+    @PostMapping("/findDraft")
+    @ApiOperation(
+            value = "List draft",
+            response = AuthDto.class,
+            notes = "Flux [PostDto]")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = ConstantKeys.AUTHORIZATION,
+                    paramType = "header",
+                    dataType = "string"),
+            @ApiImplicitParam(
+                    name = ConstantKeys.PAGE,
+                    defaultValue = "0",
+                    paramType = "query",
+                    dataType = "integer"),
+            @ApiImplicitParam(
+                    name = ConstantKeys.SIZE,
+                    defaultValue = "10",
+                    paramType = "query",
+                    dataType = "integer")
+    })
+    public Flux<PostDto> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMapMany(session -> {
+                    return postService.findDraft(session, postDto, org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
+                });
+    }
+
     @ApiOperation(
             value = "Add post",
             response = AuthDto.class,
