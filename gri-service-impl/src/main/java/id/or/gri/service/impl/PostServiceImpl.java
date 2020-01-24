@@ -135,10 +135,12 @@ public class PostServiceImpl implements PostService {
                                     author.setModifiedAt(new Date());
                                     authors.add(author);
                                 }
-                                post.setAuthors(authors);
-                                post.setModifiedAt(new Date());
-                                post.setModifiedBy(session.getId());
-                                return postRepo.save(post)
+                                Post exitingPost = postAssembler.fromDto(postAssembler.fromDraft(postDraft));
+                                exitingPost.setAuthors(authors);
+                                exitingPost.audit(post);
+                                exitingPost.setModifiedAt(new Date());
+                                exitingPost.setModifiedBy(session.getId());
+                                return postRepo.save(exitingPost)
                                         .flatMap(saved -> {
                                             postDraft.setStatus(Arrays.asList(PUBLISHED).stream().collect(Collectors.toSet()));
                                             return postDraftRepo.save(postDraft)
