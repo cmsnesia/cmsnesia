@@ -149,4 +149,25 @@ public class PostController {
                     return postService.delete(session, dto);
                 });
     }
+
+    @ApiOperation(
+            value = "Publish post",
+            response = AuthDto.class,
+            notes = "Mono [PostDto]")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = ConstantKeys.AUTHORIZATION,
+                    paramType = "header",
+                    dataType = "string")
+    })
+    @PutMapping("/publish")
+    public Mono<PostDto> publish(@RequestBody IdRequest idRequest) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(session -> {
+                    return postService.publish(session, idRequest);
+                });
+    }
+
 }
