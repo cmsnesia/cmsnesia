@@ -7,6 +7,8 @@ metadata:
     version: "1.0.0-SNAPSHOT"
     group: "id.or.gri"
   name: "gri-web"
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: ardikars-rg
 spec:
   ports:
     - name: "http"
@@ -17,3 +19,4 @@ spec:
     version: "1.0.0-SNAPSHOT"
     group: "id.or.gri"
   type: "LoadBalancer"
+  loadBalancerIP: 52.149.172.233
