@@ -56,10 +56,7 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
     private Query buildQuery(AuthDto authDto, AuthDto dto, String accessToken, String refreshToken, String tokenType) {
         Query query = new Query();
 
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("deletedAt").exists(false),
-                Criteria.where("deletedAt").is(null)
-        ));
+        query.addCriteria(Criteria.where("deletedAt").exists(false));
 
         if (!StringUtils.isEmpty(dto.getUsername())) {
             query.addCriteria(Criteria.where("username").is(dto.getUsername()));

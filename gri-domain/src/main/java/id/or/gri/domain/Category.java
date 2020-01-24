@@ -2,6 +2,7 @@ package id.or.gri.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class Category extends Audit {
 
     @NotBlank(message = "Category name must be not blank")
     @Size(max = 50)
+    @Indexed(unique = true)
     private String name;
 
 }
