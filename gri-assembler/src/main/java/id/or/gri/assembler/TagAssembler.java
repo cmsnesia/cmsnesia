@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@Deprecated
 public class TagAssembler implements Assembler<Tag, TagDto> {
 
     @Nonnull

@@ -4,15 +4,14 @@ import id.or.gri.assembler.PostAssembler;
 import id.or.gri.domain.Post;
 import id.or.gri.domain.PostDraft;
 import id.or.gri.domain.model.Author;
+import id.or.gri.domain.model.Tag;
 import id.or.gri.domain.model.enums.PostStatus;
 import id.or.gri.model.AuthDto;
 import id.or.gri.model.CategoryDto;
 import id.or.gri.model.PostDto;
-import id.or.gri.model.TagDto;
 import id.or.gri.model.request.IdRequest;
 import id.or.gri.service.CategoryService;
 import id.or.gri.service.PostService;
-import id.or.gri.service.TagService;
 import id.or.gri.service.repository.PostDraftRepo;
 import id.or.gri.service.repository.PostRepo;
 import org.springframework.data.domain.Pageable;
@@ -30,14 +29,12 @@ public class PostServiceImpl implements PostService {
     private final PostAssembler postAssembler;
     private final PostRepo postRepo;
     private final PostDraftRepo postDraftRepo;
-    private final TagService tagService;
     private final CategoryService categoryService;
 
-    public PostServiceImpl(PostAssembler postAssembler, PostRepo postRepo, PostDraftRepo postDraftRepo, TagService tagService, CategoryService categoryService) {
+    public PostServiceImpl(PostAssembler postAssembler, PostRepo postRepo, PostDraftRepo postDraftRepo, CategoryService categoryService) {
         this.postAssembler = postAssembler;
         this.postRepo = postRepo;
         this.postDraftRepo = postDraftRepo;
-        this.tagService = tagService;
         this.categoryService = categoryService;
     }
 
@@ -51,17 +48,13 @@ public class PostServiceImpl implements PostService {
         post.setCreatedAt(new Date());
         post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
 
-        return tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet()))
-                .flatMap(tagIsExist -> {
-                    if (tagIsExist != null && tagIsExist) {
-                        return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
-                                .flatMap(categotyIsExist -> {
-                                    if (categotyIsExist != null && categotyIsExist) {
-                                        return postDraftRepo.save(post).map(postAssembler::fromDraft);
-                                    } else {
-                                        return Mono.empty();
-                                    }
-                                });
+        post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+
+        return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+                .flatMap(categotyIsExist -> {
+                    if (categotyIsExist != null && categotyIsExist) {
+                        post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                        return postDraftRepo.save(post).map(postAssembler::fromDraft);
                     } else {
                         return Mono.empty();
                     }
@@ -73,23 +66,30 @@ public class PostServiceImpl implements PostService {
         return postDraftRepo.findById(dto.getId())
                 .flatMap((Function<PostDraft, Mono<PostDto>>) post -> {
                     PostDraft save = postAssembler.fromPostDto(dto);
+
                     post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
+
                     save.audit(post);
 
                     save.setModifiedBy(authDto.getId());
                     save.setModifiedAt(new Date());
 
-                    return tagService.exists(dto.getTags().stream().map(TagDto::getId).collect(Collectors.toSet()))
-                            .flatMap(tagIsExist -> {
-                                if (tagIsExist != null && tagIsExist) {
-                                    return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
-                                            .flatMap(categotyIsExist -> {
-                                                if (categotyIsExist != null && categotyIsExist) {
-                                                    return postDraftRepo.save(save).map(result -> postAssembler.fromDraft(result));
-                                                } else {
-                                                    return Mono.empty();
-                                                }
-                                            });
+                    Set<Tag> tags = new HashSet<>();
+                    save.getTags().forEach(tag -> {
+                        post.getTags().forEach(existing -> {
+                            if (!(tag.getName().equals(existing.getName())
+                                    && tag.getCreatedBy().equals(existing.getCreatedBy()))) {
+                                tag.setCreatedBy(authDto.getId());
+                                tags.add(tag);
+                            }
+                        });
+                    });
+                    save.setTags(tags);
+
+                    return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+                            .flatMap(categotyIsExist -> {
+                                if (categotyIsExist != null && categotyIsExist) {
+                                    return postDraftRepo.save(save).map(result -> postAssembler.fromDraft(result));
                                 } else {
                                     return Mono.empty();
                                 }

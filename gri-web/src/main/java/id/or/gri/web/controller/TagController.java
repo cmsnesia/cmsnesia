@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "tag")
 @Api(value = "Tag API", tags = {"Tag"})
 @Slf4j
+@Deprecated
 public class TagController {
 
     private final TagService tagService;

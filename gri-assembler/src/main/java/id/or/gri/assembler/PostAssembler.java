@@ -2,11 +2,17 @@ package id.or.gri.assembler;
 
 import id.or.gri.domain.Post;
 import id.or.gri.domain.PostDraft;
+import id.or.gri.domain.model.Tag;
 import id.or.gri.model.PostDto;
+import id.or.gri.model.TagDto;
+import id.or.gri.model.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
+import java.text.ParseException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,27 +22,32 @@ public class PostAssembler implements Assembler<Post, PostDto> {
 
     private final AuthorAssembler authorAssembler;
     private final MediaAssembler mediaAssembler;
-    private final TagAssembler tagAssembler;
     private final CategoryAssembler categoryAssembler;
 
     public PostAssembler(AuthorAssembler authorAssembler, MediaAssembler mediaAssembler,
-                         TagAssembler tagAssembler, CategoryAssembler categoryAssembler) {
+                         CategoryAssembler categoryAssembler) {
         this.authorAssembler = authorAssembler;
         this.mediaAssembler = mediaAssembler;
-        this.tagAssembler = tagAssembler;
         this.categoryAssembler = categoryAssembler;
     }
 
     @Nonnull
     @Override
     public Post fromDto(@Nonnull PostDto dto) {
+        Set<Tag> tags = new HashSet<>();
+        if (dto.getTags() != null) {
+            tags.addAll(dto.getTags().stream().map(tagDto -> Tag.builder()
+                    .createdAt(new Date())
+                    .name(tagDto.getName())
+                    .build()).collect(Collectors.toSet()));
+        }
         return Post.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .authors(dto.getAuthors() == null ? new HashSet<>() : authorAssembler.fromDto(dto.getAuthors()))
                 .medias(dto.getMedias() == null ? new HashSet<>() : mediaAssembler.fromDto(dto.getMedias()))
-                .tags(dto.getTags() == null ? new HashSet<>() : tagAssembler.fromDto(dto.getTags()))
+                .tags(tags)
                 .categories(dto.getCategories() == null ? new HashSet<>() : categoryAssembler.fromDto(dto.getCategories()))
                 .viewCount(dto.getViewCount())
                 .likeCount(dto.getLikeCount())
@@ -74,23 +85,38 @@ public class PostAssembler implements Assembler<Post, PostDto> {
     }
 
     public PostDto fromDraft(PostDraft postDraft) {
+        Set<TagDto> tagDtos = new HashSet<>();
+        if (postDraft.getTags() != null) {
+            tagDtos.addAll(postDraft.getTags().stream().map(tag -> TagDto.builder()
+                    .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
+                    .createdBy(tag.getCreatedBy())
+                    .name(tag.getName())
+                    .build()).collect(Collectors.toSet()));
+        }
         return PostDto.builder()
                 .id(postDraft.getId())
                 .title(postDraft.getTitle())
                 .content(postDraft.getContent())
                 .medias(mediaAssembler.fromEntity(postDraft.getMedias()))
-                .tags(tagAssembler.fromEntity(postDraft.getTags()))
+                .tags(tagDtos)
                 .categories(categoryAssembler.fromEntity(postDraft.getCategories()))
                 .build();
     }
 
     public PostDraft fromPostDto(PostDto postDto) {
+        Set<Tag> tags = new HashSet<>();
+        if (postDto.getTags() != null) {
+            tags.addAll(postDto.getTags().stream().map(tagDto -> Tag.builder()
+                    .createdAt(new Date())
+                    .name(tagDto.getName())
+                    .build()).collect(Collectors.toSet()));
+        }
         return PostDraft.builder()
                 .id(postDto.getId())
                 .title(postDto.getTitle())
                 .content(postDto.getContent())
                 .medias(mediaAssembler.fromDto(postDto.getMedias()))
-                .tags(tagAssembler.fromDto(postDto.getTags()))
+                .tags(tags)
                 .categories(categoryAssembler.fromDto(postDto.getCategories()))
                 .build();
     }

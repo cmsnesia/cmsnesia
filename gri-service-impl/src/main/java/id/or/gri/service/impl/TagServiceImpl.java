@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Component
+@Deprecated
 public class TagServiceImpl implements TagService {
 
     private final TagAssembler tagAssembler;

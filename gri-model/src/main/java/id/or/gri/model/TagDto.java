@@ -15,5 +15,7 @@ public class TagDto implements Serializable {
 
     private String id;
     private String name;
+    private String createdAt;
+    private String createdBy;
 
 }

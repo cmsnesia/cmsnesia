@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class TagRepoCustomImpl implements TagRepoCustom {
 
     @Autowired

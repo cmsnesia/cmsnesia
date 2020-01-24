@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
+@Deprecated
 public interface TagRepoCustom {
 
     Flux<Tag> find(AuthDto authDto, TagDto dto, Pageable pageable);

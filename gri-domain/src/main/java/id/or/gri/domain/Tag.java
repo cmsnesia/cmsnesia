@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
 @Builder
 @Document(collection = "tag")
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class Tag extends Audit {
 
     @Id

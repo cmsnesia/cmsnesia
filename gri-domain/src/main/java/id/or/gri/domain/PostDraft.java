@@ -1,6 +1,7 @@
 package id.or.gri.domain;
 
 import id.or.gri.domain.model.Media;
+import id.or.gri.domain.model.Tag;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
