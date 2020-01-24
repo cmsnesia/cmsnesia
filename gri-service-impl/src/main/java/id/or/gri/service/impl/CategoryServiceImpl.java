@@ -69,7 +69,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Mono<Boolean> exists(Set<String> ids) {
+    public Mono<CategoryDto> findById(AuthDto session, String id) {
+        return categoryRepo.findById(id)
+                .map(category -> categoryAssembler.fromEntity(category));
+    }
+
+    @Override
+    public Mono<Boolean> exists(AuthDto session, Set<String> ids) {
         return categoryRepo.exists(ids);
     }
 }

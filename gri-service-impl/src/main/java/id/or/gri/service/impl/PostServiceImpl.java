@@ -50,7 +50,7 @@ public class PostServiceImpl implements PostService {
 
         post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
 
-        return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+        return categoryService.exists(authDto, dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
                 .flatMap(categotyIsExist -> {
                     if (categotyIsExist != null && categotyIsExist) {
                         post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
@@ -86,7 +86,7 @@ public class PostServiceImpl implements PostService {
                     });
                     save.setTags(tags);
 
-                    return categoryService.exists(dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+                    return categoryService.exists(authDto, dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
                             .flatMap(categotyIsExist -> {
                                 if (categotyIsExist != null && categotyIsExist) {
                                     return postDraftRepo.save(save).map(result -> postAssembler.fromDraft(result));
@@ -144,6 +144,13 @@ public class PostServiceImpl implements PostService {
                                 exitingPost.audit(post);
                                 exitingPost.setModifiedAt(new Date());
                                 exitingPost.setModifiedBy(session.getId());
+
+                                // blocking part
+                                exitingPost.getCategories().forEach(category -> {
+                                    CategoryDto categoryDto = categoryService.findById(session, category.getId()).block();
+                                    category.setName(categoryDto.getName());
+                                });
+
                                 return postRepo.save(exitingPost)
                                         .flatMap(saved -> {
                                             postDraft.setStatus(Arrays.asList(PostStatus.PUBLISHED).stream().collect(Collectors.toSet()));
