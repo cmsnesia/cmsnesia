@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = "id.or.gri")
-@EntityScan("id.or.gri")
-@EnableReactiveMongoRepositories("id.or.gri")
+@SpringBootApplication(scanBasePackages = "com.cmsnesia")
+@EntityScan("com.cmsnesia")
+@EnableReactiveMongoRepositories("com.cmsnesia")
 public class WebApplication {
 
     public static void main(String[] args) {
