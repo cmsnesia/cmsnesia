@@ -33,8 +33,8 @@ jobs:
 
       # Container build and push to a Azure Container registry (ACR)
       - run: |
-          docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/gri-web:${{ github.sha }}
-          docker push ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/gri-web:${{ github.sha }}
+          docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/cmsnesia-web:${{ github.sha }}
+          docker push ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/cmsnesia-web:${{ github.sha }}
 
       # Set the target Azure Kubernetes Service (AKS) cluster.
       - uses: azure/aks-set-context@v1
@@ -63,7 +63,7 @@ jobs:
             .k8s/templates/deployment.yaml
             .k8s/templates/service.yaml
           images: |
-            ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/gri-web:${{ github.sha }}
+            ${{ env.REGISTRY_NAME }}.azurecr.io/ardikars/cmsnesia-web:${{ github.sha }}
           imagepullsecrets: |
             ${{ env.REGISTRY_NAME }}-registry-connection
           namespace: ${{ env.NAMESPACE }}

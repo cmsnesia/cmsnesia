@@ -3,10 +3,10 @@ apiVersion: v1
 kind: "Service"
 metadata:
   labels:
-    app: "gri-web"
+    app: "cmsnesia-web"
     version: "1.0.0-SNAPSHOT"
-    group: "id.or.gri"
-  name: "gri-web"
+    group: "com.cmsnesia"
+  name: "cmsnesia-web"
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-resource-group: ardikars-rg
 spec:
@@ -15,8 +15,8 @@ spec:
       port: 8080
       targetPort: 8080
   selector:
-    app: "gri-web-exposed"
+    app: "cmsnesia-web-exposed"
     version: "1.0.0-SNAPSHOT"
-    group: "id.or.gri"
+    group: "com.cmsnesia"
   type: "LoadBalancer"
   loadBalancerIP: 52.149.172.233

@@ -3,23 +3,23 @@ apiVersion: apps/v1
 kind: "Deployment"
 metadata:
   labels:
-    app: "gri-web"
+    app: "cmsnesia-web"
     version: "1.0.0-SNAPSHOT"
-    group: "id.or.gri"
-  name: "gri-web"
+    group: "com.cmsnesia"
+  name: "cmsnesia-web"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "gri-web-exposed"
+      app: "cmsnesia-web-exposed"
       version: "1.0.0-SNAPSHOT"
-      group: "id.or.gri"
+      group: "com.cmsnesia"
   template:
     metadata:
       labels:
-        app: "gri-web-exposed"
+        app: "cmsnesia-web-exposed"
         version: "1.0.0-SNAPSHOT"
-        group: "id.or.gri"
+        group: "com.cmsnesia"
     spec:
       containers:
         - env:
@@ -28,8 +28,8 @@ spec:
                 fieldRef:
                   fieldPath: "metadata.namespace"
           imagePullPolicy: "IfNotPresent"
-          name: "gri-web"
-          image: "ardikarscr.azurecr.io/ardikars/gri-web:latest"
+          name: "cmsnesia-web"
+          image: "ardikarscr.azurecr.io/ardikars/cmsnesia-web:latest"
           ports:
             - containerPort: 8080
               name: "http"

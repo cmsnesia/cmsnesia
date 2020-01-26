@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>id.or.gri</groupId>
-    <artifactId>gri</artifactId>
+    <groupId>com.cmsnesia</groupId>
+    <artifactId>cmsnesia</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
@@ -32,14 +32,14 @@
     </parent>
 
     <modules>
-        <module>gri-assembler</module>
-        <module>gri-model</module>
-        <module>gri-domain</module>
-        <module>gri-service-spec</module>
-        <module>gri-service-impl</module>
-        <module>gri-sdk-client</module>
-        <module>gri-web</module>
-        <module>gri-tests</module>
+        <module>cmsnesia-assembler</module>
+        <module>cmsnesia-model</module>
+        <module>cmsnesia-domain</module>
+        <module>cmsnesia-service-spec</module>
+        <module>cmsnesia-service-impl</module>
+        <module>cmsnesia-sdk-client</module>
+        <module>cmsnesia-web</module>
+        <module>cmsnesia-tests</module>
     </modules>
 
     <repositories>
@@ -78,33 +78,33 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-assembler</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-assembler</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-model</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-model</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-domain</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-domain</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-service-spec</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-service-spec</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-service-impl</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-service-impl</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>id.or.gri</groupId>
-                <artifactId>gri-sdk-client</artifactId>
+                <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-sdk-client</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
