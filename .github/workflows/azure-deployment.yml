@@ -13,9 +13,9 @@ on: [push]
 
 # Environment variables available to all jobs and steps in this workflow
 env:
-  REGISTRY_NAME: ardikarscr
-  CLUSTER_NAME: ${{ secrets.AZURE_CLUSTER_NAME }}
-  CLUSTER_RESOURCE_GROUP: ${{ secrets.AZURE_CLUSTER_RESOURCE_GROUP }}
+  REGISTRY_NAME: cmsnesiacr
+  CLUSTER_NAME: cmsnesia
+  CLUSTER_RESOURCE_GROUP: cmsnesia-rg
   NAMESPACE: default
 
 jobs:
