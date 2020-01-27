@@ -8,10 +8,10 @@ import reactor.core.publisher.Mono;
 
 public interface TokenService {
 
-    @RequestLine("POST /token/request")
+    @RequestLine("POST /auth/token/request")
     Mono<TokenResponse> request(TokenRequest request);
 
-    @RequestLine("POST /token/refresh")
+    @RequestLine("POST /auth/token/refresh")
     Mono<TokenResponse> refresh(RefreshTokenRequest request);
 
 }

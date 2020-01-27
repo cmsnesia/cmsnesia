@@ -107,13 +107,13 @@
     <logger name="net.ttddyy" level="ERROR"/>
 
     <springProfile name="local">
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="STDOUT"/>
         </root>
     </springProfile>
 
     <springProfile name="dev">
-        <root level="warn">
+        <root level="info">
 <!--            <appender-ref ref="FILE_ERROR"/>-->
 <!--            <appender-ref ref="FILE_DEBUG"/>-->
         </root>
