@@ -1,7 +1,7 @@
 package com.cmsnesia.service;
 
 import com.cmsnesia.model.AuthDto;
-import org.springframework.data.domain.Page;
+import com.cmsnesia.model.response.PageResponse;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
@@ -13,6 +13,6 @@ public interface BaseService<T> {
 
     Mono<T> delete(AuthDto authDto, T dto);
 
-    Mono<Page<T>> find(AuthDto authDto, T dto, Pageable pageable);
+    Mono<PageResponse<T>> find(AuthDto authDto, T dto, Pageable pageable);
 
 }

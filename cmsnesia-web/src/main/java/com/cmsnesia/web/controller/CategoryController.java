@@ -5,6 +5,7 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.PageRequest;
+import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -52,7 +53,7 @@ public class CategoryController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Mono<Page<CategoryDto>> find(@RequestBody CategoryDto categoryDto, PageRequest pageable) {
+    public Mono<PageResponse<CategoryDto>> find(@RequestBody CategoryDto categoryDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())

@@ -3,10 +3,10 @@ package com.cmsnesia.service.impl;
 import com.cmsnesia.assembler.AuthAssembler;
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.service.repository.AuthRepo;
+import com.cmsnesia.model.request.PageRequest;
+import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.AuthService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import com.cmsnesia.service.repository.AuthRepo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -64,14 +64,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Mono<Page<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
+    public Mono<PageResponse<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
         return authRepo.countFind(authDto, dto)
                 .map(count -> {
                     List<AuthDto> authDtos = authRepo.find(authDto, dto, pageable)
                             .map(auth -> authAssembler.fromEntity(auth))
                             .toStream()
                             .collect(Collectors.toList());
-                    return new PageImpl<>(authDtos, pageable, count);
+                    return new PageResponse<>(authDtos, PageRequest.builder()
+                            .page(pageable.getPageNumber())
+                            .size(pageable.getPageSize())
+                            .build(), count);
                 });
     }
 

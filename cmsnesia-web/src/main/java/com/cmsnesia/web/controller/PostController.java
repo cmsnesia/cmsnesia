@@ -8,6 +8,7 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PageRequest;
 import com.cmsnesia.model.request.PostEditRequest;
 import com.cmsnesia.model.request.PostRequest;
+import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -56,7 +57,7 @@ public class PostController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Mono<Page<PostDto>> find(@RequestBody PostDto postDto, PageRequest pageable) {
+    public Mono<PageResponse<PostDto>> find(@RequestBody PostDto postDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
@@ -86,7 +87,7 @@ public class PostController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Mono<Page<PostDto>> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
+    public Mono<PageResponse<PostDto>> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())

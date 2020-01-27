@@ -3,6 +3,7 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PageRequest;
+import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -54,7 +55,7 @@ public class AuthController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Mono<Page<AuthDto>> find(@RequestBody AuthDto authDto, PageRequest pageable) {
+    public Mono<PageResponse<AuthDto>> find(@RequestBody AuthDto authDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())

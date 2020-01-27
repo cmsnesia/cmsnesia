@@ -1,15 +1,17 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.domain.model.enums.PostStatus;
-import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.cmsnesia.model.request.PageRequest;
+import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.service.repository.PostDraftRepo;
@@ -112,7 +114,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Mono<Page<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+    public Mono<PageResponse<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
         return postRepo.countFind(authDto, dto)
                 .map(count -> {
                     List<PostDto> postDtos = postRepo.find(authDto, dto, pageable)
@@ -120,12 +122,15 @@ public class PostServiceImpl implements PostService {
                                 return postAssembler.fromEntity(post);
                             }).toStream()
                             .collect(Collectors.toList());
-                    return new PageImpl<>(postDtos, pageable, count);
+                    return new PageResponse<>(postDtos, PageRequest.builder()
+                            .page(pageable.getPageNumber())
+                            .size(pageable.getPageSize())
+                            .build(), count);
                 });
     }
 
     @Override
-    public Mono<Page<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
+    public Mono<PageResponse<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
         return postDraftRepo.countFind(authDto, dto)
                 .map(count -> {
                     List<PostDto> postDtos = postDraftRepo.find(authDto, dto, pageable)
@@ -133,7 +138,10 @@ public class PostServiceImpl implements PostService {
                                 return postAssembler.fromDraft(postDraft);
                             }).toStream()
                             .collect(Collectors.toList());
-                    return new PageImpl<>(postDtos, pageable, count);
+                    return new PageResponse<>(postDtos, PageRequest.builder()
+                            .page(pageable.getPageNumber())
+                            .size(pageable.getPageSize())
+                            .build(), count);
                 });
     }
 
