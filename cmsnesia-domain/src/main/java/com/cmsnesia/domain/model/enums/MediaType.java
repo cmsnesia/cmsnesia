@@ -1,4 +1,4 @@
-package cmsnesia.domain.model.enums;
+package com.cmsnesia.domain.model.enums;
 
 public enum MediaType {
 

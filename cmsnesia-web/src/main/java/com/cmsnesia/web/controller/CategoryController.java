@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
@@ -51,11 +52,11 @@ public class CategoryController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Flux<CategoryDto> find(@RequestBody CategoryDto categoryDto, PageRequest pageable) {
+    public Mono<Page<CategoryDto>> find(@RequestBody CategoryDto categoryDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
-                .flatMapMany(session -> {
+                .flatMap(session -> {
                     return categoryService.find(session, categoryDto, org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
                 });
     }

@@ -1,6 +1,6 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.model.Author;
+import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.model.AuthorDto;
 import com.cmsnesia.model.util.DateTimeUtils;
 import org.springframework.stereotype.Component;

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-@ConfigurationProperties(prefix = "gri.token")
+@ConfigurationProperties(prefix = "cmsnesia.token")
 public class TokenInfo {
 
     private String issuer;

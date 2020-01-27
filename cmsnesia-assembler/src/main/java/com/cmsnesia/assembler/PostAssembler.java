@@ -1,9 +1,9 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.Post;
-import cmsnesia.domain.PostDraft;
-import cmsnesia.domain.model.Category;
-import cmsnesia.domain.model.Tag;
+import com.cmsnesia.domain.Post;
+import com.cmsnesia.domain.PostDraft;
+import com.cmsnesia.domain.model.Category;
+import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;

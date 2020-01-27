@@ -1,8 +1,8 @@
-package cmsnesia.domain;
+package com.cmsnesia.domain;
 
-import cmsnesia.domain.model.Category;
-import cmsnesia.domain.model.Media;
-import cmsnesia.domain.model.Tag;
+import com.cmsnesia.domain.model.Category;
+import com.cmsnesia.domain.model.Media;
+import com.cmsnesia.domain.model.Tag;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

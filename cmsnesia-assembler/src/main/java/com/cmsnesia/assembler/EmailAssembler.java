@@ -1,6 +1,6 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.model.Email;
+import com.cmsnesia.domain.model.Email;
 import com.cmsnesia.model.EmailDto;
 import org.springframework.stereotype.Component;
 

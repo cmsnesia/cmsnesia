@@ -1,4 +1,4 @@
-package cmsnesia.domain.model;
+package com.cmsnesia.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

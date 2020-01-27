@@ -1,7 +1,7 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.model.Media;
-import cmsnesia.domain.model.enums.MediaType;
+import com.cmsnesia.domain.model.Media;
+import com.cmsnesia.domain.model.enums.MediaType;
 import com.cmsnesia.model.MediaDto;
 import org.springframework.stereotype.Component;
 

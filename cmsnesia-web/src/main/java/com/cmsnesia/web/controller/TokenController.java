@@ -3,13 +3,11 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.EmailDto;
-import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.CategoryService;
-import com.cmsnesia.service.TagService;
 import com.cmsnesia.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -64,9 +62,6 @@ public class TokenController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private TagService tagService;
-
     @PostMapping("/dummy")
     public Mono<AuthDto> dummy() {
         AuthDto dto = AuthDto.builder()
@@ -89,9 +84,6 @@ public class TokenController {
 
         categoryService.add(dto, CategoryDto.builder()
                 .name("Inspirasi")
-                .build()).block();
-        tagService.add(dto, TagDto.builder()
-                .name("Hidup")
                 .build()).block();
         return authService.add(dto, dto);
     }

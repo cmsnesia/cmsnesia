@@ -1,20 +1,23 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.domain.Category;
 import com.cmsnesia.assembler.CategoryAssembler;
-import cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
-import com.cmsnesia.service.repository.CategoryRepo;
 import com.cmsnesia.service.CategoryService;
+import com.cmsnesia.service.repository.CategoryRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -63,9 +66,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Flux<CategoryDto> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
-        return categoryRepo.find(authDto, dto, pageable)
-                .map(category -> categoryAssembler.fromEntity(category));
+    public Mono<Page<CategoryDto>> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
+        return categoryRepo.countFind(authDto, dto)
+                .map(count -> {
+                    List<CategoryDto> categoryDtos = categoryRepo.find(authDto, dto, pageable)
+                            .map(category -> categoryAssembler.fromEntity(category))
+                            .toStream()
+                            .collect(Collectors.toList());
+                    return new PageImpl<>(categoryDtos, pageable, count);
+                });
     }
 
     @Override

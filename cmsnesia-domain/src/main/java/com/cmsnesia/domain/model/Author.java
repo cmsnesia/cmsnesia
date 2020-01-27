@@ -1,4 +1,4 @@
-package cmsnesia.domain.model;
+package com.cmsnesia.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,16 +14,13 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Tag {
+public class Author {
 
-    @NotBlank(message = "Tag name must be not blank")
-    @Size(max = 25)
+    @NotBlank(message = "Author name must be not blank")
+    @Size(max = 100, message = "Length of author name must be less then or equal to 100")
     private String name;
 
     @NotNull
-    private Date createdAt;
-
-    @NotNull
-    private String createdBy;
+    private Date modifiedAt;
 
 }

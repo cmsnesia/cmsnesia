@@ -1,6 +1,6 @@
 package com.cmsnesia.service.repository.custom;
 
-import cmsnesia.domain.Category;
+import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,12 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
             query.with(pageable);
         }
         return reactiveMongoTemplate.find(query, Category.class);
+    }
+
+    @Override
+    public Mono<Long> countFind(AuthDto authDto, CategoryDto dto) {
+        Query query = buildQuery(authDto, dto);
+        return reactiveMongoTemplate.count(query, Category.class);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.Category;
+import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.CategoryDto;
 import org.springframework.stereotype.Component;
 

@@ -1,22 +1,23 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.domain.Post;
+import com.cmsnesia.domain.PostDraft;
+import com.cmsnesia.domain.model.Author;
+import com.cmsnesia.domain.model.Tag;
+import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.assembler.PostAssembler;
-import cmsnesia.domain.Post;
-import cmsnesia.domain.PostDraft;
-import cmsnesia.domain.model.Author;
-import cmsnesia.domain.model.Tag;
-import cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.service.repository.PostDraftRepo;
 import com.cmsnesia.service.repository.PostRepo;
-import com.cmsnesia.service.CategoryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -111,15 +112,29 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Flux<PostDto> find(AuthDto authDto, PostDto dto, Pageable pageable) {
-        return postRepo.find(authDto, dto, pageable)
-                .map(post -> postAssembler.fromEntity(post));
+    public Mono<Page<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+        return postRepo.countFind(authDto, dto)
+                .map(count -> {
+                    List<PostDto> postDtos = postRepo.find(authDto, dto, pageable)
+                            .map(post -> {
+                                return postAssembler.fromEntity(post);
+                            }).toStream()
+                            .collect(Collectors.toList());
+                    return new PageImpl<>(postDtos, pageable, count);
+                });
     }
 
     @Override
-    public Flux<PostDto> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
-        return postDraftRepo.find(authDto, dto, pageable)
-                .map(postDraft -> postAssembler.fromDraft(postDraft));
+    public Mono<Page<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
+        return postDraftRepo.countFind(authDto, dto)
+                .map(count -> {
+                    List<PostDto> postDtos = postDraftRepo.find(authDto, dto, pageable)
+                            .map(postDraft -> {
+                                return postAssembler.fromDraft(postDraft);
+                            }).toStream()
+                            .collect(Collectors.toList());
+                    return new PageImpl<>(postDtos, pageable, count);
+                });
     }
 
     @Override

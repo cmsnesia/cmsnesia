@@ -1,7 +1,7 @@
-package cmsnesia.domain.validator.impl;
+package com.cmsnesia.domain.validator.impl;
 
-import cmsnesia.domain.model.Email;
-import cmsnesia.domain.validator.EmailCollection;
+import com.cmsnesia.domain.model.Email;
+import com.cmsnesia.domain.validator.EmailCollection;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintValidator;

@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,11 +54,11 @@ public class AuthController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Flux<AuthDto> find(@RequestBody AuthDto authDto, PageRequest pageable) {
+    public Mono<Page<AuthDto>> find(@RequestBody AuthDto authDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
-                .flatMapMany(session -> {
+                .flatMap(session -> {
                     return authService.find(session, authDto, org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
                 });
     }

@@ -1,4 +1,4 @@
-package cmsnesia.domain;
+package com.cmsnesia.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -12,15 +12,14 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "tag")
+@Document(collection = "category")
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class Tag extends Audit {
+public class Category extends Audit {
 
     @Id
     private String id;
 
-    @NotBlank(message = "Tag name must be not blank")
+    @NotBlank(message = "Category name must be not blank")
     @Size(max = 50)
     @Indexed(unique = true)
     private String name;

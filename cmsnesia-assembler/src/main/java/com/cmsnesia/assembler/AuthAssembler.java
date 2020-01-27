@@ -1,6 +1,6 @@
 package com.cmsnesia.assembler;
 
-import cmsnesia.domain.Auth;
+import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import org.springframework.stereotype.Component;
 

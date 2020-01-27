@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
-import cmsnesia.domain.PostDraft;
-import cmsnesia.domain.model.enums.PostStatus;
+import com.cmsnesia.domain.PostDraft;
+import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
 import org.springframework.beans.factory.annotation.Autowired;

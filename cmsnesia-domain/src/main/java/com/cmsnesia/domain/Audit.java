@@ -1,4 +1,4 @@
-package cmsnesia.domain;
+package com.cmsnesia.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -1,6 +1,6 @@
-package cmsnesia.domain.validator.impl;
+package com.cmsnesia.domain.validator.impl;
 
-import cmsnesia.domain.validator.Password;
+import com.cmsnesia.domain.validator.Password;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

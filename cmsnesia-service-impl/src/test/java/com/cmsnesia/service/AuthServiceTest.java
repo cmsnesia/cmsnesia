@@ -1,7 +1,7 @@
 package com.cmsnesia.service;
 
 import com.cmsnesia.assembler.AuthAssembler;
-import cmsnesia.domain.Auth;
+import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.EmailDto;
 import com.cmsnesia.service.repository.AuthRepo;

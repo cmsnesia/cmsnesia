@@ -1,9 +1,9 @@
-package cmsnesia.domain;
+package com.cmsnesia.domain;
 
-import cmsnesia.domain.model.Email;
-import cmsnesia.domain.model.Token;
-import cmsnesia.domain.validator.EmailCollection;
-import cmsnesia.domain.validator.Password;
+import com.cmsnesia.domain.model.Email;
+import com.cmsnesia.domain.model.Token;
+import com.cmsnesia.domain.validator.EmailCollection;
+import com.cmsnesia.domain.validator.Password;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

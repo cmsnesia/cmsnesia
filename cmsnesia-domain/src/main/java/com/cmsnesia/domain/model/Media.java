@@ -1,6 +1,6 @@
-package cmsnesia.domain.model;
+package com.cmsnesia.domain.model;
 
-import cmsnesia.domain.model.enums.MediaType;
+import com.cmsnesia.domain.model.enums.MediaType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.cmsnesia.service.repository.custom;
 
-import cmsnesia.domain.Post;
+import com.cmsnesia.domain.Post;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
 import org.springframework.data.domain.Pageable;

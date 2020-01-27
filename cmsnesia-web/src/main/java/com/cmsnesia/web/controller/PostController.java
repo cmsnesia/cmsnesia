@@ -15,10 +15,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.stream.Collectors;
@@ -56,11 +56,11 @@ public class PostController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Flux<PostDto> find(@RequestBody PostDto postDto, PageRequest pageable) {
+    public Mono<Page<PostDto>> find(@RequestBody PostDto postDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
-                .flatMapMany(session -> {
+                .flatMap(session -> {
                     return postService.find(session, postDto, org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
                 });
     }
@@ -86,11 +86,11 @@ public class PostController {
                     paramType = "query",
                     dataType = "integer")
     })
-    public Flux<PostDto> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
+    public Mono<Page<PostDto>> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
-                .flatMapMany(session -> {
+                .flatMap(session -> {
                     return postService.findDraft(session, postDto, org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
                 });
     }

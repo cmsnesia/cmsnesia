@@ -1,18 +1,21 @@
 package com.cmsnesia.service.impl;
 
 import com.cmsnesia.assembler.AuthAssembler;
-import cmsnesia.domain.Auth;
+import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.service.repository.AuthRepo;
 import com.cmsnesia.service.AuthService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -61,9 +64,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Flux<AuthDto> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
-        return authRepo.find(authDto, dto, pageable)
-                .map(auth -> authAssembler.fromEntity(auth));
+    public Mono<Page<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
+        return authRepo.countFind(authDto, dto)
+                .map(count -> {
+                    List<AuthDto> authDtos = authRepo.find(authDto, dto, pageable)
+                            .map(auth -> authAssembler.fromEntity(auth))
+                            .toStream()
+                            .collect(Collectors.toList());
+                    return new PageImpl<>(authDtos, pageable, count);
+                });
     }
 
     @Override
