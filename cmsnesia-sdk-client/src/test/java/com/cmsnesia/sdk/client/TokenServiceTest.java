@@ -1,8 +1,8 @@
 package com.cmsnesia.sdk.client;
 
+import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
+import com.cmsnesia.model.response.TokenResponse;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.reactive.ReactorFeign;
@@ -16,10 +16,11 @@ public class TokenServiceTest {
                 .decoder(new JacksonDecoder())
                 .encoder(new JacksonEncoder())
                 .target(TokenService.class, "http://20.185.12.50:8080");
-        System.out.println(
-        tokenService.request(new TokenRequest("ardikars", "123456"))
-                .block()
-        );
+        TokenResponse tokenResponse = tokenService.request(new TokenRequest("ardikars", "123456"))
+                .block();
+//        System.out.println(tokenResponse);
+        TokenResponse tokenResponseRefresed = tokenService.refresh(new RefreshTokenRequest(tokenResponse.getRefreshToken())).block();
+        System.out.println(tokenResponseRefresed);
     }
 
 }

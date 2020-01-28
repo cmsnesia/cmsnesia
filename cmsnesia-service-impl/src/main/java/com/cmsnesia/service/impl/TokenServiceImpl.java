@@ -115,16 +115,20 @@ public class TokenServiceImpl implements TokenService {
                     log.info("Invalid refresh token, maybe access token.");
                     return Mono.empty();
                 }
-                return authRepo.findByRefreshTokenAndTokenType(AuthDto.builder().build(), token, TOKEN_TYPE)
-                        .flatMap(auth -> {
-                            auth.getTokens().removeIf(o -> {
-                                return o.getRefreshToken().equals(token);
+                if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
+                    return authRepo.findByRefreshTokenAndTokenType(AuthDto.builder().build(), token, TOKEN_TYPE)
+                            .flatMap(auth -> {
+                                auth.getTokens().removeIf(o -> {
+                                    return o.getRefreshToken().equals(token);
+                                });
+                                return authRepo.save(auth)
+                                        .flatMap(saved -> {
+                                            return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
+                                        });
                             });
-                            return authRepo.save(auth)
-                                    .flatMap(saved -> {
-                                        return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
-                                    });
-                        });
+                } else {
+                    return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
+                }
             } else {
                 return Mono.empty();
             }

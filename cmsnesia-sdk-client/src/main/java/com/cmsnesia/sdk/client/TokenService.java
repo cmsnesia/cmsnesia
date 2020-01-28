@@ -13,11 +13,11 @@ public interface TokenService {
     @Headers("Content-Type: application/json")
     Mono<TokenResponse> request(TokenRequest request);
 
-    @RequestLine("POST /token/refresh")
+    @RequestLine("PUT /token/refresh")
     @Headers("Content-Type: application/json")
     Mono<TokenResponse> refresh(RefreshTokenRequest request);
 
-    @RequestLine("POST /token/destroy")
+    @RequestLine("DELETE /token/destroy")
     @Headers("Content-Type: application/json")
     Mono<TokenResponse> destroy(TokenResponse request);
 
