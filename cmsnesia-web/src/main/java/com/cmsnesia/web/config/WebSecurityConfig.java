@@ -20,7 +20,8 @@ public class WebSecurityConfig {
     "/swagger*/**",
     "/webjars/**",
     "/token/**",
-    "/favicon.ico"
+    "/favicon.ico",
+    "/public/**"
   };
 
   @Bean
