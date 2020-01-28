@@ -9,6 +9,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface AuthRepo extends ReactiveMongoRepository<Auth, String>, AuthRepoCustom {
 
-    Mono<Auth> findByUsername(String username);
-
+  Mono<Auth> findByUsername(String username);
 }

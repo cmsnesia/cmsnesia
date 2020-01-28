@@ -9,8 +9,7 @@ import reactor.core.publisher.Mono;
 
 public interface PostRepoCustom {
 
-    Flux<Post> find(AuthDto authDto, PostDto dto, Pageable pageable);
+  Flux<Post> find(AuthDto authDto, PostDto dto, Pageable pageable);
 
-    Mono<Long> countFind(AuthDto authDto, PostDto dto);
-
+  Mono<Long> countFind(AuthDto authDto, PostDto dto);
 }

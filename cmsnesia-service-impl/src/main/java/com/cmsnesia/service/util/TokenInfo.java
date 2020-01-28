@@ -13,10 +13,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "cmsnesia.token")
 public class TokenInfo {
 
-    private String issuer;
-    private Long accessTokenExparation;
-    private Long refreshTokenExparation;
-    private String secret;
-    private Long max;
-
+  private String issuer;
+  private Long accessTokenExparation;
+  private Long refreshTokenExparation;
+  private String secret;
+  private Long max;
 }

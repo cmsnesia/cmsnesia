@@ -1,11 +1,10 @@
 package com.cmsnesia.model.request;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +12,5 @@ import java.io.Serializable;
 @Builder
 public class IdRequest implements Serializable {
 
-    private String id;
-
+  private String id;
 }

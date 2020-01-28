@@ -1,12 +1,11 @@
 package com.cmsnesia.model;
 
+import java.io.Serializable;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -14,16 +13,15 @@ import java.util.Set;
 @Builder
 public class AuthDto implements Serializable {
 
-    private String id;
+  private String id;
 
-    private String username;
+  private String username;
 
-    private String password;
+  private String password;
 
-    private Set<String> roles;
+  private Set<String> roles;
 
-    private String fullName;
+  private String fullName;
 
-    private Set<EmailDto> emails;
-
+  private Set<EmailDto> emails;
 }

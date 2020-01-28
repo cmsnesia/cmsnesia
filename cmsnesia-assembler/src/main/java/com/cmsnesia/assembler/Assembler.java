@@ -5,16 +5,15 @@ import javax.annotation.Nonnull;
 
 public interface Assembler<A, B> {
 
-    @Nonnull
-    A fromDto(@Nonnull B dto);
+  @Nonnull
+  A fromDto(@Nonnull B dto);
 
-    @Nonnull
-    Collection<A> fromDto(@Nonnull Collection<B> dtos);
+  @Nonnull
+  Collection<A> fromDto(@Nonnull Collection<B> dtos);
 
-    @Nonnull
-    B fromEntity(@Nonnull A entity);
+  @Nonnull
+  B fromEntity(@Nonnull A entity);
 
-    @Nonnull
-    Collection<B> fromEntity(@Nonnull Collection<A> entities);
-
+  @Nonnull
+  Collection<B> fromEntity(@Nonnull Collection<A> entities);
 }

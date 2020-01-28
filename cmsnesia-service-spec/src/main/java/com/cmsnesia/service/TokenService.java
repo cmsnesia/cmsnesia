@@ -8,12 +8,11 @@ import reactor.core.publisher.Mono;
 
 public interface TokenService {
 
-    Mono<AuthDto> decode(TokenResponse tokenResponse);
+  Mono<AuthDto> decode(TokenResponse tokenResponse);
 
-    Mono<TokenResponse> encode(TokenRequest tokenRequest);
+  Mono<TokenResponse> encode(TokenRequest tokenRequest);
 
-    Mono<TokenResponse> refresh(RefreshTokenRequest tokenResponse);
+  Mono<TokenResponse> refresh(RefreshTokenRequest tokenResponse);
 
-    Mono<String> destroy(TokenResponse tokenResponse);
-
+  Mono<String> destroy(TokenResponse tokenResponse);
 }

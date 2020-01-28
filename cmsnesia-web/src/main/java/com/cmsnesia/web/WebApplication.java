@@ -10,8 +10,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @EnableReactiveMongoRepositories("com.cmsnesia")
 public class WebApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(WebApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(WebApplication.class, args);
+  }
 }

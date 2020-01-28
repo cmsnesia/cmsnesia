@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TokenRequest {
 
-    private String username;
-    private String passsword;
-
+  private String username;
+  private String passsword;
 }

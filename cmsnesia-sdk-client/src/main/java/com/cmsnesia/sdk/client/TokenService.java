@@ -9,16 +9,15 @@ import reactor.core.publisher.Mono;
 
 public interface TokenService {
 
-    @RequestLine("POST /token/request")
-    @Headers("Content-Type: application/json")
-    Mono<TokenResponse> request(TokenRequest request);
+  @RequestLine("POST /token/request")
+  @Headers("Content-Type: application/json")
+  Mono<TokenResponse> request(TokenRequest request);
 
-    @RequestLine("PUT /token/refresh")
-    @Headers("Content-Type: application/json")
-    Mono<TokenResponse> refresh(RefreshTokenRequest request);
+  @RequestLine("PUT /token/refresh")
+  @Headers("Content-Type: application/json")
+  Mono<TokenResponse> refresh(RefreshTokenRequest request);
 
-    @RequestLine("DELETE /token/destroy")
-    @Headers("Content-Type: application/json")
-    Mono<TokenResponse> destroy(TokenResponse request);
-
+  @RequestLine("DELETE /token/destroy")
+  @Headers("Content-Type: application/json")
+  Mono<TokenResponse> destroy(TokenResponse request);
 }

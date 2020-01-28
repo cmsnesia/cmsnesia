@@ -13,31 +13,37 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig {
 
-    private static final String[] AUTH_WHITELIST = {
-            "/v2/api-docs",
-            "/resources/**",
-            "/configuration/**",
-            "/swagger*/**",
-            "/webjars/**",
-            "/token/**",
-            "/favicon.ico"
-    };
+  private static final String[] AUTH_WHITELIST = {
+    "/v2/api-docs",
+    "/resources/**",
+    "/configuration/**",
+    "/swagger*/**",
+    "/webjars/**",
+    "/token/**",
+    "/favicon.ico"
+  };
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http, SecurityContextRepository contextRepository) {
-        return http
-                .csrf().disable()
-                .httpBasic().disable()
-                .formLogin().disable()
-                .securityContextRepository(contextRepository)
-                .authorizeExchange()
-                .pathMatchers(AUTH_WHITELIST).permitAll()
-                .anyExchange().authenticated()
-                .and().build();
-    }
+  @Bean
+  public SecurityWebFilterChain securitygWebFilterChain(
+      ServerHttpSecurity http, SecurityContextRepository contextRepository) {
+    return http.csrf()
+        .disable()
+        .httpBasic()
+        .disable()
+        .formLogin()
+        .disable()
+        .securityContextRepository(contextRepository)
+        .authorizeExchange()
+        .pathMatchers(AUTH_WHITELIST)
+        .permitAll()
+        .anyExchange()
+        .authenticated()
+        .and()
+        .build();
+  }
 }

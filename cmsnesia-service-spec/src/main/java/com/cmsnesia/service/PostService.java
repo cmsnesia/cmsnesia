@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 public interface PostService extends BaseService<PostDto> {
 
-    Mono<PostDto> publish(AuthDto session, IdRequest id);
+  Mono<PostDto> publish(AuthDto session, IdRequest id);
 
-    Mono<PageResponse<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable);
+  Mono<PageResponse<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable);
 }

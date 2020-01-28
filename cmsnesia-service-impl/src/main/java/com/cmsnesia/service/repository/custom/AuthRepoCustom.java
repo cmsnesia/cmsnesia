@@ -9,14 +9,13 @@ import reactor.core.publisher.Mono;
 
 public interface AuthRepoCustom {
 
-    Flux<Auth> find(AuthDto authDto, AuthDto dto, Pageable pageable);
+  Flux<Auth> find(AuthDto authDto, AuthDto dto, Pageable pageable);
 
-    Mono<Long> countFind(AuthDto authDto, AuthDto dto);
+  Mono<Long> countFind(AuthDto authDto, AuthDto dto);
 
-    Mono<Auth> findByAccessTokenAndType(AuthDto authDto, String accessToken, String tokenType);
+  Mono<Auth> findByAccessTokenAndType(AuthDto authDto, String accessToken, String tokenType);
 
-    Mono<Auth> findByRefreshTokenAndTokenType(AuthDto authDto, String refreshToken, String tokenType);
+  Mono<Auth> findByRefreshTokenAndTokenType(AuthDto authDto, String refreshToken, String tokenType);
 
-    Mono<Auth> findByAccessTokenAndRefreshTokenAndTokenType(AuthDto authDto, TokenResponse token);
-
+  Mono<Auth> findByAccessTokenAndRefreshTokenAndTokenType(AuthDto authDto, TokenResponse token);
 }

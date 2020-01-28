@@ -1,11 +1,10 @@
 package com.cmsnesia.domain.model;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -13,8 +12,7 @@ import java.io.Serializable;
 @Builder
 public class Token implements Serializable {
 
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType;
-    
+  private String accessToken;
+  private String refreshToken;
+  private String tokenType;
 }

@@ -13,31 +13,32 @@ import org.junit.Test;
 
 public class CategoryServiceTest {
 
-    @Test
-    public void categoryTest() {
-        CategoryService categoryService = ReactorFeign.builder()
+  @Test
+  public void categoryTest() {
+    CategoryService categoryService =
+        ReactorFeign.builder()
+            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder())
+            .requestInterceptor(interceptor())
+            .target(CategoryService.class, "http://localhost:8080");
+    PageResponse<CategoryDto> categories = categoryService.find(new CategoryDto(), 0, 20).block();
+    categories.getContent().forEach(System.out::println);
+  }
+
+  public RequestInterceptor interceptor() {
+    return new RequestInterceptor() {
+      @Override
+      public void apply(RequestTemplate requestTemplate) {
+        TokenService tokenService =
+            ReactorFeign.builder()
                 .decoder(new JacksonDecoder())
                 .encoder(new JacksonEncoder())
-                .requestInterceptor(interceptor())
-                .target(CategoryService.class, "http://20.185.12.50:8080");
-        PageResponse<CategoryDto> categories = categoryService.find(new CategoryDto(), 0, 20)
-                .block();
-        categories.getContent().forEach(System.out::println);
-    }
-
-    public RequestInterceptor interceptor() {
-        return new RequestInterceptor() {
-            @Override
-            public void apply(RequestTemplate requestTemplate) {
-                TokenService tokenService = ReactorFeign.builder()
-                        .decoder(new JacksonDecoder())
-                        .encoder(new JacksonEncoder())
-                        .target(TokenService.class, "http://20.185.12.50:8080");
-                TokenResponse tokenResponse = tokenService.request(new TokenRequest("ardikars", "123456"))
-                        .block();
-                System.out.println(tokenResponse.getAccessToken());
-                requestTemplate.header("Authorization", "Bearer " + tokenResponse.getAccessToken());
-            }
-        };
-    }
+                .target(TokenService.class, "http://localhost:8080");
+        TokenResponse tokenResponse =
+            tokenService.request(new TokenRequest("ardikars", "123456")).block();
+        System.out.println(tokenResponse.getAccessToken());
+        requestTemplate.header("Authorization", "Bearer " + tokenResponse.getAccessToken());
+      }
+    };
+  }
 }

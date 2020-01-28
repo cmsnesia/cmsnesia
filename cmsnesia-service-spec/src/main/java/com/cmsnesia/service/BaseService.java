@@ -7,12 +7,11 @@ import reactor.core.publisher.Mono;
 
 public interface BaseService<T> {
 
-    Mono<T> add(AuthDto authDto, T dto);
+  Mono<T> add(AuthDto authDto, T dto);
 
-    Mono<T> edit(AuthDto authDto, T dto);
+  Mono<T> edit(AuthDto authDto, T dto);
 
-    Mono<T> delete(AuthDto authDto, T dto);
+  Mono<T> delete(AuthDto authDto, T dto);
 
-    Mono<PageResponse<T>> find(AuthDto authDto, T dto, Pageable pageable);
-
+  Mono<PageResponse<T>> find(AuthDto authDto, T dto, Pageable pageable);
 }

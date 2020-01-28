@@ -12,24 +12,24 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @EnableReactiveMongoRepositories
 public class MongoReactiveConfig extends AbstractReactiveMongoConfiguration {
 
-    @Override
-    protected String getDatabaseName() {
-        return "reactive";
-    }
+  @Override
+  protected String getDatabaseName() {
+    return "reactive";
+  }
 
-    @Override
-    public MongoClient reactiveMongoClient() {
-        return MongoClients.create();
-    }
+  @Override
+  public MongoClient reactiveMongoClient() {
+    return MongoClients.create();
+  }
 
-    @Bean
-    public ReactiveMongoTemplate reactiveMongoTemplate() {
-        return new ReactiveMongoTemplate(reactiveMongoClient(), getDatabaseName());
-    }
+  @Bean
+  public ReactiveMongoTemplate reactiveMongoTemplate() {
+    return new ReactiveMongoTemplate(reactiveMongoClient(), getDatabaseName());
+  }
 
-    @Bean
-    public ReactiveMongoTransactionManager reactiveMongoTransactionManager(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory) {
-        return new ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory);
-    }
-
+  @Bean
+  public ReactiveMongoTransactionManager reactiveMongoTransactionManager(
+      ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory) {
+    return new ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory);
+  }
 }

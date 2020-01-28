@@ -10,17 +10,18 @@ import org.junit.Test;
 
 public class TokenServiceTest {
 
-    @Test
-    public void requestAndRefresh() {
-        TokenService tokenService = ReactorFeign.builder()
-                .decoder(new JacksonDecoder())
-                .encoder(new JacksonEncoder())
-                .target(TokenService.class, "http://20.185.12.50:8080");
-        TokenResponse tokenResponse = tokenService.request(new TokenRequest("ardikars", "123456"))
-                .block();
-//        System.out.println(tokenResponse);
-        TokenResponse tokenResponseRefresed = tokenService.refresh(new RefreshTokenRequest(tokenResponse.getRefreshToken())).block();
-        System.out.println(tokenResponseRefresed);
-    }
-
+  @Test
+  public void requestAndRefresh() {
+    TokenService tokenService =
+        ReactorFeign.builder()
+            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder())
+            .target(TokenService.class, "http://20.185.12.50:8080");
+    TokenResponse tokenResponse =
+        tokenService.request(new TokenRequest("ardikars", "123456")).block();
+    //        System.out.println(tokenResponse);
+    TokenResponse tokenResponseRefresed =
+        tokenService.refresh(new RefreshTokenRequest(tokenResponse.getRefreshToken())).block();
+    System.out.println(tokenResponseRefresed);
+  }
 }

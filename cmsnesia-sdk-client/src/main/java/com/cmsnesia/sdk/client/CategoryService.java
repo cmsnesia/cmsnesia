@@ -9,8 +9,8 @@ import reactor.core.publisher.Mono;
 
 public interface CategoryService {
 
-    @RequestLine("GET /category/find?page={page}&size={size}")
-    @Headers("Content-Type: application/json")
-    Mono<PageResponse<CategoryDto>> find(CategoryDto dto, @Param("page") Integer page, @Param("size") Integer size);
-
+  @RequestLine("GET /category/find?page={page}&size={size}")
+  @Headers("Content-Type: application/json")
+  Mono<PageResponse<CategoryDto>> find(
+      CategoryDto dto, @Param("page") Integer page, @Param("size") Integer size);
 }
