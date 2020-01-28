@@ -67,3 +67,8 @@ jobs:
           imagepullsecrets: |
             ${{ env.REGISTRY_NAME }}-registry-connection
           namespace: ${{ env.NAMESPACE }}
+
+      # Deploy artifact to github package registry
+      - run: |
+          echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
+          ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-web,!cmsnesia-tests,!cmsnesia-service-spec,!cmsnesia-service-impl,!cmsnesia-domain,!cmsnesia-assembler clean package deploy -DskipTests
