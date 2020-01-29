@@ -5,7 +5,6 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.model.request.PageRequest;
 import com.cmsnesia.model.request.PostEditRequest;
 import com.cmsnesia.model.request.PostRequest;
 import com.cmsnesia.model.response.PageResponse;
@@ -17,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
@@ -51,17 +51,16 @@ public class PostController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<PostDto>> find(@RequestBody PostDto postDto, PageRequest pageable) {
+  public Mono<PageResponse<PostDto>> find(
+      @RequestBody PostDto postDto,
+      @RequestParam("page") Integer page,
+      @RequestParam("size") Integer size) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.find(
-                  session,
-                  postDto,
-                  org.springframework.data.domain.PageRequest.of(
-                      pageable.getPage(), pageable.getSize()));
+              return postService.find(session, postDto, PageRequest.of(page, size));
             });
   }
 
@@ -80,17 +79,16 @@ public class PostController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<PostDto>> findDraft(@RequestBody PostDto postDto, PageRequest pageable) {
+  public Mono<PageResponse<PostDto>> findDraft(
+      @RequestBody PostDto postDto,
+      @RequestParam("page") Integer page,
+      @RequestParam("size") Integer size) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.findDraft(
-                  session,
-                  postDto,
-                  org.springframework.data.domain.PageRequest.of(
-                      pageable.getPage(), pageable.getSize()));
+              return postService.findDraft(session, postDto, PageRequest.of(page, size));
             });
   }
 

@@ -3,7 +3,6 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
-import com.cmsnesia.model.request.PageRequest;
 import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
@@ -13,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -50,11 +50,11 @@ public class PublicController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<PostDto>> find(@RequestBody PostDto postDto, PageRequest pageable) {
-    return postService.find(
-        null,
-        postDto,
-        org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
+  public Mono<PageResponse<PostDto>> find(
+      @RequestBody PostDto postDto,
+      @RequestParam("page") Integer page,
+      @RequestParam("size") Integer size) {
+    return postService.find(null, postDto, PageRequest.of(page, size));
   }
 
   @PostMapping(
@@ -75,10 +75,9 @@ public class PublicController {
         dataType = "integer")
   })
   public Mono<PageResponse<CategoryDto>> find(
-      @RequestBody CategoryDto categoryDto, PageRequest pageable) {
-    return categoryService.find(
-        null,
-        categoryDto,
-        org.springframework.data.domain.PageRequest.of(pageable.getPage(), pageable.getSize()));
+      @RequestBody CategoryDto categoryDto,
+      @RequestParam("page") Integer page,
+      @RequestParam("size") Integer size) {
+    return categoryService.find(null, categoryDto, PageRequest.of(page, size));
   }
 }

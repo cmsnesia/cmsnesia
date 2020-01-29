@@ -2,7 +2,6 @@ package com.cmsnesia.web.controller;
 
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.model.request.PageRequest;
 import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.web.util.ConstantKeys;
@@ -11,6 +10,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,17 +49,16 @@ public class AuthController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<AuthDto>> find(@RequestBody AuthDto authDto, PageRequest pageable) {
+  public Mono<PageResponse<AuthDto>> find(
+      @RequestBody AuthDto authDto,
+      @RequestParam("page") Integer page,
+      @RequestParam("size") Integer size) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return authService.find(
-                  session,
-                  authDto,
-                  org.springframework.data.domain.PageRequest.of(
-                      pageable.getPage(), pageable.getSize()));
+              return authService.find(session, authDto, PageRequest.of(page, size));
             });
   }
 
