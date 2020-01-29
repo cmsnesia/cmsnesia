@@ -7,7 +7,7 @@ import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PostEditRequest;
 import com.cmsnesia.model.request.PostRequest;
-import com.cmsnesia.model.response.PageResponse;
+import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -16,7 +16,11 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
@@ -51,16 +55,15 @@ public class PostController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<PostDto>> find(
+  public Mono<Page<PostDto>> find(
       @RequestBody PostDto postDto,
-      @RequestParam("page") Integer page,
-      @RequestParam("size") Integer size) {
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.find(session, postDto, PageRequest.of(page, size));
+              return postService.find(session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
@@ -79,16 +82,15 @@ public class PostController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<PostDto>> findDraft(
+  public Mono<Page<PostDto>> findDraft(
       @RequestBody PostDto postDto,
-      @RequestParam("page") Integer page,
-      @RequestParam("size") Integer size) {
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.findDraft(session, postDto, PageRequest.of(page, size));
+              return postService.findDraft(session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 

@@ -4,7 +4,7 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
-import com.cmsnesia.model.response.PageResponse;
+import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -12,7 +12,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
@@ -47,16 +51,15 @@ public class CategoryController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<PageResponse<CategoryDto>> find(
+  public Mono<Page<CategoryDto>> find(
       @RequestBody CategoryDto categoryDto,
-      @RequestParam("page") Integer page,
-      @RequestParam("size") Integer size) {
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.find(session, categoryDto, PageRequest.of(page, size));
+              return categoryService.find(session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 

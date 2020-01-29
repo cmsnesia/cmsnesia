@@ -4,7 +4,6 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.TokenRequest;
-import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.model.response.TokenResponse;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -12,6 +11,7 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.reactive.ReactorFeign;
 import org.junit.Test;
+import org.springframework.data.domain.Page;
 
 public class CategoryServiceTest {
 
@@ -23,7 +23,7 @@ public class CategoryServiceTest {
             .encoder(new JacksonEncoder())
             .requestInterceptor(interceptor())
             .target(CategoryService.class, "http://52.188.40.20:8080");
-    PageResponse<CategoryDto> categories = categoryService.find(new CategoryDto(), 0, 20).block();
+    Page<CategoryDto> categories = categoryService.find(new CategoryDto(), 0, 20).block();
     System.out.println(categories);
   }
 

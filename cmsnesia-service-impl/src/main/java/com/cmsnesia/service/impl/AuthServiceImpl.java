@@ -3,14 +3,14 @@ package com.cmsnesia.service.impl;
 import com.cmsnesia.assembler.AuthAssembler;
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.model.request.PageRequest;
-import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.repository.AuthRepo;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<PageResponse<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
+  public Mono<Page<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
     return authRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -74,16 +74,7 @@ public class AuthServiceImpl implements AuthService {
                       .find(authDto, dto, pageable)
                       .map(auth -> authAssembler.fromEntity(auth))
                       .collectList();
-              return mono.map(
-                  authDtos -> {
-                    return new PageResponse<>(
-                        authDtos,
-                        PageRequest.builder()
-                            .page(pageable.getPageNumber())
-                            .size(pageable.getPageSize())
-                            .build(),
-                        count);
-                  });
+              return mono.map(authDtos -> new PageImpl<AuthDto>(authDtos, pageable, count));
             });
   }
 

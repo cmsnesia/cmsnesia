@@ -10,8 +10,6 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.model.request.PageRequest;
-import com.cmsnesia.model.response.PageResponse;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.service.repository.PostDraftRepo;
@@ -19,6 +17,8 @@ import com.cmsnesia.service.repository.PostRepo;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -137,7 +137,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<PageResponse<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+  public Mono<Page<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
     return postRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -145,26 +145,14 @@ public class PostServiceImpl implements PostService {
               Mono<List<PostDto>> mono =
                   postRepo
                       .find(authDto, dto, pageable)
-                      .map(
-                          post -> {
-                            return postAssembler.fromEntity(post);
-                          })
+                      .map(post -> postAssembler.fromEntity(post))
                       .collectList();
-              return mono.map(
-                  postDtos -> {
-                    return new PageResponse<>(
-                        postDtos,
-                        PageRequest.builder()
-                            .page(pageable.getPageNumber())
-                            .size(pageable.getPageSize())
-                            .build(),
-                        count);
-                  });
+              return mono.map(postDtos -> new PageImpl<PostDto>(postDtos, pageable, count));
             });
   }
 
   @Override
-  public Mono<PageResponse<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
+  public Mono<Page<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
     return postDraftRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -172,21 +160,9 @@ public class PostServiceImpl implements PostService {
               Mono<List<PostDto>> mono =
                   postDraftRepo
                       .find(authDto, dto, pageable)
-                      .map(
-                          postDraft -> {
-                            return postAssembler.fromDraft(postDraft);
-                          })
+                      .map(postDraft -> postAssembler.fromDraft(postDraft))
                       .collectList();
-              return mono.map(
-                  postDtos -> {
-                    return new PageResponse<>(
-                        postDtos,
-                        PageRequest.builder()
-                            .page(pageable.getPageNumber())
-                            .size(pageable.getPageSize())
-                            .build(),
-                        count);
-                  });
+              return mono.map(postDtos -> new PageImpl<PostDto>(postDtos, pageable, count));
             });
   }
 
@@ -240,10 +216,7 @@ public class PostServiceImpl implements PostService {
                                           .collect(Collectors.toSet()));
                                   return postDraftRepo
                                       .save(postDraft)
-                                      .map(
-                                          result -> {
-                                            return postAssembler.fromEntity(saved);
-                                          });
+                                      .map(result -> postAssembler.fromEntity(saved));
                                 });
                       });
             });
