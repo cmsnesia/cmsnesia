@@ -21,8 +21,8 @@ public class WebSecurityConfig {
     "/webjars/**",
     "/token/**",
     "/favicon.ico",
-    "/public/**",
-    "/*/**"
+    "/public/**"
+//    "/*/**"
   };
 
   @Bean
