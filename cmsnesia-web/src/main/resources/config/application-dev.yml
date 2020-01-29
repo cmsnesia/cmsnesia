@@ -22,7 +22,7 @@ management:
 cmsnesia:
   token:
     issuer: ardikars
-    accessTokenExparation: 288000
-    refreshTokenExparation: 588000
+    accessTokenExparation: 207360000
+    refreshTokenExparation: 414720000
     secret: 123456
     max: 0
