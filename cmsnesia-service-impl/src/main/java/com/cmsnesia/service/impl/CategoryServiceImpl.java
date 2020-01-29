@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+
+import com.cmsnesia.service.repository.PostRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +24,12 @@ public class CategoryServiceImpl implements CategoryService {
 
   private final CategoryAssembler categoryAssembler;
   private final CategoryRepo categoryRepo;
+  private final PostRepo postRepo;
 
-  public CategoryServiceImpl(CategoryAssembler categoryAssembler, CategoryRepo categoryRepo) {
+  public CategoryServiceImpl(CategoryAssembler categoryAssembler, CategoryRepo categoryRepo, PostRepo postRepo) {
     this.categoryAssembler = categoryAssembler;
     this.categoryRepo = categoryRepo;
+    this.postRepo = postRepo;
   }
 
   @Override
@@ -48,6 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
                   save.audit(category);
                   save.setModifiedBy(authDto.getId());
                   save.setModifiedAt(new Date());
+                  postRepo.findAndModifyCategory(authDto, categoryAssembler.fromEntity(category)).block(); // blocking part
                   return categoryRepo
                       .save(save)
                       .map(result -> categoryAssembler.fromEntity(result));

@@ -2,6 +2,7 @@ package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,22 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   public Mono<Long> countFind(AuthDto authDto, PostDto dto) {
     Query query = buildQuery(authDto, dto);
     return reactiveMongoTemplate.count(query, Post.class);
+  }
+
+  @Override
+  public Mono<Void> findAndModifyCategory(AuthDto authDto, CategoryDto categoryDto) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("categories.id").is(categoryDto.getId()));
+    // blocking part
+    reactiveMongoTemplate.find(query, Post.class).toStream()
+            .forEach(post -> {
+              post.getCategories().stream().filter(category -> category.getId().equals(categoryDto.getId()))
+                      .forEach(category -> {
+                        category.setName(categoryDto.getName());
+                      });
+              reactiveMongoTemplate.save(post).block();
+            });
+    return Mono.empty();
   }
 
   private Query buildQuery(AuthDto authDto, PostDto dto) {
