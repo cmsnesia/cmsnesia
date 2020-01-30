@@ -1,12 +1,13 @@
 package com.cmsnesia.sdk.client;
 
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
+import com.cmsnesia.sdk.client.domain.Page;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
 
 public interface CategoryService {
@@ -18,13 +19,13 @@ public interface CategoryService {
 
   @RequestLine("POST /category/add")
   @Headers("Content-Type: application/json")
-  Mono<CategoryDto> add(NameRequest nameRequest);
+  Mono<Result<CategoryDto>> add(NameRequest nameRequest);
 
   @RequestLine("PUT /category/edit")
   @Headers("Content-Type: application/json")
-  Mono<CategoryDto> edit(CategoryDto categoryDto);
+  Mono<Result<CategoryDto>> edit(CategoryDto categoryDto);
 
   @RequestLine("PUT /category/delete")
   @Headers("Content-Type: application/json")
-  Mono<CategoryDto> delete(IdRequest idRequest);
+  Mono<Result<CategoryDto>> delete(IdRequest idRequest);
 }

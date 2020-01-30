@@ -1,12 +1,13 @@
 package com.cmsnesia.sdk.client;
 
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PostRequest;
+import com.cmsnesia.sdk.client.domain.Page;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
 
 public interface PostService {
@@ -23,17 +24,17 @@ public interface PostService {
 
   @RequestLine("POST /post/add")
   @Headers("Content-Type: application/json")
-  Mono<PostDto> add(PostRequest postRequest);
+  Mono<Result<PostDto>> add(PostRequest postRequest);
 
   @RequestLine("PUT /post/edit")
   @Headers("Content-Type: application/json")
-  Mono<PostDto> edit(PostRequest postRequest);
+  Mono<Result<PostDto>> edit(PostRequest postRequest);
 
   @RequestLine("PUT /post/delete")
   @Headers("Content-Type: application/json")
-  Mono<PostDto> delete(IdRequest idRequest);
+  Mono<Result<PostDto>> delete(IdRequest idRequest);
 
   @RequestLine("PUT /post/publish")
   @Headers("Content-Type: application/json")
-  Mono<PostDto> publish(IdRequest idRequest);
+  Mono<Result<PostDto>> publish(IdRequest idRequest);
 }
