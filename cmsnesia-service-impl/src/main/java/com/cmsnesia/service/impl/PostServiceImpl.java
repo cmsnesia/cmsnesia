@@ -9,6 +9,8 @@ import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.api.Result;
+import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
@@ -43,7 +45,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<PostDto> add(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> add(AuthDto authDto, PostDto dto) {
     PostDraft post = postAssembler.fromPostDto(dto);
 
     post.setId(UUID.randomUUID().toString());
@@ -60,21 +62,22 @@ public class PostServiceImpl implements PostService {
             dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
         .flatMap(
             categotyIsExist -> {
-              if (categotyIsExist != null && categotyIsExist) {
-                post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
-                return postDraftRepo.save(post).map(postAssembler::fromDraft);
-              } else {
-                return Mono.empty();
-              }
+                if (categotyIsExist != null && categotyIsExist.getData() != null && categotyIsExist.getData()) {
+                    post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                    return postDraftRepo.save(post).map(postAssembler::fromDraft)
+                            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                } else {
+                    return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+                }
             });
   }
 
   @Override
-  public Mono<PostDto> edit(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> edit(AuthDto authDto, PostDto dto) {
     return postDraftRepo
         .findById(dto.getId())
         .flatMap(
-            (Function<PostDraft, Mono<PostDto>>)
+            (Function<PostDraft, Mono<Result<PostDto>>>)
                 post -> {
                   PostDraft save = postAssembler.fromPostDto(dto);
 
@@ -110,29 +113,31 @@ public class PostServiceImpl implements PostService {
                               .collect(Collectors.toSet()))
                       .flatMap(
                           categotyIsExist -> {
-                            if (categotyIsExist != null && categotyIsExist) {
+                              if (categotyIsExist != null && categotyIsExist.getData() != null && categotyIsExist.getData()) {
                               return postDraftRepo
                                   .save(save)
-                                  .map(result -> postAssembler.fromDraft(result));
+                                  .map(saved -> postAssembler.fromDraft(saved))
+                                  .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
                             } else {
-                              return Mono.empty();
+                              return Mono.just(Result.build(StatusCode.SAVE_FAILED));
                             }
                           });
                 });
   }
 
   @Override
-  public Mono<PostDto> delete(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> delete(AuthDto authDto, PostDto dto) {
     return postDraftRepo
         .findById(dto.getId())
         .flatMap(
-            (Function<PostDraft, Mono<PostDto>>)
+            (Function<PostDraft, Mono<Result<PostDto>>>)
                 post -> {
                   post.setDeletedBy(authDto.getId());
                   post.setDeletedAt(new Date());
                   post.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
-                  return postDraftRepo.save(post).map(result -> postAssembler.fromDraft(result));
+                  return postDraftRepo.save(post).map(saved -> postAssembler.fromDraft(saved))
+                          .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
                 });
   }
 
@@ -147,7 +152,7 @@ public class PostServiceImpl implements PostService {
                       .find(authDto, dto, pageable)
                       .map(post -> postAssembler.fromEntity(post))
                       .collectList();
-              return mono.map(postDtos -> new PageImpl<PostDto>(postDtos, pageable, count));
+              return mono.map(postDtos -> new PageImpl<>(postDtos, pageable, count));
             });
   }
 
@@ -162,12 +167,12 @@ public class PostServiceImpl implements PostService {
                       .find(authDto, dto, pageable)
                       .map(postDraft -> postAssembler.fromDraft(postDraft))
                       .collectList();
-              return mono.map(postDtos -> new PageImpl<PostDto>(postDtos, pageable, count));
+              return mono.map(postDtos -> new PageImpl<>(postDtos, pageable, count));
             });
   }
 
   @Override
-  public Mono<PostDto> publish(AuthDto session, IdRequest id) {
+  public Mono<Result<PostDto>> publish(AuthDto session, IdRequest id) {
     return postDraftRepo
         .findById(id.getId())
         .flatMap(
@@ -202,9 +207,11 @@ public class PostServiceImpl implements PostService {
                             .getCategories()
                             .forEach(
                                 category -> {
-                                  CategoryDto categoryDto =
+                                  Result<CategoryDto> result =
                                       categoryService.findById(session, category.getId()).block();
-                                  category.setName(categoryDto.getName());
+                                  if (result.getStatusCode().equals(StatusCode.DATA_FOUND)) {
+                                      category.setName(result.getData().getName());
+                                  }
                                 });
 
                         return postRepo
@@ -216,7 +223,8 @@ public class PostServiceImpl implements PostService {
                                           .collect(Collectors.toSet()));
                                   return postDraftRepo
                                       .save(postDraft)
-                                      .map(result -> postAssembler.fromEntity(saved));
+                                      .map(result -> postAssembler.fromEntity(saved))
+                                      .map(returned -> Result.build(returned, StatusCode.SAVE_SUCCESS));
                                 });
                       });
             });

@@ -4,6 +4,7 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
+import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PostEditRequest;
 import com.cmsnesia.model.request.PostRequest;
@@ -99,7 +100,7 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
-  public Mono<PostDto> add(@RequestBody PostRequest postRequest) {
+  public Mono<Result<PostDto>> add(@RequestBody PostRequest postRequest) {
     PostDto postDto =
         PostDto.builder()
             .title(postRequest.getTitle())
@@ -128,7 +129,7 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
-  public Mono<PostDto> edit(@RequestBody PostEditRequest postEditRequest) {
+  public Mono<Result<PostDto>> edit(@RequestBody PostEditRequest postEditRequest) {
     PostDto postDto =
         PostDto.builder()
             .id(postEditRequest.getId())
@@ -158,7 +159,7 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
-  public Mono<PostDto> delete(@RequestBody IdRequest idRequest) {
+  public Mono<Result<PostDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
@@ -175,7 +176,7 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/publish")
-  public Mono<PostDto> publish(@RequestBody IdRequest idRequest) {
+  public Mono<Result<PostDto>> publish(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())

@@ -56,7 +56,7 @@ public class TokenServiceImpl implements TokenService {
   }
 
   @Override
-  public Mono<AuthDto> decode(TokenResponse tokenResponse) {
+  public Mono<AuthDto> validate(TokenResponse tokenResponse) {
     String token = tokenResponse.getAccessToken();
     if (token == null) {
       return Mono.empty();
@@ -83,7 +83,7 @@ public class TokenServiceImpl implements TokenService {
   }
 
   @Override
-  public Mono<TokenResponse> encode(TokenRequest tokenRequest) {
+  public Mono<TokenResponse> request(TokenRequest tokenRequest) {
     return authRepo
         .findByUsername(tokenRequest.getUsername())
         .flatMap(
@@ -146,12 +146,12 @@ public class TokenServiceImpl implements TokenService {
                                 .save(auth)
                                 .flatMap(
                                     saved -> {
-                                      return encode(
+                                      return request(
                                           new TokenRequest(claims.get(USERNAME, String.class), ""));
                                     });
                           });
                 } else {
-                  return encode(new TokenRequest(claims.get(USERNAME, String.class), ""));
+                  return request(new TokenRequest(claims.get(USERNAME, String.class), ""));
                 }
               } else {
                 return Mono.empty();

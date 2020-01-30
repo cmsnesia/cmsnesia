@@ -1,17 +1,20 @@
 package com.cmsnesia.service;
 
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.api.Result;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
-public interface BaseService<T> {
+import java.io.Serializable;
 
-  Mono<T> add(AuthDto authDto, T dto);
+public interface BaseService<T extends Serializable> {
 
-  Mono<T> edit(AuthDto authDto, T dto);
+  Mono<Result<T>> add(AuthDto authDto, T dto);
 
-  Mono<T> delete(AuthDto authDto, T dto);
+  Mono<Result<T>> edit(AuthDto authDto, T dto);
+
+  Mono<Result<T>> delete(AuthDto authDto, T dto);
 
   Mono<Page<T>> find(AuthDto authDto, T dto, Pageable pageable);
 }

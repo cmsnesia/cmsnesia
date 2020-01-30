@@ -4,6 +4,8 @@ import com.cmsnesia.assembler.CategoryAssembler;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.api.Result;
+import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.repository.CategoryRepo;
 import java.util.Date;
@@ -33,20 +35,21 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<CategoryDto> add(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> add(AuthDto authDto, CategoryDto dto) {
     Category category = categoryAssembler.fromDto(dto);
     category.setId(UUID.randomUUID().toString());
     category.setCreatedBy(authDto.getId());
     category.setCreatedAt(new Date());
-    return categoryRepo.save(category).map(categoryAssembler::fromEntity);
+    return categoryRepo.save(category).map(categoryAssembler::fromEntity)
+            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
   }
 
   @Override
-  public Mono<CategoryDto> edit(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> edit(AuthDto authDto, CategoryDto dto) {
     return categoryRepo
         .findById(dto.getId())
         .flatMap(
-            (Function<Category, Mono<CategoryDto>>)
+            (Function<Category, Mono<Result<CategoryDto>>>)
                 category -> {
                   Category save = categoryAssembler.fromDto(dto);
                   save.audit(category);
@@ -55,22 +58,24 @@ public class CategoryServiceImpl implements CategoryService {
                   postRepo.findAndModifyCategory(authDto, categoryAssembler.fromEntity(category)).block(); // blocking part
                   return categoryRepo
                       .save(save)
-                      .map(result -> categoryAssembler.fromEntity(result));
+                      .map(saved -> categoryAssembler.fromEntity(saved))
+                      .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
                 });
   }
 
   @Override
-  public Mono<CategoryDto> delete(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> delete(AuthDto authDto, CategoryDto dto) {
     return categoryRepo
         .findById(dto.getId())
         .flatMap(
-            (Function<Category, Mono<CategoryDto>>)
+            (Function<Category, Mono<Result<CategoryDto>>>)
                 category -> {
                   category.setDeletedBy(authDto.getId());
                   category.setDeletedAt(new Date());
                   return categoryRepo
                       .save(category)
-                      .map(result -> categoryAssembler.fromEntity(result));
+                      .map(saved -> categoryAssembler.fromEntity(saved))
+                      .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
                 });
   }
 
@@ -91,12 +96,15 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<CategoryDto> findById(AuthDto session, String id) {
-    return categoryRepo.findById(id).map(category -> categoryAssembler.fromEntity(category));
+  public Mono<Result<CategoryDto>> findById(AuthDto session, String id) {
+    return categoryRepo.findById(id)
+            .map(category -> categoryAssembler.fromEntity(category))
+            .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, Set<String> ids) {
-    return categoryRepo.exists(ids);
+  public Mono<Result<Boolean>> exists(AuthDto session, Set<String> ids) {
+    return categoryRepo.exists(ids)
+            .map(result -> Result.build(result, result ? StatusCode.DATA_FOUND : StatusCode.DATA_NOT_FOUND));
   }
 }

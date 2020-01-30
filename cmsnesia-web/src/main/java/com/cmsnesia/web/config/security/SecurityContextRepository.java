@@ -40,7 +40,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String authToken = authHeader.substring(7);
-      Mono<AuthDto> authDtoMono = tokenService.decode(new TokenResponse(authToken, "", "Bearer"));
+      Mono<AuthDto> authDtoMono = tokenService.validate(new TokenResponse(authToken, "", "Bearer"));
       return authDtoMono.map(
           authDto -> {
             Set<GrantedAuthority> authorities =

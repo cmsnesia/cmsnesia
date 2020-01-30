@@ -2,6 +2,7 @@ package com.cmsnesia.web.controller;
 
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
@@ -68,7 +69,7 @@ public class CategoryController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
-  public Mono<CategoryDto> add(@RequestBody NameRequest nameRequest) {
+  public Mono<Result<CategoryDto>> add(@RequestBody NameRequest nameRequest) {
     CategoryDto categoryDto = CategoryDto.builder().name(nameRequest.getName()).build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
@@ -84,7 +85,7 @@ public class CategoryController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
-  public Mono<CategoryDto> edit(@RequestBody CategoryDto categoryDto) {
+  public Mono<Result<CategoryDto>> edit(@RequestBody CategoryDto categoryDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
@@ -102,7 +103,7 @@ public class CategoryController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
-  public Mono<CategoryDto> delete(@RequestBody IdRequest idRequest) {
+  public Mono<Result<CategoryDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
