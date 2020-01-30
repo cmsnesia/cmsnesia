@@ -59,8 +59,6 @@ public class TokenController {
     return Mono.just(ResponseEntity.ok(tokenService.destroy(tokenResponse)));
   }
 
-  @Autowired private CategoryService categoryService;
-
 //  @PostMapping("/dummy")
 //  public Mono<AuthDto> dummy() {
 //    AuthDto dto =
