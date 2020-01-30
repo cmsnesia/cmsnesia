@@ -62,13 +62,17 @@ public class PostServiceImpl implements PostService {
             dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
         .flatMap(
             categotyIsExist -> {
-                if (categotyIsExist != null && categotyIsExist.getData() != null && categotyIsExist.getData()) {
-                    post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
-                    return postDraftRepo.save(post).map(postAssembler::fromDraft)
-                            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
-                } else {
-                    return Mono.just(Result.build(StatusCode.SAVE_FAILED));
-                }
+              if (categotyIsExist != null
+                  && categotyIsExist.getData() != null
+                  && categotyIsExist.getData()) {
+                post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                return postDraftRepo
+                    .save(post)
+                    .map(postAssembler::fromDraft)
+                    .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+              } else {
+                return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+              }
             });
   }
 
@@ -113,7 +117,9 @@ public class PostServiceImpl implements PostService {
                               .collect(Collectors.toSet()))
                       .flatMap(
                           categotyIsExist -> {
-                              if (categotyIsExist != null && categotyIsExist.getData() != null && categotyIsExist.getData()) {
+                            if (categotyIsExist != null
+                                && categotyIsExist.getData() != null
+                                && categotyIsExist.getData()) {
                               return postDraftRepo
                                   .save(save)
                                   .map(saved -> postAssembler.fromDraft(saved))
@@ -136,8 +142,10 @@ public class PostServiceImpl implements PostService {
                   post.setDeletedAt(new Date());
                   post.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
-                  return postDraftRepo.save(post).map(saved -> postAssembler.fromDraft(saved))
-                          .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
+                  return postDraftRepo
+                      .save(post)
+                      .map(saved -> postAssembler.fromDraft(saved))
+                      .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
                 });
   }
 
@@ -169,6 +177,22 @@ public class PostServiceImpl implements PostService {
                       .collectList();
               return mono.map(postDtos -> new PageImpl<>(postDtos, pageable, count));
             });
+  }
+
+  @Override
+  public Mono<Result<PostDto>> find(AuthDto session, IdRequest idRequest) {
+    return postRepo
+        .find(session, idRequest)
+        .map(postAssembler::fromEntity)
+        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
+  }
+
+  @Override
+  public Mono<Result<PostDto>> findDraft(AuthDto authDto, IdRequest idRequest) {
+    return postDraftRepo
+        .find(authDto, idRequest)
+        .map(postAssembler::fromDraft)
+        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override
@@ -210,7 +234,7 @@ public class PostServiceImpl implements PostService {
                                   Result<CategoryDto> result =
                                       categoryService.findById(session, category.getId()).block();
                                   if (result.getStatusCode().equals(StatusCode.DATA_FOUND)) {
-                                      category.setName(result.getData().getName());
+                                    category.setName(result.getData().getName());
                                   }
                                 });
 
@@ -224,7 +248,9 @@ public class PostServiceImpl implements PostService {
                                   return postDraftRepo
                                       .save(postDraft)
                                       .map(result -> postAssembler.fromEntity(saved))
-                                      .map(returned -> Result.build(returned, StatusCode.SAVE_SUCCESS));
+                                      .map(
+                                          returned ->
+                                              Result.build(returned, StatusCode.SAVE_SUCCESS));
                                 });
                       });
             });

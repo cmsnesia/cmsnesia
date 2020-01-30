@@ -4,6 +4,7 @@ import com.cmsnesia.domain.Post;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.request.IdRequest;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,12 @@ import reactor.core.publisher.Mono;
 public class PostRepoCustomImpl implements PostRepoCustom {
 
   @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+
+  @Override
+  public Mono<Post> find(AuthDto authDto, IdRequest id) {
+    Query query = buildQuery(authDto, PostDto.builder().id(id.getId()).build());
+    return reactiveMongoTemplate.findOne(query, Post.class);
+  }
 
   @Override
   public Flux<Post> find(AuthDto authDto, PostDto dto, Pageable pageable) {
@@ -38,10 +45,15 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     Query query = new Query();
     query.addCriteria(Criteria.where("categories.id").is(categoryDto.getId()));
     // blocking part
-    reactiveMongoTemplate.find(query, Post.class).toStream()
-            .forEach(post -> {
-              post.getCategories().stream().filter(category -> category.getId().equals(categoryDto.getId()))
-                      .forEach(category -> {
+    reactiveMongoTemplate
+        .find(query, Post.class)
+        .toStream()
+        .forEach(
+            post -> {
+              post.getCategories().stream()
+                  .filter(category -> category.getId().equals(categoryDto.getId()))
+                  .forEach(
+                      category -> {
                         category.setName(categoryDto.getName());
                       });
               reactiveMongoTemplate.save(post).block();

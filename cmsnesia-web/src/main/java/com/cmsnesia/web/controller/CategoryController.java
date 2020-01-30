@@ -15,7 +15,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -37,8 +36,26 @@ public class CategoryController {
     this.categoryService = categoryService;
   }
 
+  @ApiOperation(
+      value = "Get category by ID",
+      response = AuthDto.class,
+      notes = "Result<CategoryDto>")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+  })
+  @GetMapping("/findById")
+  public Mono<Result<CategoryDto>> findById(@RequestParam("id") String id) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(SecurityContext::getAuthentication)
+        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .flatMap(
+            session -> {
+              return categoryService.find(session, IdRequest.builder().id(id).build());
+            });
+  }
+
   @PostMapping("/find")
-  @ApiOperation(value = "List category", response = AuthDto.class, notes = "Flux [CategoryDto]")
+  @ApiOperation(value = "List category", response = AuthDto.class, notes = "Page<CategoryDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -60,11 +77,12 @@ public class CategoryController {
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.find(session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+              return categoryService.find(
+                  session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
-  @ApiOperation(value = "Add Category", response = AuthDto.class, notes = "Mono [CategoryDto]")
+  @ApiOperation(value = "Add Category", response = AuthDto.class, notes = "Result<CategoryDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -80,7 +98,7 @@ public class CategoryController {
             });
   }
 
-  @ApiOperation(value = "Edit category", response = AuthDto.class, notes = "Mono [CategoryDto]")
+  @ApiOperation(value = "Edit category", response = AuthDto.class, notes = "Result<CategoryDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -98,7 +116,7 @@ public class CategoryController {
   @ApiOperation(
       value = "Soft delete category",
       response = AuthDto.class,
-      notes = "Mono [CategoryDto]")
+      notes = "Result<CategoryDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })

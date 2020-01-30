@@ -3,6 +3,7 @@ package com.cmsnesia.service.repository.custom;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.request.IdRequest;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,12 @@ import reactor.core.publisher.Mono;
 public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
   @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+
+  @Override
+  public Mono<Category> find(AuthDto authDto, IdRequest id) {
+    Query query = buildQuery(authDto, CategoryDto.builder().id(id.getId()).build());
+    return reactiveMongoTemplate.findOne(query, Category.class);
+  }
 
   @Override
   public Flux<Category> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
@@ -47,11 +54,11 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
     if (!StringUtils.isEmpty(dto.getId())) {
       query.addCriteria(Criteria.where("id").is(dto.getId()));
-    }
-
-    if (!StringUtils.isEmpty(dto.getName())) {
-      Pattern regex = Pattern.compile(dto.getName(), Pattern.CASE_INSENSITIVE);
-      query.addCriteria(Criteria.where("name").regex(regex));
+    } else {
+      if (!StringUtils.isEmpty(dto.getName())) {
+        Pattern regex = Pattern.compile(dto.getName(), Pattern.CASE_INSENSITIVE);
+        query.addCriteria(Criteria.where("name").regex(regex));
+      }
     }
 
     return query;

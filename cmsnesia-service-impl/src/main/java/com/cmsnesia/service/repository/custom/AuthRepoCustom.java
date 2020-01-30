@@ -2,12 +2,15 @@ package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.response.TokenResponse;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface AuthRepoCustom {
+
+  Mono<Auth> find(AuthDto authDto, IdRequest id);
 
   Flux<Auth> find(AuthDto authDto, AuthDto dto, Pageable pageable);
 

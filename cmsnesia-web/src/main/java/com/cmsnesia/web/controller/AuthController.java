@@ -38,8 +38,23 @@ public class AuthController {
     this.passwordEncoder = passwordEncoder;
   }
 
+  @ApiOperation(value = "Get user by ID", response = AuthDto.class, notes = "Result<AuthDto>")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+  })
+  @GetMapping("/findById")
+  public Mono<Result<AuthDto>> findById(@RequestParam("id") String id) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(SecurityContext::getAuthentication)
+        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .flatMap(
+            session -> {
+              return authService.find(session, IdRequest.builder().id(id).build());
+            });
+  }
+
   @PostMapping("/find")
-  @ApiOperation(value = "List user", response = AuthDto.class, notes = "Flux [AuthDto]")
+  @ApiOperation(value = "List user", response = AuthDto.class, notes = "Page<AuthDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -61,11 +76,12 @@ public class AuthController {
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return authService.find(session, authDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+              return authService.find(
+                  session, authDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
-  @ApiOperation(value = "Add user", response = AuthDto.class, notes = "Mono [AuthDto]")
+  @ApiOperation(value = "Add user", response = AuthDto.class, notes = "Result<AuthDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -81,7 +97,7 @@ public class AuthController {
             });
   }
 
-  @ApiOperation(value = "Edit user", response = AuthDto.class, notes = "Mono [AuthDto]")
+  @ApiOperation(value = "Edit user", response = AuthDto.class, notes = "Result<AuthDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -97,7 +113,7 @@ public class AuthController {
             });
   }
 
-  @ApiOperation(value = "Soft delete user", response = AuthDto.class, notes = "Mono [AuthDto]")
+  @ApiOperation(value = "Soft delete user", response = AuthDto.class, notes = "Result<AuthDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })

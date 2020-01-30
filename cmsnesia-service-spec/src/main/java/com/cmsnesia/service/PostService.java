@@ -13,4 +13,6 @@ public interface PostService extends BaseService<PostDto> {
   Mono<Result<PostDto>> publish(AuthDto session, IdRequest id);
 
   Mono<Page<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable);
+
+  Mono<Result<PostDto>> findDraft(AuthDto authDto, IdRequest idRequest);
 }

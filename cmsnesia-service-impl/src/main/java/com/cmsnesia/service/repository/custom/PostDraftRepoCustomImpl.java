@@ -4,6 +4,7 @@ import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.request.IdRequest;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,12 @@ import reactor.core.publisher.Mono;
 public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
 
   @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+
+  @Override
+  public Mono<PostDraft> find(AuthDto authDto, IdRequest id) {
+    Query query = buildQuery(authDto, PostDto.builder().id(id.getId()).build());
+    return reactiveMongoTemplate.findOne(query, PostDraft.class);
+  }
 
   @Override
   public Flux<PostDraft> find(AuthDto authDto, PostDto dto, Pageable pageable) {

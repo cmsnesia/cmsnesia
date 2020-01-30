@@ -6,15 +6,15 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.repository.CategoryRepo;
+import com.cmsnesia.service.repository.PostRepo;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-
-import com.cmsnesia.service.repository.PostRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,8 @@ public class CategoryServiceImpl implements CategoryService {
   private final CategoryRepo categoryRepo;
   private final PostRepo postRepo;
 
-  public CategoryServiceImpl(CategoryAssembler categoryAssembler, CategoryRepo categoryRepo, PostRepo postRepo) {
+  public CategoryServiceImpl(
+      CategoryAssembler categoryAssembler, CategoryRepo categoryRepo, PostRepo postRepo) {
     this.categoryAssembler = categoryAssembler;
     this.categoryRepo = categoryRepo;
     this.postRepo = postRepo;
@@ -40,8 +41,10 @@ public class CategoryServiceImpl implements CategoryService {
     category.setId(UUID.randomUUID().toString());
     category.setCreatedBy(authDto.getId());
     category.setCreatedAt(new Date());
-    return categoryRepo.save(category).map(categoryAssembler::fromEntity)
-            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+    return categoryRepo
+        .save(category)
+        .map(categoryAssembler::fromEntity)
+        .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
   }
 
   @Override
@@ -55,7 +58,9 @@ public class CategoryServiceImpl implements CategoryService {
                   save.audit(category);
                   save.setModifiedBy(authDto.getId());
                   save.setModifiedAt(new Date());
-                  postRepo.findAndModifyCategory(authDto, categoryAssembler.fromEntity(category)).block(); // blocking part
+                  postRepo
+                      .findAndModifyCategory(authDto, categoryAssembler.fromEntity(category))
+                      .block(); // blocking part
                   return categoryRepo
                       .save(save)
                       .map(saved -> categoryAssembler.fromEntity(saved))
@@ -96,15 +101,27 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
+  public Mono<Result<CategoryDto>> find(AuthDto session, IdRequest idRequest) {
+    return categoryRepo
+        .find(session, idRequest)
+        .map(categoryAssembler::fromEntity)
+        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
+  }
+
+  @Override
   public Mono<Result<CategoryDto>> findById(AuthDto session, String id) {
-    return categoryRepo.findById(id)
-            .map(category -> categoryAssembler.fromEntity(category))
-            .map(result -> Result.build(result, StatusCode.DATA_FOUND));
+    return categoryRepo
+        .findById(id)
+        .map(category -> categoryAssembler.fromEntity(category))
+        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override
   public Mono<Result<Boolean>> exists(AuthDto session, Set<String> ids) {
-    return categoryRepo.exists(ids)
-            .map(result -> Result.build(result, result ? StatusCode.DATA_FOUND : StatusCode.DATA_NOT_FOUND));
+    return categoryRepo
+        .exists(ids)
+        .map(
+            result ->
+                Result.build(result, result ? StatusCode.DATA_FOUND : StatusCode.DATA_NOT_FOUND));
   }
 }

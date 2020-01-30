@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -41,8 +40,38 @@ public class PostController {
     this.postService = postService;
   }
 
+  @ApiOperation(value = "Get post by ID", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+  })
+  @GetMapping("/findById")
+  public Mono<Result<PostDto>> findById(@RequestParam("id") String id) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(SecurityContext::getAuthentication)
+        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .flatMap(
+            session -> {
+              return postService.find(session, IdRequest.builder().id(id).build());
+            });
+  }
+
+  @ApiOperation(value = "Get draft by ID", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+  })
+  @GetMapping("/findDraftById")
+  public Mono<Result<PostDto>> findDraftById(@RequestParam("id") String id) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(SecurityContext::getAuthentication)
+        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .flatMap(
+            session -> {
+              return postService.findDraft(session, IdRequest.builder().id(id).build());
+            });
+  }
+
   @PostMapping("/find")
-  @ApiOperation(value = "List post", response = AuthDto.class, notes = "Flux [PostDto]")
+  @ApiOperation(value = "List post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -64,12 +93,13 @@ public class PostController {
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.find(session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+              return postService.find(
+                  session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
   @PostMapping("/findDraft")
-  @ApiOperation(value = "List draft", response = AuthDto.class, notes = "Flux [PostDto]")
+  @ApiOperation(value = "List draft", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -91,11 +121,12 @@ public class PostController {
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.findDraft(session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+              return postService.findDraft(
+                  session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
-  @ApiOperation(value = "Add post", response = AuthDto.class, notes = "Mono [PostDto]")
+  @ApiOperation(value = "Add post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -124,7 +155,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Edit post", response = AuthDto.class, notes = "Mono [PostDto]")
+  @ApiOperation(value = "Edit post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -154,7 +185,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Soft delete post", response = AuthDto.class, notes = "Mono [PostDto]")
+  @ApiOperation(value = "Soft delete post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -171,7 +202,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Publish post", response = AuthDto.class, notes = "Mono [PostDto]")
+  @ApiOperation(value = "Publish post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })

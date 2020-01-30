@@ -5,6 +5,7 @@ import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.repository.AuthRepo;
 import java.util.Date;
@@ -34,22 +35,28 @@ public class AuthServiceImpl implements AuthService {
     auth.setId(UUID.randomUUID().toString());
     auth.setCreatedBy(authDto.getId());
     auth.setCreatedAt(new Date());
-    return authRepo.save(auth).map(authAssembler::fromEntity)
-            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+    return authRepo
+        .save(auth)
+        .map(authAssembler::fromEntity)
+        .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
   }
 
   @Override
   public Mono<Result<AuthDto>> edit(AuthDto authDto, AuthDto dto) {
     return authRepo
         .findById(dto.getId())
-        .flatMap((Function<Auth, Mono<Result<AuthDto>>>) auth -> {
-            Auth save = authAssembler.fromDto(dto);
-            save.audit(auth);
-            save.setModifiedBy(authDto.getId());
-            save.setModifiedAt(new Date());
-            return authRepo.save(save).map(saved -> authAssembler.fromEntity(saved))
-                    .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
-        });
+        .flatMap(
+            (Function<Auth, Mono<Result<AuthDto>>>)
+                auth -> {
+                  Auth save = authAssembler.fromDto(dto);
+                  save.audit(auth);
+                  save.setModifiedBy(authDto.getId());
+                  save.setModifiedAt(new Date());
+                  return authRepo
+                      .save(save)
+                      .map(saved -> authAssembler.fromEntity(saved))
+                      .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                });
   }
 
   @Override
@@ -61,8 +68,10 @@ public class AuthServiceImpl implements AuthService {
                 auth -> {
                   auth.setDeletedBy(authDto.getId());
                   auth.setDeletedAt(new Date());
-                  return authRepo.save(auth).map(saved -> authAssembler.fromEntity(saved))
-                          .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
+                  return authRepo
+                      .save(auth)
+                      .map(saved -> authAssembler.fromEntity(saved))
+                      .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
                 });
   }
 
@@ -79,6 +88,14 @@ public class AuthServiceImpl implements AuthService {
                       .collectList();
               return mono.map(authDtos -> new PageImpl<>(authDtos, pageable, count));
             });
+  }
+
+  @Override
+  public Mono<Result<AuthDto>> find(AuthDto session, IdRequest idRequest) {
+    return authRepo
+        .find(session, idRequest)
+        .map(authAssembler::fromEntity)
+        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override

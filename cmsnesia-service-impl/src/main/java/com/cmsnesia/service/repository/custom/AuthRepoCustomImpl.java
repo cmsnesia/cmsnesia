@@ -2,6 +2,7 @@ package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.response.TokenResponse;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,12 @@ import reactor.core.publisher.Mono;
 public class AuthRepoCustomImpl implements AuthRepoCustom {
 
   @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+
+  @Override
+  public Mono<Auth> find(AuthDto authDto, IdRequest id) {
+    Query query = buildQuery(authDto, AuthDto.builder().id(id.getId()).build(), null, null, null);
+    return reactiveMongoTemplate.findOne(query, Auth.class);
+  }
 
   @Override
   public Flux<Auth> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
@@ -65,18 +72,24 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 
-    if (!StringUtils.isEmpty(dto.getUsername())) {
+    if (!StringUtils.isEmpty(dto.getId())) {
+      query.addCriteria(Criteria.where("id").is(dto.getId()));
+      if (!StringUtils.isEmpty(dto.getUsername())) {
+        query.addCriteria(Criteria.where("username").is(dto.getUsername()));
+      }
+    } else if (!StringUtils.isEmpty(dto.getUsername())) {
       query.addCriteria(Criteria.where("username").is(dto.getUsername()));
-    }
-    if (!StringUtils.isEmpty(dto.getFullName())) {
-      Pattern regex = Pattern.compile(dto.getFullName(), Pattern.CASE_INSENSITIVE);
-      query.addCriteria(Criteria.where("fullName").regex(regex));
-    }
-    if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
-      query.addCriteria(Criteria.where("roles").in(dto.getRoles()));
-    }
-    if (dto.getEmails() != null && !dto.getEmails().isEmpty()) {
-      query.addCriteria(Criteria.where("emails").in(dto.getEmails()));
+    } else {
+      if (!StringUtils.isEmpty(dto.getFullName())) {
+        Pattern regex = Pattern.compile(dto.getFullName(), Pattern.CASE_INSENSITIVE);
+        query.addCriteria(Criteria.where("fullName").regex(regex));
+      }
+      if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+        query.addCriteria(Criteria.where("roles").in(dto.getRoles()));
+      }
+      if (dto.getEmails() != null && !dto.getEmails().isEmpty()) {
+        query.addCriteria(Criteria.where("emails").in(dto.getEmails()));
+      }
     }
     if (!StringUtils.isEmpty(accessToken)
         && !StringUtils.isEmpty(refreshToken)

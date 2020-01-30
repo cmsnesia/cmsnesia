@@ -79,6 +79,7 @@ public class PublicController {
   public Mono<Page<CategoryDto>> find(
       @RequestBody CategoryDto categoryDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    return categoryService.find(null, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+    return categoryService.find(
+        null, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
   }
 }

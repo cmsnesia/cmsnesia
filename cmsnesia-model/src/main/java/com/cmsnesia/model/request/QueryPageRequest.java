@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class QueryPageRequest {
 
-    private int page;
-    private int size;
-
+  private int page;
+  private int size;
 }

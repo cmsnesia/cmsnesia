@@ -4,11 +4,9 @@ import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.AuthService;
-import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,7 +38,8 @@ public class TokenController {
         .findByUsername(request.getUsername())
         .map(
             (userDetails) -> {
-              if (passwordEncoder.matches(request.getPasssword(), userDetails.getData().getPassword())) {
+              if (passwordEncoder.matches(
+                  request.getPasssword(), userDetails.getData().getPassword())) {
                 return ResponseEntity.ok(tokenService.request(request));
               } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -59,33 +58,34 @@ public class TokenController {
     return Mono.just(ResponseEntity.ok(tokenService.destroy(tokenResponse)));
   }
 
-//  @PostMapping("/dummy")
-//  public Mono<AuthDto> dummy() {
-//    AuthDto dto =
-//        AuthDto.builder()
-//            .username("ardikars")
-//            .password(passwordEncoder.encode("123456"))
-//            .fullName("Ardika Rommy Sanjaya")
-//            .emails(
-//                Arrays.asList(
-//                        EmailDto.builder()
-//                            .address("ardikars@gmail.com")
-//                            .status("VERIFIED")
-//                            .types(
-//                                Arrays.asList("NOTIFICATION", "PROMOTION").stream()
-//                                    .collect(Collectors.toSet()))
-//                            .build(),
-//                        EmailDto.builder()
-//                            .address("contact@ardikars.com")
-//                            .status("VERIFIED")
-//                            .types(Arrays.asList("PRIMARY").stream().collect(Collectors.toSet()))
-//                            .build())
-//                    .stream()
-//                    .collect(Collectors.toSet()))
-//            .roles(Arrays.asList("ADMIN").stream().collect(Collectors.toSet()))
-//            .build();
-//
-//    categoryService.add(dto, CategoryDto.builder().name("Inspirasi").build()).block();
-//    return authService.add(dto, dto);
-//  }
+  //  @PostMapping("/dummy")
+  //  public Mono<AuthDto> dummy() {
+  //    AuthDto dto =
+  //        AuthDto.builder()
+  //            .username("ardikars")
+  //            .password(passwordEncoder.encode("123456"))
+  //            .fullName("Ardika Rommy Sanjaya")
+  //            .emails(
+  //                Arrays.asList(
+  //                        EmailDto.builder()
+  //                            .address("ardikars@gmail.com")
+  //                            .status("VERIFIED")
+  //                            .types(
+  //                                Arrays.asList("NOTIFICATION", "PROMOTION").stream()
+  //                                    .collect(Collectors.toSet()))
+  //                            .build(),
+  //                        EmailDto.builder()
+  //                            .address("contact@ardikars.com")
+  //                            .status("VERIFIED")
+  //
+  // .types(Arrays.asList("PRIMARY").stream().collect(Collectors.toSet()))
+  //                            .build())
+  //                    .stream()
+  //                    .collect(Collectors.toSet()))
+  //            .roles(Arrays.asList("ADMIN").stream().collect(Collectors.toSet()))
+  //            .build();
+  //
+  //    categoryService.add(dto, CategoryDto.builder().name("Inspirasi").build()).block();
+  //    return authService.add(dto, dto);
+  //  }
 }
