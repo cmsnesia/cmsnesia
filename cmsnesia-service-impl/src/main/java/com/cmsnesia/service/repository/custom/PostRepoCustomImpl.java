@@ -1,16 +1,20 @@
 package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Post;
+import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,11 +48,9 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   public Mono<Void> findAndModifyCategory(AuthDto authDto, CategoryDto categoryDto) {
     Query query = new Query();
     query.addCriteria(Criteria.where("categories.id").is(categoryDto.getId()));
-    // blocking part
     reactiveMongoTemplate
         .find(query, Post.class)
-        .toStream()
-        .forEach(
+        .subscribe(
             post -> {
               post.getCategories().stream()
                   .filter(category -> category.getId().equals(categoryDto.getId()))
@@ -56,15 +58,26 @@ public class PostRepoCustomImpl implements PostRepoCustom {
                       category -> {
                         category.setName(categoryDto.getName());
                       });
+              // blocking part
               reactiveMongoTemplate.save(post).block();
             });
     return Mono.empty();
+  }
+
+  @Override
+  public Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").is(id.getId()));
+    Update update = new Update();
+    update.set("status", postStatus.stream().map(PostStatus::name).collect(Collectors.toSet()));
+    return reactiveMongoTemplate.findAndModify(query, update, Post.class);
   }
 
   private Query buildQuery(AuthDto authDto, PostDto dto) {
     Query query = new Query();
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
+    query.addCriteria(Criteria.where("status").is(PostStatus.PUBLISHED.name()));
 
     if (!StringUtils.isEmpty(dto.getId())) {
       query.addCriteria(Criteria.where("id").is(dto.getId()));

@@ -46,15 +46,15 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> add(AuthDto authDto, PostDto dto) {
-    PostDraft post = postAssembler.fromPostDto(dto);
+    PostDraft postDraft = postAssembler.fromPostDto(dto);
 
-    post.setId(UUID.randomUUID().toString());
+    postDraft.setId(UUID.randomUUID().toString());
 
-    post.setCreatedBy(authDto.getId());
-    post.setCreatedAt(new Date());
-    post.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
+    postDraft.setCreatedBy(authDto.getId());
+    postDraft.setCreatedAt(new Date());
+    postDraft.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
 
-    post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+    postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
 
     return categoryService
         .exists(
@@ -65,9 +65,9 @@ public class PostServiceImpl implements PostService {
               if (categotyIsExist != null
                   && categotyIsExist.getData() != null
                   && categotyIsExist.getData()) {
-                post.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
                 return postDraftRepo
-                    .save(post)
+                    .save(postDraft)
                     .map(postAssembler::fromDraft)
                     .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
               } else {
@@ -82,13 +82,13 @@ public class PostServiceImpl implements PostService {
         .findById(dto.getId())
         .flatMap(
             (Function<PostDraft, Mono<Result<PostDto>>>)
-                post -> {
+                postDraft -> {
                   PostDraft save = postAssembler.fromPostDto(dto);
 
-                  post.setStatus(
+                  postDraft.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
 
-                  save.audit(post);
+                  save.audit(postDraft);
 
                   save.setModifiedBy(authDto.getId());
                   save.setModifiedAt(new Date());
@@ -97,7 +97,8 @@ public class PostServiceImpl implements PostService {
                   save.getTags()
                       .forEach(
                           tag -> {
-                            post.getTags()
+                            postDraft
+                                .getTags()
                                 .forEach(
                                     existing -> {
                                       if (!(tag.getName().equals(existing.getName())
@@ -120,10 +121,20 @@ public class PostServiceImpl implements PostService {
                             if (categotyIsExist != null
                                 && categotyIsExist.getData() != null
                                 && categotyIsExist.getData()) {
-                              return postDraftRepo
-                                  .save(save)
-                                  .map(saved -> postAssembler.fromDraft(saved))
-                                  .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                              return postRepo
+                                  .findAndModifyStatus(
+                                      authDto,
+                                      IdRequest.builder().id(save.getId()).build(),
+                                          new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
+                                  .flatMap(
+                                      savedStatus -> {
+                                        return postDraftRepo
+                                            .save(save)
+                                            .map(saved -> postAssembler.fromDraft(saved))
+                                            .map(
+                                                result ->
+                                                    Result.build(result, StatusCode.SAVE_SUCCESS));
+                                      });
                             } else {
                               return Mono.just(Result.build(StatusCode.SAVE_FAILED));
                             }
@@ -137,13 +148,13 @@ public class PostServiceImpl implements PostService {
         .findById(dto.getId())
         .flatMap(
             (Function<PostDraft, Mono<Result<PostDto>>>)
-                post -> {
-                  post.setDeletedBy(authDto.getId());
-                  post.setDeletedAt(new Date());
-                  post.setStatus(
+                postDraft -> {
+                  postDraft.setDeletedBy(authDto.getId());
+                  postDraft.setDeletedAt(new Date());
+                  postDraft.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
                   return postDraftRepo
-                      .save(post)
+                      .save(postDraft)
                       .map(saved -> postAssembler.fromDraft(saved))
                       .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
                 });
@@ -225,6 +236,8 @@ public class PostServiceImpl implements PostService {
                         exitingPost.audit(post);
                         exitingPost.setModifiedAt(new Date());
                         exitingPost.setModifiedBy(session.getId());
+                        exitingPost.setStatus(
+                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
 
                         // blocking part
                         exitingPost
@@ -243,8 +256,7 @@ public class PostServiceImpl implements PostService {
                             .flatMap(
                                 saved -> {
                                   postDraft.setStatus(
-                                      Arrays.asList(PostStatus.PUBLISHED).stream()
-                                          .collect(Collectors.toSet()));
+                                          new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)));
                                   return postDraftRepo
                                       .save(postDraft)
                                       .map(result -> postAssembler.fromEntity(saved))
