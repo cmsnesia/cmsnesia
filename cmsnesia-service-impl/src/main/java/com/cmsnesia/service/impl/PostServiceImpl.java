@@ -7,7 +7,6 @@ import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -59,7 +58,9 @@ public class PostServiceImpl implements PostService {
     return categoryService
         .exists(
             authDto,
-            dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet()))
+            dto.getCategories().stream()
+                .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
+                .collect(Collectors.toSet()))
         .flatMap(
             categotyIsExist -> {
               if (categotyIsExist != null
@@ -114,7 +115,9 @@ public class PostServiceImpl implements PostService {
                       .exists(
                           authDto,
                           dto.getCategories().stream()
-                              .map(CategoryDto::getId)
+                              .map(
+                                  categoryDto ->
+                                      IdRequest.builder().id(categoryDto.getId()).build())
                               .collect(Collectors.toSet()))
                       .flatMap(
                           categotyIsExist -> {
@@ -125,7 +128,7 @@ public class PostServiceImpl implements PostService {
                                   .findAndModifyStatus(
                                       authDto,
                                       IdRequest.builder().id(save.getId()).build(),
-                                          new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
+                                      new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
                                   .flatMap(
                                       savedStatus -> {
                                         return postDraftRepo
@@ -237,32 +240,29 @@ public class PostServiceImpl implements PostService {
                         exitingPost.setModifiedAt(new Date());
                         exitingPost.setModifiedBy(session.getId());
                         exitingPost.setStatus(
-                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
-
-                        // blocking part
-                        exitingPost
-                            .getCategories()
-                            .forEach(
-                                category -> {
-                                  Result<CategoryDto> result =
-                                      categoryService.findById(session, category.getId()).block();
-                                  if (result.getStatusCode().equals(StatusCode.DATA_FOUND)) {
-                                    category.setName(result.getData().getName());
-                                  }
-                                });
-
-                        return postRepo
-                            .save(exitingPost)
+                            new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
+                        Set<IdRequest> ids =
+                            exitingPost.getCategories().stream()
+                                .map(category -> IdRequest.builder().id(category.getId()).build())
+                                .collect(Collectors.toSet());
+                        return categoryService
+                            .findByIds(session, ids)
                             .flatMap(
-                                saved -> {
-                                  postDraft.setStatus(
-                                          new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)));
-                                  return postDraftRepo
-                                      .save(postDraft)
-                                      .map(result -> postAssembler.fromEntity(saved))
-                                      .map(
-                                          returned ->
-                                              Result.build(returned, StatusCode.SAVE_SUCCESS));
+                                categoryDtos -> {
+                                  return postRepo
+                                      .save(exitingPost)
+                                      .flatMap(
+                                          saved -> {
+                                            postDraft.setStatus(
+                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)));
+                                            return postDraftRepo
+                                                .save(postDraft)
+                                                .map(result -> postAssembler.fromEntity(saved))
+                                                .map(
+                                                    returned ->
+                                                        Result.build(
+                                                            returned, StatusCode.SAVE_SUCCESS));
+                                          });
                                 });
                       });
             });

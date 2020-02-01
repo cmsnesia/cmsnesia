@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> edit(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> edit(AuthDto session, CategoryDto dto) {
     return categoryRepo
         .findById(dto.getId())
         .flatMap(
@@ -56,15 +57,17 @@ public class CategoryServiceImpl implements CategoryService {
                 category -> {
                   Category save = categoryAssembler.fromDto(dto);
                   save.audit(category);
-                  save.setModifiedBy(authDto.getId());
+                  save.setModifiedBy(session.getId());
                   save.setModifiedAt(new Date());
-                  postRepo
-                      .findAndModifyCategory(authDto, categoryAssembler.fromEntity(category))
-                      .block(); // blocking part
-                  return categoryRepo
-                      .save(save)
-                      .map(saved -> categoryAssembler.fromEntity(saved))
-                      .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                  return postRepo
+                      .findAndModifyCategory(session, dto)
+                      .flatMap(
+                          updateResult -> {
+                            return categoryRepo
+                                .save(save)
+                                .map(saved -> categoryAssembler.fromEntity(saved))
+                                .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                          });
                 });
   }
 
@@ -109,17 +112,25 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> findById(AuthDto session, String id) {
+  public Mono<Result<CategoryDto>> findById(AuthDto session, IdRequest id) {
     return categoryRepo
-        .findById(id)
+        .findById(id.getId())
         .map(category -> categoryAssembler.fromEntity(category))
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override
-  public Mono<Result<Boolean>> exists(AuthDto session, Set<String> ids) {
+  public Mono<Set<CategoryDto>> findByIds(AuthDto session, Set<IdRequest> ids) {
     return categoryRepo
-        .exists(ids)
+        .findAllById(ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
+        .collectList()
+        .map(categoryAssembler::fromEntity);
+  }
+
+  @Override
+  public Mono<Result<Boolean>> exists(AuthDto session, Set<IdRequest> ids) {
+    return categoryRepo
+        .exists(ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
         .map(
             result ->
                 Result.build(result, result ? StatusCode.DATA_FOUND : StatusCode.DATA_NOT_FOUND));

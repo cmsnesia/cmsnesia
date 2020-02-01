@@ -6,6 +6,7 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.mongodb.client.result.UpdateResult;
 import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
@@ -19,7 +20,7 @@ public interface PostRepoCustom {
 
   Mono<Long> countFind(AuthDto session, PostDto dto);
 
-  Mono<Void> findAndModifyCategory(AuthDto session, CategoryDto categoryDto);
+  Mono<UpdateResult> findAndModifyCategory(AuthDto session, CategoryDto categoryDto);
 
   Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus);
 }

@@ -6,6 +6,8 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.mongodb.client.result.UpdateResult;
+import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -45,23 +47,12 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Mono<Void> findAndModifyCategory(AuthDto authDto, CategoryDto categoryDto) {
+  public Mono<UpdateResult> findAndModifyCategory(AuthDto authDto, CategoryDto categoryDto) {
     Query query = new Query();
     query.addCriteria(Criteria.where("categories.id").is(categoryDto.getId()));
-    reactiveMongoTemplate
-        .find(query, Post.class)
-        .subscribe(
-            post -> {
-              post.getCategories().stream()
-                  .filter(category -> category.getId().equals(categoryDto.getId()))
-                  .forEach(
-                      category -> {
-                        category.setName(categoryDto.getName());
-                      });
-              // blocking part
-              reactiveMongoTemplate.save(post).block();
-            });
-    return Mono.empty();
+    Update update = new Update();
+    update.set("categories.$.name", categoryDto.getName());
+    return reactiveMongoTemplate.updateMulti(query, update, Collection.class);
   }
 
   @Override
