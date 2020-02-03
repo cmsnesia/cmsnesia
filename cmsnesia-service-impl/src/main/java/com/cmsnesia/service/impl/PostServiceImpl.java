@@ -249,6 +249,13 @@ public class PostServiceImpl implements PostService {
                             .findByIds(session, ids)
                             .flatMap(
                                 categoryDtos -> {
+                                  categoryDtos.forEach(categoryDto -> {
+                                    exitingPost.getCategories().forEach(category -> {
+                                      if (category.getId().equals(categoryDto.getId())) {
+                                          category.setName(categoryDto.getName());
+                                      }
+                                    });
+                                  });
                                   return postRepo
                                       .save(exitingPost)
                                       .flatMap(
