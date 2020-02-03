@@ -129,6 +129,17 @@ public class PostAssembler implements Assembler<Post, PostDto> {
         .build();
   }
 
+  public PostDraft fromPost(Post post) {
+    return PostDraft.builder()
+        .id(post.getId())
+        .title(post.getTitle())
+        .content(post.getContent())
+        .tags(post.getTags())
+        .medias(post.getMedias())
+        .categories(post.getCategories())
+        .build();
+  }
+
   private Set<Category> fromDto(Set<CategoryDto> categoryDtos) {
     return categoryDtos.stream()
         .map(

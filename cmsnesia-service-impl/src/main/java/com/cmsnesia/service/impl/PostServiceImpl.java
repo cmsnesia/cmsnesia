@@ -78,7 +78,23 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Result<PostDto>> edit(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> edit(AuthDto session, PostDto dto) {
+    return postRepo
+        .findById(dto.getId())
+        .flatMap(
+            post -> {
+              PostDraft postDraft = postAssembler.fromPost(post);
+              return postDraftRepo.save(postDraft);
+            })
+        .flatMap(
+            postDraft -> {
+              PostDto postDto = postAssembler.fromDraft(postDraft);
+              return editDraft(session, postDto);
+            });
+  }
+
+  @Override
+  public Mono<Result<PostDto>> editDraft(AuthDto authDto, PostDto dto) {
     return postDraftRepo
         .findById(dto.getId())
         .flatMap(
@@ -249,13 +265,19 @@ public class PostServiceImpl implements PostService {
                             .findByIds(session, ids)
                             .flatMap(
                                 categoryDtos -> {
-                                  categoryDtos.forEach(categoryDto -> {
-                                    exitingPost.getCategories().forEach(category -> {
-                                      if (category.getId().equals(categoryDto.getId())) {
-                                          category.setName(categoryDto.getName());
-                                      }
-                                    });
-                                  });
+                                  categoryDtos.forEach(
+                                      categoryDto -> {
+                                        exitingPost
+                                            .getCategories()
+                                            .forEach(
+                                                category -> {
+                                                  if (category
+                                                      .getId()
+                                                      .equals(categoryDto.getId())) {
+                                                    category.setName(categoryDto.getName());
+                                                  }
+                                                });
+                                      });
                                   return postRepo
                                       .save(exitingPost)
                                       .flatMap(

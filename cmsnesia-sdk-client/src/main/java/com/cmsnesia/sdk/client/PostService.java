@@ -30,6 +30,10 @@ public interface PostService {
   @Headers("Content-Type: application/json")
   Mono<Result<PostDto>> edit(PostRequest postRequest);
 
+  @RequestLine("PUT /post/editDraft")
+  @Headers("Content-Type: application/json")
+  Mono<Result<PostDto>> editDraft(PostRequest postRequest);
+
   @RequestLine("PUT /post/delete")
   @Headers("Content-Type: application/json")
   Mono<Result<PostDto>> delete(IdRequest idRequest);
