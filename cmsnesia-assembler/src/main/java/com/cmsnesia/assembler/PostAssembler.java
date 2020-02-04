@@ -74,6 +74,8 @@ public class PostAssembler implements Assembler<Post, PostDto> {
             entity.getMedias() == null
                 ? new HashSet<>()
                 : mediaAssembler.fromEntity(entity.getMedias()))
+        .categories(this.fromCategoryModel(entity.getCategories()))
+        .tags(fromTagModel(entity.getTags()))
         .viewCount(entity.getViewCount())
         .likeCount(entity.getLikeCount())
         .dislikeCount(entity.getDislikeCount())
@@ -107,7 +109,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
         .content(postDraft.getContent())
         .medias(mediaAssembler.fromEntity(postDraft.getMedias()))
         .tags(tagDtos)
-        .categories(fromModel(postDraft.getCategories()))
+        .categories(this.fromCategoryModel(postDraft.getCategories()))
         .build();
   }
 
@@ -149,13 +151,24 @@ public class PostAssembler implements Assembler<Post, PostDto> {
         .collect(Collectors.toSet());
   }
 
-  private Set<CategoryDto> fromModel(Set<Category> categories) {
+  private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {
     return categories.stream()
         .map(
             category -> {
               return CategoryDto.builder().id(category.getId()).name(category.getName()).build();
             })
         .collect(Collectors.toSet());
+  }
+
+  private Set<TagDto> fromTagModel(Set<Tag> tags) {
+    return tags.stream()
+            .map(
+                    tag -> {
+                      return TagDto.builder().name(tag.getName())
+                              .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
+                              .createdBy(tag.getCreatedBy()).build();
+                    })
+            .collect(Collectors.toSet());
   }
 
   //    public PostDraft toDraft(PostDto postDto) {
