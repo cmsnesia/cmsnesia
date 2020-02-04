@@ -21,9 +21,6 @@ public class Post extends Audit {
 
   @Id private String id;
 
-  @Indexed(unique = true)
-  private Set<String> draftIds;
-
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
   private String title;
