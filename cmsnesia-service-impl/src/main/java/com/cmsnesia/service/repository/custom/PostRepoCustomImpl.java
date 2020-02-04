@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -59,9 +60,17 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   public Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").is(id.getId()));
-    Update update = new Update();
-    update.set("status", postStatus.stream().map(PostStatus::name).collect(Collectors.toSet()));
-    return reactiveMongoTemplate.findAndModify(query, update, Post.class);
+    return reactiveMongoTemplate.exists(query, Post.class)
+            .flatMap(exist -> {
+              if (exist) {
+                Update update = new Update();
+                update.set("status", postStatus.stream().map(PostStatus::name).collect(Collectors.toSet()));
+                return reactiveMongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true), Post.class);
+              } else {
+                return Mono.just(Post.builder().id(id.getId()).build());
+              }
+            });
+
   }
 
   private Query buildQuery(AuthDto authDto, PostDto dto) {
