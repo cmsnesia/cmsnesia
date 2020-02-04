@@ -232,6 +232,23 @@ public class PostController {
             });
   }
 
+    @ApiOperation(value = "Delete draft", response = AuthDto.class, notes = "Result<PostDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @PutMapping("/deleteDraft")
+    public Mono<Result<PostDto>> deleteDraft(@RequestBody IdRequest idRequest) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            PostDto dto = new PostDto();
+                            dto.setId(idRequest.getId());
+                            return postService.deleteDraft(session, dto);
+                        });
+    }
+
   @ApiOperation(value = "Publish post", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
