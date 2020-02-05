@@ -15,9 +15,6 @@ import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.service.repository.PostDraftRepo;
 import com.cmsnesia.service.repository.PostRepo;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -104,7 +105,7 @@ public class PostServiceImpl implements PostService {
 
   @Transactional
   @Override
-  public Mono<Result<PostDto>> editDraft(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> editDraft(AuthDto session, PostDto dto) {
     return postDraftRepo
         .findById(dto.getId())
         .flatMap(
@@ -117,39 +118,22 @@ public class PostServiceImpl implements PostService {
 
                   save.audit(postDraft);
 
-                  save.setModifiedBy(authDto.getId());
+                  save.setModifiedBy(session.getId());
                   save.setModifiedAt(new Date());
-
-                  Set<Tag> tags = new HashSet<>();
-                  if (postDraft.getTags() != null) {
-                    tags.addAll(postDraft.getTags());
-                  }
-                  tags.stream()
-                      .forEach(
-                          draftTag -> {
-                            save.getTags()
-                                .forEach(
-                                    saveTag -> {
-                                      if (!saveTag.getName().equalsIgnoreCase(draftTag.getName())) {
-                                        tags.add(saveTag);
-                                      }
-                                    });
-                          });
-                  save.setTags(tags);
 
                   Set<IdRequest> categoryIds =
                       dto.getCategories().stream()
                           .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
                           .collect(Collectors.toSet());
                   return categoryService
-                      .exists(authDto, categoryIds)
+                      .exists(session, categoryIds)
                       .flatMap(
                           categotyIsExist -> {
                             if (categotyIsExist != null
                                 && categotyIsExist.getData() != null
                                 && categotyIsExist.getData()) {
                               return categoryService
-                                  .findByIds(authDto, categoryIds)
+                                  .findByIds(session, categoryIds)
                                   .flatMap(
                                       categoryDtos -> {
                                         save.getCategories()
@@ -166,7 +150,7 @@ public class PostServiceImpl implements PostService {
                                                 });
                                         return postRepo
                                             .findAndModifyStatus(
-                                                authDto,
+                                                session,
                                                 IdRequest.builder().id(save.getId()).build(),
                                                 new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
                                             .flatMap(
