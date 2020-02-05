@@ -60,17 +60,21 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   public Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").is(id.getId()));
-    return reactiveMongoTemplate.exists(query, Post.class)
-            .flatMap(exist -> {
+    return reactiveMongoTemplate
+        .exists(query, Post.class)
+        .flatMap(
+            exist -> {
               if (exist) {
                 Update update = new Update();
-                update.set("status", postStatus.stream().map(PostStatus::name).collect(Collectors.toSet()));
-                return reactiveMongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true), Post.class);
+                update.set(
+                    "status",
+                    postStatus.stream().map(PostStatus::name).collect(Collectors.toSet()));
+                return reactiveMongoTemplate.findAndModify(
+                    query, update, FindAndModifyOptions.options().returnNew(true), Post.class);
               } else {
                 return Mono.just(Post.builder().id(id.getId()).build());
               }
             });
-
   }
 
   private Query buildQuery(AuthDto authDto, PostDto dto) {

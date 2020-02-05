@@ -44,8 +44,9 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   public Mono<Boolean> exists(Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    return reactiveMongoTemplate.count(query, Category.class)
-            .map(count -> count == null ? false : count == ids.size());
+    return reactiveMongoTemplate
+        .count(query, Category.class)
+        .map(count -> count == null ? false : count == ids.size());
   }
 
   private Query buildQuery(AuthDto authDto, CategoryDto dto) {

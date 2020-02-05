@@ -162,13 +162,15 @@ public class PostAssembler implements Assembler<Post, PostDto> {
 
   private Set<TagDto> fromTagModel(Set<Tag> tags) {
     return tags.stream()
-            .map(
-                    tag -> {
-                      return TagDto.builder().name(tag.getName())
-                              .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
-                              .createdBy(tag.getCreatedBy()).build();
-                    })
-            .collect(Collectors.toSet());
+        .map(
+            tag -> {
+              return TagDto.builder()
+                  .name(tag.getName())
+                  .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
+                  .createdBy(tag.getCreatedBy())
+                  .build();
+            })
+        .collect(Collectors.toSet());
   }
 
   //    public PostDraft toDraft(PostDto postDto) {

@@ -56,31 +56,38 @@ public class PostServiceImpl implements PostService {
 
     postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
 
-    Set<IdRequest> categoryIds = dto.getCategories().stream()
+    Set<IdRequest> categoryIds =
+        dto.getCategories().stream()
             .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
             .collect(Collectors.toSet());
     return categoryService
-        .exists(
-            authDto, categoryIds)
+        .exists(authDto, categoryIds)
         .flatMap(
             categotyIsExist -> {
               if (categotyIsExist != null
                   && categotyIsExist.getData() != null
                   && categotyIsExist.getData()) {
-                return categoryService.findByIds(authDto, categoryIds).flatMap(categoryDtos -> {
-                    postDraft.getCategories().forEach(category -> {
-                        categoryDtos.forEach(categoryDto -> {
-                            if (categoryDto.getId().equals(category.getId())) {
-                                category.setName(categoryDto.getName());
-                            }
+                return categoryService
+                    .findByIds(authDto, categoryIds)
+                    .flatMap(
+                        categoryDtos -> {
+                          postDraft
+                              .getCategories()
+                              .forEach(
+                                  category -> {
+                                    categoryDtos.forEach(
+                                        categoryDto -> {
+                                          if (categoryDto.getId().equals(category.getId())) {
+                                            category.setName(categoryDto.getName());
+                                          }
+                                        });
+                                  });
+                          postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                          return postDraftRepo
+                              .save(postDraft)
+                              .map(postAssembler::fromDraft)
+                              .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
                         });
-                    });
-                    postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
-                    return postDraftRepo
-                            .save(postDraft)
-                            .map(postAssembler::fromDraft)
-                            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
-                });
               } else {
                 return Mono.just(Result.build(StatusCode.SAVE_FAILED));
               }
@@ -130,40 +137,56 @@ public class PostServiceImpl implements PostService {
                                 .getTags()
                                 .forEach(
                                     existing -> {
-                                      if (!(tag.getName().equals(existing.getName()))) {
+                                      if (!(tag.getName().equalsIgnoreCase(existing.getName()))) {
                                         tag.setCreatedBy(authDto.getId());
                                         tags.add(tag);
                                       }
                                     });
                           });
-                  save.setTags(tags);
+                  save.getTags().addAll(tags);
 
+                  Set<IdRequest> categoryIds =
+                      dto.getCategories().stream()
+                          .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
+                          .collect(Collectors.toSet());
                   return categoryService
-                      .exists(
-                          authDto,
-                          dto.getCategories().stream()
-                              .map(
-                                  categoryDto ->
-                                      IdRequest.builder().id(categoryDto.getId()).build())
-                              .collect(Collectors.toSet()))
+                      .exists(authDto, categoryIds)
                       .flatMap(
                           categotyIsExist -> {
                             if (categotyIsExist != null
                                 && categotyIsExist.getData() != null
                                 && categotyIsExist.getData()) {
-                              return postRepo
-                                  .findAndModifyStatus(
-                                      authDto,
-                                      IdRequest.builder().id(save.getId()).build(),
-                                      new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
+                              return categoryService
+                                  .findByIds(authDto, categoryIds)
                                   .flatMap(
-                                      savedStatus -> {
-                                        return postDraftRepo
-                                            .save(save)
-                                            .map(saved -> postAssembler.fromDraft(saved))
-                                            .map(
-                                                result ->
-                                                    Result.build(result, StatusCode.SAVE_SUCCESS));
+                                      categoryDtos -> {
+                                        save.getCategories()
+                                            .forEach(
+                                                category -> {
+                                                  categoryDtos.forEach(
+                                                      categoryDto -> {
+                                                        if (categoryDto
+                                                            .getId()
+                                                            .equals(category.getId())) {
+                                                          category.setName(categoryDto.getName());
+                                                        }
+                                                      });
+                                                });
+                                        return postRepo
+                                            .findAndModifyStatus(
+                                                authDto,
+                                                IdRequest.builder().id(save.getId()).build(),
+                                                new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
+                                            .flatMap(
+                                                savedStatus -> {
+                                                  return postDraftRepo
+                                                      .save(save)
+                                                      .map(saved -> postAssembler.fromDraft(saved))
+                                                      .map(
+                                                          result ->
+                                                              Result.build(
+                                                                  result, StatusCode.SAVE_SUCCESS));
+                                                });
                                       });
                             } else {
                               return Mono.just(Result.build(StatusCode.SAVE_FAILED));
@@ -184,14 +207,18 @@ public class PostServiceImpl implements PostService {
                   post.setDeletedAt(new Date());
                   post.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
-                  return postRepo.save(post)
-                          .flatMap(saved -> {
-                            return postDraftRepo.deleteById(post.getId())
-                                    .map(result -> {
-                                        return Result.build(dto, StatusCode.DELETE_SUCCESS);
+                  return postRepo
+                      .save(post)
+                      .flatMap(
+                          saved -> {
+                            return postDraftRepo
+                                .deleteById(post.getId())
+                                .map(
+                                    result -> {
+                                      return Result.build(dto, StatusCode.DELETE_SUCCESS);
                                     });
                           });
-              });
+                });
   }
 
   @Override
@@ -315,9 +342,11 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
-    return postDraftRepo.deleteById(dto.getId())
-            .map(aVoid -> {
-               return Result.build(dto, StatusCode.DELETE_SUCCESS);
+    return postDraftRepo
+        .deleteById(dto.getId())
+        .map(
+            aVoid -> {
+              return Result.build(dto, StatusCode.DELETE_SUCCESS);
             });
   }
 }
