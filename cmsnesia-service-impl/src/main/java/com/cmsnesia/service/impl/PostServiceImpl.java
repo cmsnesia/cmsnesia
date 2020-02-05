@@ -56,22 +56,31 @@ public class PostServiceImpl implements PostService {
 
     postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
 
+    Set<IdRequest> categoryIds = dto.getCategories().stream()
+            .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
+            .collect(Collectors.toSet());
     return categoryService
         .exists(
-            authDto,
-            dto.getCategories().stream()
-                .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
-                .collect(Collectors.toSet()))
+            authDto, categoryIds)
         .flatMap(
             categotyIsExist -> {
               if (categotyIsExist != null
                   && categotyIsExist.getData() != null
                   && categotyIsExist.getData()) {
-                postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
-                return postDraftRepo
-                    .save(postDraft)
-                    .map(postAssembler::fromDraft)
-                    .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                return categoryService.findByIds(authDto, categoryIds).flatMap(categoryDtos -> {
+                    postDraft.getCategories().forEach(category -> {
+                        categoryDtos.forEach(categoryDto -> {
+                            if (categoryDto.getId().equals(category.getId())) {
+                                category.setName(categoryDto.getName());
+                            }
+                        });
+                    });
+                    postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                    return postDraftRepo
+                            .save(postDraft)
+                            .map(postAssembler::fromDraft)
+                            .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                });
               } else {
                 return Mono.just(Result.build(StatusCode.SAVE_FAILED));
               }
@@ -121,8 +130,7 @@ public class PostServiceImpl implements PostService {
                                 .getTags()
                                 .forEach(
                                     existing -> {
-                                      if (!(tag.getName().equals(existing.getName())
-                                          && tag.getCreatedBy().equals(existing.getCreatedBy()))) {
+                                      if (!(tag.getName().equals(existing.getName()))) {
                                         tag.setCreatedBy(authDto.getId());
                                         tags.add(tag);
                                       }
