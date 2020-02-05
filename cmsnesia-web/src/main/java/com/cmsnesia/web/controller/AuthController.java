@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,15 +29,11 @@ import reactor.core.publisher.Mono;
     value = "Auth API",
     tags = {"Auth"})
 @Slf4j
+@RequiredArgsConstructor
 public class AuthController {
 
   private final AuthService authService;
   private final PasswordEncoder passwordEncoder;
-
-  public AuthController(AuthService authService, PasswordEncoder passwordEncoder) {
-    this.authService = authService;
-    this.passwordEncoder = passwordEncoder;
-  }
 
   @ApiOperation(value = "Get user by ID", response = AuthDto.class, notes = "Result<AuthDto>")
   @ApiImplicitParams({

@@ -5,18 +5,16 @@ import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class Crypto {
 
   private static final SecureRandom RANDOM = new SecureRandom();
 
   private final TokenInfo tokenInfo;
-
-  public Crypto(TokenInfo tokenInfo) {
-    this.tokenInfo = tokenInfo;
-  }
 
   public byte[] encrypt(String plainText) throws Exception {
     byte[] clean = plainText.getBytes();

@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,15 +27,11 @@ import reactor.core.publisher.Mono;
     value = "Public API",
     tags = {"Public API"})
 @Slf4j
+@RequiredArgsConstructor
 public class PublicController {
 
   private final CategoryService categoryService;
   private final PostService postService;
-
-  public PublicController(CategoryService categoryService, PostService postService) {
-    this.categoryService = categoryService;
-    this.postService = postService;
-  }
 
   @PostMapping(
       value = "/posts",

@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,19 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
   private final CategoryAssembler categoryAssembler;
   private final CategoryRepo categoryRepo;
   private final PostRepo postRepo;
-
-  public CategoryServiceImpl(
-      CategoryAssembler categoryAssembler, CategoryRepo categoryRepo, PostRepo postRepo) {
-    this.categoryAssembler = categoryAssembler;
-    this.categoryRepo = categoryRepo;
-    this.postRepo = postRepo;
-  }
 
   @Override
   public Mono<Result<CategoryDto>> add(AuthDto authDto, CategoryDto dto) {

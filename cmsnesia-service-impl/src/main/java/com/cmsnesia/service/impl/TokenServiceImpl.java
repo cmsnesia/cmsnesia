@@ -19,10 +19,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class TokenServiceImpl implements TokenService {
@@ -39,21 +41,6 @@ public class TokenServiceImpl implements TokenService {
   private final TokenInfo tokenInfo;
   private final Json json;
   private final Crypto crypto;
-
-  public TokenServiceImpl(
-      AuthAssembler authAssembler,
-      AuthRepo authRepo,
-      AuthService authService,
-      TokenInfo tokenInfo,
-      Json json,
-      Crypto crypto) {
-    this.authAssembler = authAssembler;
-    this.authRepo = authRepo;
-    this.authService = authService;
-    this.tokenInfo = tokenInfo;
-    this.json = json;
-    this.crypto = crypto;
-  }
 
   @Override
   public Mono<AuthDto> validate(TokenResponse tokenResponse) {

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -22,9 +22,10 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 public class PostRepoCustomImpl implements PostRepoCustom {
 
-  @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+  private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
   public Mono<Post> find(AuthDto authDto, IdRequest id) {

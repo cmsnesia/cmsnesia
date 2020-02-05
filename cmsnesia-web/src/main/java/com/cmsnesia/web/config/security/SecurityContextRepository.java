@@ -5,6 +5,7 @@ import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.TokenService;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -19,15 +20,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
   private final TokenService tokenService;
-
-  public SecurityContextRepository(TokenService tokenService) {
-    this.tokenService = tokenService;
-  }
 
   @Override
   public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {

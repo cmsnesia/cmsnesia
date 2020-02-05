@@ -6,6 +6,7 @@ import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.TokenService;
 import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +20,12 @@ import reactor.core.publisher.Mono;
     value = "Token API",
     tags = {"Token"})
 @Slf4j
+@RequiredArgsConstructor
 public class TokenController {
 
   private final AuthService authService;
   private final TokenService tokenService;
   private final PasswordEncoder passwordEncoder;
-
-  public TokenController(
-      AuthService authService, TokenService tokenService, PasswordEncoder passwordEncoder) {
-    this.authService = authService;
-    this.tokenService = tokenService;
-    this.passwordEncoder = passwordEncoder;
-  }
 
   @PostMapping("/request")
   public Mono<ResponseEntity<?>> request(@RequestBody TokenRequest request) {

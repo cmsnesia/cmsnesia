@@ -6,7 +6,7 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,9 +15,10 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
-  @Autowired private ReactiveMongoTemplate reactiveMongoTemplate;
+  private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
   public Mono<Category> find(AuthDto authDto, IdRequest id) {

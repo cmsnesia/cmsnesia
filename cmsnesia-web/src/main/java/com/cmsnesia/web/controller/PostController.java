@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,13 +33,10 @@ import reactor.core.publisher.Mono;
     value = "Post API",
     tags = {"Post"})
 @Slf4j
+@RequiredArgsConstructor
 public class PostController {
 
   private final PostService postService;
-
-  public PostController(PostService postService) {
-    this.postService = postService;
-  }
 
   @ApiOperation(value = "Get post by ID", response = AuthDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({

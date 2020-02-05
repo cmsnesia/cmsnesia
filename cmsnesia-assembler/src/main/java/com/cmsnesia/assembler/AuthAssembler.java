@@ -7,16 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class AuthAssembler implements Assembler<Auth, AuthDto> {
 
   private final EmailAssembler emailAssembler;
-
-  public AuthAssembler(EmailAssembler emailAssembler) {
-    this.emailAssembler = emailAssembler;
-  }
 
   @Nonnull
   @Override

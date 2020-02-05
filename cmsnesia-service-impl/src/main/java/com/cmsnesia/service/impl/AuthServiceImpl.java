@@ -12,22 +12,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
 
-  private AuthAssembler authAssembler;
-  private AuthRepo authRepo;
-
-  public AuthServiceImpl(AuthAssembler authAssembler, AuthRepo authRepo) {
-    this.authAssembler = authAssembler;
-    this.authRepo = authRepo;
-  }
+  private final AuthAssembler authAssembler;
+  private final AuthRepo authRepo;
 
   @Override
   public Mono<Result<AuthDto>> add(AuthDto authDto, AuthDto dto) {

@@ -14,18 +14,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class PostAssembler implements Assembler<Post, PostDto> {
 
   private final AuthorAssembler authorAssembler;
   private final MediaAssembler mediaAssembler;
-
-  public PostAssembler(AuthorAssembler authorAssembler, MediaAssembler mediaAssembler) {
-    this.authorAssembler = authorAssembler;
-    this.mediaAssembler = mediaAssembler;
-  }
 
   @Nonnull
   @Override

@@ -18,6 +18,7 @@ import com.cmsnesia.service.repository.PostRepo;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @Component
 public class PostServiceImpl implements PostService {
 
@@ -32,17 +34,6 @@ public class PostServiceImpl implements PostService {
   private final PostRepo postRepo;
   private final PostDraftRepo postDraftRepo;
   private final CategoryService categoryService;
-
-  public PostServiceImpl(
-      PostAssembler postAssembler,
-      PostRepo postRepo,
-      PostDraftRepo postDraftRepo,
-      CategoryService categoryService) {
-    this.postAssembler = postAssembler;
-    this.postRepo = postRepo;
-    this.postDraftRepo = postDraftRepo;
-    this.categoryService = categoryService;
-  }
 
   @Override
   public Mono<Result<PostDto>> add(AuthDto authDto, PostDto dto) {
@@ -130,20 +121,21 @@ public class PostServiceImpl implements PostService {
                   save.setModifiedAt(new Date());
 
                   Set<Tag> tags = new HashSet<>();
-                  save.getTags()
+                  if (postDraft.getTags() != null) {
+                    tags.addAll(postDraft.getTags());
+                  }
+                  tags.stream()
                       .forEach(
-                          tag -> {
-                            postDraft
-                                .getTags()
+                          draftTag -> {
+                            save.getTags()
                                 .forEach(
-                                    existing -> {
-                                      if (!(tag.getName().equalsIgnoreCase(existing.getName()))) {
-                                        tag.setCreatedBy(authDto.getId());
-                                        tags.add(tag);
+                                    saveTag -> {
+                                      if (!saveTag.getName().equalsIgnoreCase(draftTag.getName())) {
+                                        tags.add(saveTag);
                                       }
                                     });
                           });
-                  save.getTags().addAll(tags);
+                  save.setTags(tags);
 
                   Set<IdRequest> categoryIds =
                       dto.getCategories().stream()
