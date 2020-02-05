@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -24,6 +25,7 @@ public class PostDraft extends Audit {
 
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
+  @Indexed(unique = true)
   private String title;
 
   @NotBlank(message = "Post content must be not blank")

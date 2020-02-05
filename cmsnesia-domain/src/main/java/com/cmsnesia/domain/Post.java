@@ -23,6 +23,7 @@ public class Post extends Audit {
 
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
+  @Indexed(unique = true)
   private String title;
 
   @NotBlank(message = "Post content must be not blank")
