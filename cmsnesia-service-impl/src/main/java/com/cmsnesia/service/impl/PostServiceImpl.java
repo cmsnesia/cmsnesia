@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -77,6 +78,7 @@ public class PostServiceImpl implements PostService {
             });
   }
 
+  @Transactional
   @Override
   public Mono<Result<PostDto>> edit(AuthDto session, PostDto dto) {
     return postRepo
@@ -93,6 +95,7 @@ public class PostServiceImpl implements PostService {
             });
   }
 
+  @Transactional
   @Override
   public Mono<Result<PostDto>> editDraft(AuthDto authDto, PostDto dto) {
     return postDraftRepo
@@ -161,22 +164,26 @@ public class PostServiceImpl implements PostService {
                 });
   }
 
+  @Transactional
   @Override
   public Mono<Result<PostDto>> delete(AuthDto authDto, PostDto dto) {
-    return postDraftRepo
+    return postRepo
         .findById(dto.getId())
         .flatMap(
-            (Function<PostDraft, Mono<Result<PostDto>>>)
-                postDraft -> {
-                  postDraft.setDeletedBy(authDto.getId());
-                  postDraft.setDeletedAt(new Date());
-                  postDraft.setStatus(
+            (Function<Post, Mono<Result<PostDto>>>)
+                post -> {
+                  post.setDeletedBy(authDto.getId());
+                  post.setDeletedAt(new Date());
+                  post.setStatus(
                       Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
-                  return postDraftRepo
-                      .save(postDraft)
-                      .map(saved -> postAssembler.fromDraft(saved))
-                      .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
-                });
+                  return postRepo.save(post)
+                          .flatMap(saved -> {
+                            return postDraftRepo.deleteById(post.getId())
+                                    .map(result -> {
+                                        return Result.build(dto, StatusCode.DELETE_SUCCESS);
+                                    });
+                          });
+              });
   }
 
   @Override
@@ -225,6 +232,7 @@ public class PostServiceImpl implements PostService {
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
+  @Transactional
   @Override
   public Mono<Result<PostDto>> publish(AuthDto session, IdRequest id) {
     return postDraftRepo

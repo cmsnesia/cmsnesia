@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -48,6 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
         .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
   }
 
+  @Transactional
   @Override
   public Mono<Result<CategoryDto>> edit(AuthDto session, CategoryDto dto) {
     return categoryRepo
