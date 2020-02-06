@@ -158,28 +158,13 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
-  public Mono<Result<PostDto>> edit(@RequestBody PostEditRequest postEditRequest) {
-    PostDto postDto =
-        PostDto.builder()
-            .id(postEditRequest.getId())
-            .title(postEditRequest.getTitle())
-            .content(postEditRequest.getContent())
-            .medias(postEditRequest.getMedias())
-            .tags(
-                postEditRequest.getTags().stream()
-                    .map(tagDto -> TagDto.builder().name(tagDto.getName()).build())
-                    .collect(Collectors.toSet()))
-            .categories(
-                postEditRequest.getCategories().stream()
-                    .map(id -> CategoryDto.builder().id(id.getId()).build())
-                    .collect(Collectors.toSet()))
-            .build();
+  public Mono<Result<PostDto>> edit(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.edit(session, postDto);
+              return postService.edit(session, PostDto.builder().id(idRequest.getId()).build());
             });
   }
 
