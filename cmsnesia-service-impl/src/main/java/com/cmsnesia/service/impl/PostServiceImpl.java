@@ -151,7 +151,7 @@ public class PostServiceImpl implements PostService {
                                             .findAndModifyStatus(
                                                 session,
                                                 IdRequest.builder().id(save.getId()).build(),
-                                                new HashSet<>(Arrays.asList(PostStatus.DRAFTED)))
+                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED, PostStatus.DRAFTED)))
                                             .flatMap(
                                                 savedStatus -> {
                                                   return postDraftRepo
