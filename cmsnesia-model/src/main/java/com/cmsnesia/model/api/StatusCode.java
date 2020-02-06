@@ -1,51 +1,50 @@
 package com.cmsnesia.model.api;
 
+import lombok.*;
+
 import java.io.Serializable;
 
-public enum StatusCode implements Serializable {
-  DATA_FOUND(1, "Data ditemukan."),
-  SYSTEM_EXCEPTION(2, "Kesalahan sistem."),
-  DATABASE_EXCEPTION(3, "Kesalahan di database."),
-  DUPLICATE_DATA_EXCEPTION(4, "Data sudah ada."),
-  DATA_NOT_FOUND(5, "Data tidak ditemukan."),
-  SAVE_SUCCESS(6, "Data berhasil disimpan."),
-  SAVE_FAILED(7, "Data gagal disimpan."),
-  DELETE_SUCCESS(8, "Data berhasil dihapus."),
-  DELETE_FAILED(9, "Data gagal dihapus."),
-  LOGIN_FAILED(10, "Login gagal! Pastikas username dan password anda benar."),
-  LOGIN_SUCCESS(11, "Login berhasil."),
-  GENERAL_EXCEPTION(
-      12, "Mungkin terjadi masalah pada jaringan anda, periksa kembali jaringan anda."),
-  INVALID_TOKEN(13, "Token anda tidak valid."),
-  LOGOUT_SUCCESS(14, "Logout berhasil.");
+@Getter
+@ToString
+public class StatusCode implements Serializable {
 
-  private final int statusCode;
+  private static String STATUS_SUCCESS = "SUCCESS";
+  private static String STATUS_ERROR = "ERROR";
+  private static String STATUS_WARN = "WARN";
+
+  public static StatusCode DATA_FOUND = new StatusCode(1, STATUS_SUCCESS, "Data ditemukan.");
+  public static StatusCode SYSTEM_EXCEPTION = new StatusCode(2, STATUS_ERROR, "Kesalahan sistem.");
+  public static StatusCode DATABASE_EXCEPTION = new StatusCode(3, STATUS_ERROR, "Kesalahan di database.");
+  public static StatusCode DUPLICATE_DATA_EXCEPTION = new StatusCode(4, STATUS_ERROR, "Data sudah ada.");
+  public static StatusCode DATA_NOT_FOUND = new StatusCode(5, STATUS_WARN, "Data tidak ditemukan.");
+  public static StatusCode SAVE_SUCCESS = new StatusCode(6, STATUS_SUCCESS, "Data berhasil disimpan.");
+  public static StatusCode SAVE_FAILED = new StatusCode(7, STATUS_ERROR, "Data gagal disimpan.");
+  public static StatusCode DELETE_SUCCESS = new StatusCode(8, STATUS_ERROR, "Data berhasil dihapus.");
+  public static StatusCode DELETE_FAILED = new StatusCode(9, STATUS_ERROR, "Data gagal dihapus.");
+  public static StatusCode LOGIN_FAILED =
+          new StatusCode(10, STATUS_WARN, "Login gagal! Pastikas username dan password anda benar.");
+  public static StatusCode LOGIN_SUCCESS = new StatusCode(11, STATUS_SUCCESS, "Login berhasil.");
+  public static StatusCode GENERAL_EXCEPTION =
+          new StatusCode(
+                  12, STATUS_ERROR, "Mungkin terjadi masalah pada jaringan anda, periksa kembali jaringan anda.");
+  public static StatusCode INVALID_TOKEN = new StatusCode(13, STATUS_ERROR, "Token anda tidak valid.");
+  public static StatusCode LOGOUT_SUCCESS = new StatusCode(14, STATUS_SUCCESS,  "Logout berhasil.");
+
+  private final int code;
+  private final String status;
   private final String message;
 
-  StatusCode() {
-    this.statusCode = -1;
-    this.message = "";
+  public StatusCode() {
+    this.code = GENERAL_EXCEPTION.getCode();
+    this.status = GENERAL_EXCEPTION.getStatus();
+    this.message = GENERAL_EXCEPTION.getMessage();
   }
 
-  StatusCode(final int statusCode, final String message) {
-    this.statusCode = statusCode;
+  public StatusCode(int code, String status, String message) {
+    this.code = code;
+    this.status = status;
     this.message = message;
   }
 
-  public int getStatusCode() {
-    return statusCode;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("StatusCode{");
-    sb.append("statusCode=").append(statusCode);
-    sb.append(", message='").append(message).append('\'');
-    sb.append('}');
-    return sb.toString();
-  }
 }
+
