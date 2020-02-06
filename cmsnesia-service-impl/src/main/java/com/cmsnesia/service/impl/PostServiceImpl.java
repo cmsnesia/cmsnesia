@@ -4,7 +4,6 @@ import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.Author;
-import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
@@ -318,11 +317,9 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
-    return postDraftRepo
-        .deleteById(dto.getId())
-        .map(
-            aVoid -> {
-              return Result.build(dto, StatusCode.DELETE_SUCCESS);
+    return postDraftRepo.deleteById(IdRequest.builder().id(dto.getId()).build())
+            .map(postDraft -> {
+                return Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS);
             });
   }
 }

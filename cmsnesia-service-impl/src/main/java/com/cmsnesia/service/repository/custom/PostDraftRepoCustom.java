@@ -15,4 +15,6 @@ public interface PostDraftRepoCustom {
   Flux<PostDraft> find(AuthDto authDto, PostDto dto, Pageable pageable);
 
   Mono<Long> countFind(AuthDto authDto, PostDto dto);
+
+  Mono<PostDraft> deleteById(IdRequest idRequest);
 }

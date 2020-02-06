@@ -41,6 +41,12 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
     return reactiveMongoTemplate.count(query, PostDraft.class);
   }
 
+  @Override
+  public Mono<PostDraft> deleteById(IdRequest idRequest) {
+    Query query = new Query(Criteria.where("id").is(idRequest.getId()));
+    return reactiveMongoTemplate.findAndRemove(query, PostDraft.class);
+  }
+
   private Query buildQuery(AuthDto authDto, PostDto dto) {
     Query query = new Query();
 
