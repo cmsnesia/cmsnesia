@@ -19,7 +19,7 @@ public class StatusCode implements Serializable {
   public static StatusCode DATA_NOT_FOUND = new StatusCode(5, STATUS_WARN, "Data tidak ditemukan.");
   public static StatusCode SAVE_SUCCESS = new StatusCode(6, STATUS_SUCCESS, "Data berhasil disimpan.");
   public static StatusCode SAVE_FAILED = new StatusCode(7, STATUS_ERROR, "Data gagal disimpan.");
-  public static StatusCode DELETE_SUCCESS = new StatusCode(8, STATUS_ERROR, "Data berhasil dihapus.");
+  public static StatusCode DELETE_SUCCESS = new StatusCode(8, STATUS_SUCCESS, "Data berhasil dihapus.");
   public static StatusCode DELETE_FAILED = new StatusCode(9, STATUS_ERROR, "Data gagal dihapus.");
   public static StatusCode LOGIN_FAILED =
           new StatusCode(10, STATUS_WARN, "Login gagal! Pastikas username dan password anda benar.");
