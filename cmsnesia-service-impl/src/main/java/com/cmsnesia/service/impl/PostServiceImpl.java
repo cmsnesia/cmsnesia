@@ -318,8 +318,8 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
     return postDraftRepo.deleteById(IdRequest.builder().id(dto.getId()).build())
-            .map(postDraft -> {
-                return Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS);
-            });
+            .flatMap(postDraft -> postRepo.findAndModifyStatus(session, IdRequest.builder().id(dto.getId()).build(), new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
+                    .map(post -> Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS))
+                    .defaultIfEmpty(Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_FAILED)));
   }
 }
