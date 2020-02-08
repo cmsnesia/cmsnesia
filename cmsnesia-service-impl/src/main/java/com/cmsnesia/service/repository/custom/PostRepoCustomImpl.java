@@ -7,6 +7,8 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.mongodb.client.result.UpdateResult;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -82,7 +84,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     Query query = new Query();
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
-    query.addCriteria(Criteria.where("status").is(PostStatus.PUBLISHED.name()));
+    query.addCriteria(Criteria.where("status").is(Arrays.asList(PostStatus.PUBLISHED.name())));
 
     if (!StringUtils.isEmpty(dto.getId())) {
       query.addCriteria(Criteria.where("id").is(dto.getId()));
