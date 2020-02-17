@@ -2,17 +2,9 @@ package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
-import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.model.CategoryDto;
-import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.*;
 import com.cmsnesia.model.request.IdRequest;
 import com.mongodb.client.result.UpdateResult;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -23,6 +15,13 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PostRepoCustomImpl implements PostRepoCustom {
@@ -100,7 +99,36 @@ public class PostRepoCustomImpl implements PostRepoCustom {
       }
 
       if (dto.getAuthors() != null && !dto.getAuthors().isEmpty()) {
-        query.addCriteria(Criteria.where("authors").in(dto.getAuthors()));
+        Set<String> names = dto.getAuthors().stream()
+                .filter(authorDto -> StringUtils.hasText(authorDto.getName()))
+                .map(AuthorDto::getName)
+                .collect(Collectors.toSet());
+        if (!names.isEmpty()) {
+          query.addCriteria(Criteria.where("authors.name").in(names));
+        }
+      }
+
+      if (dto.getTags() != null && !dto.getTags().isEmpty()) {
+        Set<String> names = dto.getTags().stream()
+                .filter(tagDto -> StringUtils.hasText(tagDto.getName()))
+                .map(TagDto::getName)
+                .collect(Collectors.toSet());
+        if (!names.isEmpty()) {
+          query.addCriteria(Criteria.where("tags.name").in(names));
+        }
+      }
+
+      if (dto.getCategories() != null && !dto.getCategories().isEmpty()) {
+        if (dto.getCategories().stream()
+            .anyMatch(categoryDto -> Objects.isNull(categoryDto.getId()))) {
+          Set<String> ids =
+              dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
+          query.addCriteria(Criteria.where("categories.id").in(ids));
+        } else {
+          Set<String> names =
+              dto.getCategories().stream().map(CategoryDto::getName).collect(Collectors.toSet());
+          query.addCriteria(Criteria.where("categories.name").in(names));
+        }
       }
     }
 
