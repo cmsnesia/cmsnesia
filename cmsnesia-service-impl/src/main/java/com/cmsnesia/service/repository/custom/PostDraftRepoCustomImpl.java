@@ -8,6 +8,7 @@ import com.cmsnesia.model.request.IdRequest;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -49,6 +50,8 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
 
   private Query buildQuery(AuthDto authDto, PostDto dto) {
     Query query = new Query();
+
+    query.with(Sort.by(Sort.Order.desc("createdAt")));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(PostStatus.UNPUBLISHED));

@@ -4,15 +4,17 @@ import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.response.TokenResponse;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class AuthRepoCustomImpl implements AuthRepoCustom {
@@ -70,6 +72,8 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
   private Query buildQuery(
       AuthDto authDto, AuthDto dto, String accessToken, String refreshToken, String tokenType) {
     Query query = new Query();
+
+    query.with(Sort.by(Sort.Order.desc("createdAt")));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

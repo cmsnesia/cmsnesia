@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -52,6 +53,8 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
   private Query buildQuery(AuthDto authDto, CategoryDto dto) {
     Query query = new Query();
+
+    query.with(Sort.by(Sort.Order.desc("createdAt")));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

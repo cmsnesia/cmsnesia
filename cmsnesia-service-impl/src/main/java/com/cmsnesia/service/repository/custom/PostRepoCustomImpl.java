@@ -7,6 +7,7 @@ import com.cmsnesia.model.request.IdRequest;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -82,6 +83,8 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   private Query buildQuery(AuthDto authDto, PostDto dto) {
     Query query = new Query();
 
+    query.with(Sort.by(Sort.Order.desc("createdAt")));
+
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(Arrays.asList(PostStatus.PUBLISHED.name())));
 
@@ -99,7 +102,8 @@ public class PostRepoCustomImpl implements PostRepoCustom {
       }
 
       if (dto.getAuthors() != null && !dto.getAuthors().isEmpty()) {
-        Set<String> names = dto.getAuthors().stream()
+        Set<String> names =
+            dto.getAuthors().stream()
                 .filter(authorDto -> StringUtils.hasText(authorDto.getName()))
                 .map(AuthorDto::getName)
                 .collect(Collectors.toSet());
@@ -109,7 +113,8 @@ public class PostRepoCustomImpl implements PostRepoCustom {
       }
 
       if (dto.getTags() != null && !dto.getTags().isEmpty()) {
-        Set<String> names = dto.getTags().stream()
+        Set<String> names =
+            dto.getTags().stream()
                 .filter(tagDto -> StringUtils.hasText(tagDto.getName()))
                 .map(TagDto::getName)
                 .collect(Collectors.toSet());
