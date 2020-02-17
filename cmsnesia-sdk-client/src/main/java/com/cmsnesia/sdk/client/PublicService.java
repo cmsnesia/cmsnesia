@@ -2,6 +2,8 @@ package com.cmsnesia.sdk.client;
 
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.api.Result;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.sdk.client.domain.Page;
 import feign.Headers;
 import feign.Param;
@@ -15,9 +17,12 @@ public interface PublicService {
   Mono<Page<PostDto>> findPosts(
       PostDto postDto, @Param("page") Integer page, @Param("size") Integer size);
 
+  @RequestLine("POST /public/postById")
+  @Headers("Content-Type: application/json")
+  Mono<Result<PostDto>> findPostById(IdRequest id);
+
   @RequestLine("POST /public/categories?page={page}&size={size}")
   @Headers("Content-Type: application/json")
   Mono<Page<CategoryDto>> findCategories(
       CategoryDto categoryDto, @Param("page") Integer page, @Param("size") Integer size);
-
 }

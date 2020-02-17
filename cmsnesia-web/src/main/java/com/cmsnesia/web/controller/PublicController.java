@@ -3,6 +3,8 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.api.Result;
+import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
@@ -18,7 +20,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -54,6 +59,15 @@ public class PublicController {
       @RequestBody PostDto postDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return postService.find(null, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+      value = "/postById",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Post detail", response = AuthDto.class, notes = "Mono [PostDto]")
+  public Mono<Result<PostDto>> findById(@RequestBody IdRequest id) {
+    return postService.find(null, id);
   }
 
   @PostMapping(
