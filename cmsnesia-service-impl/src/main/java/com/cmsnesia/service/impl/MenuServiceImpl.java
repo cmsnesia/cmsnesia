@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -48,6 +49,7 @@ public class MenuServiceImpl implements MenuService {
             exists -> {
               if (exists) {
                 Menu menu = menuAssembler.fromDto(dto);
+                menu.setId(UUID.randomUUID().toString());
                 menu.setCreatedAt(new Date());
                 menu.setCreatedBy(session.getId());
                 return menuRepo

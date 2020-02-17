@@ -138,7 +138,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<Category> fromDto(Set<CategoryDto> categoryDtos) {
-    if (categoryDtos != null) {
+    if (categoryDtos == null) {
       return Collections.emptySet();
     }
     return categoryDtos.stream()
@@ -150,7 +150,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {
-    if (categories != null) {
+    if (categories == null) {
       return Collections.emptySet();
     }
     return categories.stream()
@@ -162,7 +162,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<TagDto> fromTagModel(Set<Tag> tags) {
-    if (tags != null) {
+    if (tags == null) {
       return Collections.emptySet();
     }
     return tags.stream()

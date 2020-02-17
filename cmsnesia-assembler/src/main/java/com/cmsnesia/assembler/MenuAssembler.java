@@ -44,11 +44,11 @@ public class MenuAssembler implements Assembler<Menu, MenuDto> {
   @Nonnull
   @Override
   public Collection<MenuDto> fromEntity(@Nonnull Collection<Menu> entities) {
-    return null;
+    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
   private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {
-    if (categories != null) {
+    if (categories == null) {
       return Collections.emptySet();
     }
     return categories.stream()
@@ -60,7 +60,7 @@ public class MenuAssembler implements Assembler<Menu, MenuDto> {
   }
 
   private Set<Category> fromCategoryDto(Set<CategoryDto> categories) {
-    if (categories != null) {
+    if (categories == null) {
       return Collections.emptySet();
     }
     return categories.stream()
