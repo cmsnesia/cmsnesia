@@ -1,12 +1,13 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.CategoryService;
+import com.cmsnesia.service.MenuService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -37,12 +38,13 @@ public class PublicController {
 
   private final CategoryService categoryService;
   private final PostService postService;
+  private final MenuService menuService;
 
   @PostMapping(
       value = "/posts",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "List post", response = AuthDto.class, notes = "Flux [PostDto]")
+  @ApiOperation(value = "List post", response = PostDto.class, notes = "Flux [PostDto]")
   @ApiImplicitParams({
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
@@ -65,7 +67,7 @@ public class PublicController {
       value = "/postById",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Post detail", response = AuthDto.class, notes = "Mono [PostDto]")
+  @ApiOperation(value = "Post detail", response = PostDto.class, notes = "Mono [PostDto]")
   public Mono<Result<PostDto>> findById(@RequestBody IdRequest id) {
     return postService.find(null, id);
   }
@@ -74,7 +76,7 @@ public class PublicController {
       value = "/categories",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "List category", response = AuthDto.class, notes = "Flux [CategoryDto]")
+  @ApiOperation(value = "List category", response = CategoryDto.class, notes = "Flux [CategoryDto]")
   @ApiImplicitParams({
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
@@ -92,5 +94,28 @@ public class PublicController {
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return categoryService.find(
         null, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+      value = "/menus",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "List menus", response = MenuDto.class, notes = "Flux [MenuDto]")
+  @ApiImplicitParams({
+    @ApiImplicitParam(
+        name = ConstantKeys.PAGE,
+        defaultValue = "0",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.SIZE,
+        defaultValue = "10",
+        paramType = "query",
+        dataType = "integer")
+  })
+  public Mono<Page<MenuDto>> find(
+      @RequestBody MenuDto menuDto,
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+    return menuService.find(null, menuDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
   }
 }

@@ -1,6 +1,7 @@
 package com.cmsnesia.sdk.client;
 
 import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
@@ -25,4 +26,9 @@ public interface PublicService {
   @Headers("Content-Type: application/json")
   Mono<Page<CategoryDto>> findCategories(
       CategoryDto categoryDto, @Param("page") Integer page, @Param("size") Integer size);
+
+  @RequestLine("POST /public/menus?page={page}&size={size}")
+  @Headers("Content-Type: application/json")
+  Mono<Page<MenuDto>> findMenus(
+      MenuDto menuDto, @Param("page") Integer page, @Param("size") Integer size);
 }
