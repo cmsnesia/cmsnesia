@@ -84,7 +84,7 @@ public class MenuServiceImpl implements MenuService {
                           save.audit(menu);
                           save.setModifiedAt(new Date());
                           save.setModifiedBy(session.getId());
-                          return menuRepo.save(menu);
+                          return menuRepo.save(save);
                         })
                     .map(menuAssembler::fromEntity)
                     .map(menuDto -> Result.build(menuDto, StatusCode.SAVE_SUCCESS));
