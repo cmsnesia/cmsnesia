@@ -4,7 +4,6 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.MenuService;
 import com.cmsnesia.web.util.ConstantKeys;
@@ -82,8 +81,7 @@ public class MenuController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
-  public Mono<Result<MenuDto>> add(@RequestBody NameRequest nameRequest) {
-    MenuDto menuDto = MenuDto.builder().name(nameRequest.getName()).build();
+  public Mono<Result<MenuDto>> add(@RequestBody MenuDto menuDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
