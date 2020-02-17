@@ -1,8 +1,8 @@
 package com.cmsnesia.service.repository.custom;
 
-import com.cmsnesia.domain.Category;
+import com.cmsnesia.domain.Menu;
 import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.request.IdRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -14,45 +14,35 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
-public class CategoryRepoCustomImpl implements CategoryRepoCustom {
+public class MenuRepoCustomImpl implements MenuRepoCustom {
 
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Category> find(AuthDto authDto, IdRequest id) {
-    Query query = buildQuery(authDto, CategoryDto.builder().id(id.getId()).build());
-    return reactiveMongoTemplate.findOne(query, Category.class);
+  public Mono<Menu> find(AuthDto authDto, IdRequest id) {
+    Query query = buildQuery(authDto, MenuDto.builder().id(id.getId()).build());
+    return reactiveMongoTemplate.findOne(query, Menu.class);
   }
 
   @Override
-  public Flux<Category> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
+  public Flux<Menu> find(AuthDto authDto, MenuDto dto, Pageable pageable) {
     Query query = buildQuery(authDto, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
     }
-    return reactiveMongoTemplate.find(query, Category.class);
+    return reactiveMongoTemplate.find(query, Menu.class);
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto authDto, CategoryDto dto) {
+  public Mono<Long> countFind(AuthDto authDto, MenuDto dto) {
     Query query = buildQuery(authDto, dto);
-    return reactiveMongoTemplate.count(query, Category.class);
+    return reactiveMongoTemplate.count(query, Menu.class);
   }
 
-  @Override
-  public Mono<Boolean> exists(Set<String> ids) {
-    Query query = new Query();
-    query.addCriteria(Criteria.where("id").in(ids));
-    return reactiveMongoTemplate
-        .count(query, Category.class)
-        .map(count -> count == null ? false : count == ids.size());
-  }
-
-  private Query buildQuery(AuthDto authDto, CategoryDto dto) {
+  private Query buildQuery(AuthDto authDto, MenuDto dto) {
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));

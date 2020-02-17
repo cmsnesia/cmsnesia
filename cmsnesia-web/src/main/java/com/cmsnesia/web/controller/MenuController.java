@@ -1,12 +1,12 @@
 package com.cmsnesia.web.controller;
 
 import com.cmsnesia.model.AuthDto;
-import com.cmsnesia.model.CategoryDto;
+import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
-import com.cmsnesia.service.CategoryService;
+import com.cmsnesia.service.MenuService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,36 +24,33 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping(value = "category")
+@RequestMapping(value = "menu")
 @Api(
-    value = "Category API",
-    tags = {"Category"})
+    value = "Menu API",
+    tags = {"Menu"})
 @Slf4j
 @RequiredArgsConstructor
-public class CategoryController {
+public class MenuController {
 
-  private final CategoryService categoryService;
+  private final MenuService menuService;
 
-  @ApiOperation(
-      value = "Get category by ID",
-      response = CategoryDto.class,
-      notes = "Result<CategoryDto>")
+  @ApiOperation(value = "Get menu by ID", response = MenuDto.class, notes = "Result<MenuDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
-  public Mono<Result<CategoryDto>> findById(@RequestParam("id") String id) {
+  public Mono<Result<MenuDto>> findById(@RequestParam("id") String id) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.find(session, IdRequest.builder().id(id).build());
+              return menuService.find(session, IdRequest.builder().id(id).build());
             });
   }
 
   @PostMapping("/find")
-  @ApiOperation(value = "List category", response = CategoryDto.class, notes = "Page<CategoryDto>")
+  @ApiOperation(value = "List menu", response = MenuDto.class, notes = "Page<MenuDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -67,67 +64,64 @@ public class CategoryController {
         paramType = "query",
         dataType = "integer")
   })
-  public Mono<Page<CategoryDto>> find(
-      @RequestBody CategoryDto categoryDto,
+  public Mono<Page<MenuDto>> find(
+      @RequestBody MenuDto menuDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.find(
-                  session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+              return menuService.find(
+                  session, menuDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
-  @ApiOperation(value = "Add Category", response = CategoryDto.class, notes = "Result<CategoryDto>")
+  @ApiOperation(value = "Add Menu", response = MenuDto.class, notes = "Result<MenuDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
-  public Mono<Result<CategoryDto>> add(@RequestBody NameRequest nameRequest) {
-    CategoryDto categoryDto = CategoryDto.builder().name(nameRequest.getName()).build();
+  public Mono<Result<MenuDto>> add(@RequestBody NameRequest nameRequest) {
+    MenuDto menuDto = MenuDto.builder().name(nameRequest.getName()).build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.add(session, categoryDto);
+              return menuService.add(session, menuDto);
             });
   }
 
-  @ApiOperation(value = "Edit category", response = CategoryDto.class, notes = "Result<CategoryDto>")
+  @ApiOperation(value = "Edit menu", response = MenuDto.class, notes = "Result<MenuDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
-  public Mono<Result<CategoryDto>> edit(@RequestBody CategoryDto categoryDto) {
+  public Mono<Result<MenuDto>> edit(@RequestBody MenuDto menuDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return categoryService.edit(session, categoryDto);
+              return menuService.edit(session, menuDto);
             });
   }
 
-  @ApiOperation(
-      value = "Soft delete category",
-      response = AuthDto.class,
-      notes = "Result<CategoryDto>")
+  @ApiOperation(value = "Soft delete menu", response = MenuDto.class, notes = "Result<MenuDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
-  public Mono<Result<CategoryDto>> delete(@RequestBody IdRequest idRequest) {
+  public Mono<Result<MenuDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              CategoryDto dto = new CategoryDto();
+              MenuDto dto = new MenuDto();
               dto.setId(idRequest.getId());
-              return categoryService.delete(session, dto);
+              return menuService.delete(session, dto);
             });
   }
 }

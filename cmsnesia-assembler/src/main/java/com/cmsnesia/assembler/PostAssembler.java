@@ -8,10 +8,8 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.util.DateTimeUtils;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -140,6 +138,9 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<Category> fromDto(Set<CategoryDto> categoryDtos) {
+    if (categoryDtos != null) {
+      return Collections.emptySet();
+    }
     return categoryDtos.stream()
         .map(
             categoryDto -> {
@@ -149,6 +150,9 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {
+    if (categories != null) {
+      return Collections.emptySet();
+    }
     return categories.stream()
         .map(
             category -> {
@@ -158,6 +162,9 @@ public class PostAssembler implements Assembler<Post, PostDto> {
   }
 
   private Set<TagDto> fromTagModel(Set<Tag> tags) {
+    if (tags != null) {
+      return Collections.emptySet();
+    }
     return tags.stream()
         .map(
             tag -> {
