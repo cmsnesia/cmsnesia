@@ -96,6 +96,7 @@ public class PostServiceImpl implements PostService {
         .flatMap(
             post -> {
               PostDraft postDraft = postAssembler.fromPost(post);
+              postDraft.setApplications(Sessions.applications(session));
               return postDraftRepo.save(postDraft);
             })
         .flatMap(
