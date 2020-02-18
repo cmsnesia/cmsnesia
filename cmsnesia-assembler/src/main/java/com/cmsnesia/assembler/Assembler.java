@@ -1,15 +1,7 @@
 package com.cmsnesia.assembler;
 
-import com.cmsnesia.domain.Audit;
-import com.cmsnesia.domain.model.Application;
-import com.cmsnesia.model.ApplicationDto;
-import com.cmsnesia.model.BaseDto;
-
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class Assembler<A, B> {
 
@@ -24,33 +16,4 @@ public abstract class Assembler<A, B> {
 
   @Nonnull
   public abstract Collection<B> fromEntity(@Nonnull Collection<A> entities);
-
-  @Nonnull
-  protected Set<Application> applicationsFromDto(BaseDto dto) {
-    Set<Application> applications =
-        dto.getApplications() == null
-            ? Collections.emptySet()
-            : dto.getApplications().stream()
-                .map(
-                    applicationDto ->
-                        Application.builder()
-                            .id(applicationDto.getId())
-                            .name(applicationDto.getName())
-                            .build())
-                .collect(Collectors.toSet());
-    return applications;
-  }
-
-  @Nonnull
-  protected Set<ApplicationDto> applicationsFromModel(Audit audit) {
-    Set<ApplicationDto> applications =
-        audit.getApplications() == null
-            ? Collections.emptySet()
-            : audit.getApplications().stream()
-                .map(
-                    model ->
-                        ApplicationDto.builder().id(model.getId()).name(model.getName()).build())
-                .collect(Collectors.toSet());
-    return applications;
-  }
 }

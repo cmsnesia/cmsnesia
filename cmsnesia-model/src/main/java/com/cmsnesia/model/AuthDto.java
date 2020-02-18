@@ -24,4 +24,6 @@ public class AuthDto extends BaseDto {
   private String fullName;
 
   private Set<EmailDto> emails;
+
+  private Set<ApplicationDto> applications;
 }

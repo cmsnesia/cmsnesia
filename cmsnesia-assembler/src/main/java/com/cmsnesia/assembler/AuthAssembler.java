@@ -30,7 +30,6 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
             .emails(
                 dto.getEmails() == null ? new HashSet<>() : emailAssembler.fromDto(dto.getEmails()))
             .build();
-    auth.setApplications(applicationsFromDto(dto));
     return auth;
   }
 
@@ -55,7 +54,6 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
                     ? new HashSet<>()
                     : emailAssembler.fromEntity(entity.getEmails()))
             .build();
-    dto.setApplications(applicationsFromModel(entity));
     return dto;
   }
 

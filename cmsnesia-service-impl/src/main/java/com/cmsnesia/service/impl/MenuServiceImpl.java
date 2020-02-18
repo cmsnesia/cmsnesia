@@ -11,6 +11,7 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.MenuService;
 import com.cmsnesia.service.repository.CategoryRepo;
 import com.cmsnesia.service.repository.MenuRepo;
+import com.cmsnesia.service.util.Sessions;
 import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,7 @@ public class MenuServiceImpl implements MenuService {
                 menu.setId(UUID.randomUUID().toString());
                 menu.setCreatedAt(new Date());
                 menu.setCreatedBy(session.getId());
+                menu.setApplications(Sessions.applications(session));
                 return menuRepo
                     .save(menu)
                     .map(menuAssembler::fromEntity)

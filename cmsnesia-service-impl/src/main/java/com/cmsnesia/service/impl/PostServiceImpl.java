@@ -14,6 +14,7 @@ import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.service.repository.PostDraftRepo;
 import com.cmsnesia.service.repository.PostRepo;
+import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,30 +37,31 @@ public class PostServiceImpl implements PostService {
   private final CategoryService categoryService;
 
   @Override
-  public Mono<Result<PostDto>> add(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> add(AuthDto session, PostDto dto) {
     PostDraft postDraft = postAssembler.fromPostDto(dto);
 
     postDraft.setId(UUID.randomUUID().toString());
 
-    postDraft.setCreatedBy(authDto.getId());
+    postDraft.setCreatedBy(session.getId());
     postDraft.setCreatedAt(new Date());
-    postDraft.setStatus(Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
+    postDraft.setStatus(
+        Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
 
-    postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+    postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
 
     Set<IdRequest> categoryIds =
         dto.getCategories().stream()
             .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
             .collect(Collectors.toSet());
     return categoryService
-        .exists(authDto, categoryIds)
+        .exists(session, categoryIds)
         .flatMap(
             categotyIsExist -> {
               if (categotyIsExist != null
                   && categotyIsExist.getData() != null
                   && categotyIsExist.getData()) {
                 return categoryService
-                    .findByIds(authDto, categoryIds)
+                    .findByIds(session, categoryIds)
                     .flatMap(
                         categoryDtos -> {
                           postDraft
@@ -73,7 +75,8 @@ public class PostServiceImpl implements PostService {
                                           }
                                         });
                                   });
-                          postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
+                          postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
+                          postDraft.setApplications(Sessions.applications(session));
                           return postDraftRepo
                               .save(postDraft)
                               .map(postAssembler::fromDraft)
@@ -113,7 +116,8 @@ public class PostServiceImpl implements PostService {
                   PostDraft save = postAssembler.fromPostDto(dto);
 
                   postDraft.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
+                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                          .collect(Collectors.toSet()));
 
                   save.audit(postDraft);
 
@@ -151,7 +155,9 @@ public class PostServiceImpl implements PostService {
                                             .findAndModifyStatus(
                                                 session,
                                                 IdRequest.builder().id(save.getId()).build(),
-                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED, PostStatus.DRAFTED)))
+                                                new HashSet<>(
+                                                    Arrays.asList(
+                                                        PostStatus.PUBLISHED, PostStatus.DRAFTED)))
                                             .flatMap(
                                                 savedStatus -> {
                                                   return postDraftRepo
@@ -181,7 +187,8 @@ public class PostServiceImpl implements PostService {
                   post.setDeletedBy(authDto.getId());
                   post.setDeletedAt(new Date());
                   post.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
+                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                          .collect(Collectors.toSet()));
                   return postRepo
                       .save(post)
                       .flatMap(
@@ -296,12 +303,14 @@ public class PostServiceImpl implements PostService {
                                                   }
                                                 });
                                       });
+                                  exitingPost.setApplications(Sessions.applications(session));
                                   return postRepo
                                       .save(exitingPost)
                                       .flatMap(
                                           saved -> {
                                             postDraft.setStatus(
-                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
+                                                new HashSet<>(
+                                                    Arrays.asList(PostStatus.PUBLISHED.name())));
                                             return postDraftRepo
                                                 .save(postDraft)
                                                 .map(result -> postAssembler.fromEntity(saved))
@@ -317,9 +326,21 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
-    return postDraftRepo.deleteById(session, IdRequest.builder().id(dto.getId()).build())
-            .flatMap(postDraft -> postRepo.findAndModifyStatus(session, IdRequest.builder().id(dto.getId()).build(), new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
-                    .map(post -> Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS))
-                    .defaultIfEmpty(Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_FAILED)));
+    return postDraftRepo
+        .deleteById(session, IdRequest.builder().id(dto.getId()).build())
+        .flatMap(
+            postDraft ->
+                postRepo
+                    .findAndModifyStatus(
+                        session,
+                        IdRequest.builder().id(dto.getId()).build(),
+                        new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
+                    .map(
+                        post ->
+                            Result.build(
+                                postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS))
+                    .defaultIfEmpty(
+                        Result.build(
+                            postAssembler.fromDraft(postDraft), StatusCode.DELETE_FAILED)));
   }
 }

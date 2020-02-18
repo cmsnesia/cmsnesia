@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,11 +35,12 @@ public class CategoryServiceImpl implements CategoryService {
   private final PostRepo postRepo;
 
   @Override
-  public Mono<Result<CategoryDto>> add(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> add(AuthDto session, CategoryDto dto) {
     Category category = categoryAssembler.fromDto(dto);
     category.setId(UUID.randomUUID().toString());
-    category.setCreatedBy(authDto.getId());
+    category.setCreatedBy(session.getId());
     category.setCreatedAt(new Date());
+    category.setApplications(Sessions.applications(session));
     return categoryRepo
         .save(category)
         .map(categoryAssembler::fromEntity)

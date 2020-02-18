@@ -15,7 +15,6 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Override
   public Category fromDto(@Nonnull CategoryDto dto) {
     Category category = Category.builder().id(dto.getId()).name(dto.getName()).build();
-    category.setApplications(applicationsFromDto(dto));
     return category;
   }
 

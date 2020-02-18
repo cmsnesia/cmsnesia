@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+
+import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     auth.setId(UUID.randomUUID().toString());
     auth.setCreatedBy(authDto.getId());
     auth.setCreatedAt(new Date());
+    auth.setApplications(Sessions.applications(authDto));
     return authRepo
         .save(auth)
         .map(authAssembler::fromEntity)

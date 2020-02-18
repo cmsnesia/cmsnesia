@@ -4,7 +4,7 @@ import com.cmsnesia.domain.Menu;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.AppsUtil;
+import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -49,7 +49,7 @@ public class MenuRepoCustomImpl implements MenuRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

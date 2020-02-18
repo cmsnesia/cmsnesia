@@ -50,7 +50,6 @@ public class PostAssembler extends Assembler<Post, PostDto> {
             .dislikeCount(dto.getDislikeCount())
             .shareCount(dto.getShareCount())
             .build();
-    post.setApplications(applicationsFromDto(dto));
     return post;
   }
 

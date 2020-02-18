@@ -23,7 +23,6 @@ public class MenuAssembler extends Assembler<Menu, MenuDto> {
         .name(dto.getName())
         .categories(fromCategoryDto(dto.getCategories()))
         .build();
-    menu.setApplications(applicationsFromDto(dto));
     return menu;
   }
 

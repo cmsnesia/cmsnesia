@@ -4,7 +4,7 @@ import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.AppsUtil;
+import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -48,7 +48,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   public Mono<Boolean> exists(AuthDto session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     return reactiveMongoTemplate
         .count(query, Category.class)
         .map(count -> count == null ? false : count == ids.size());
@@ -60,7 +60,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 
