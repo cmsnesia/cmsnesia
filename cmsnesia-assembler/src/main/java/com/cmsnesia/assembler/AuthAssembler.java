@@ -1,12 +1,16 @@
 package com.cmsnesia.assembler;
 
 import com.cmsnesia.domain.Auth;
+import com.cmsnesia.domain.model.Application;
+import com.cmsnesia.model.ApplicationDto;
 import com.cmsnesia.model.AuthDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +34,10 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
             .emails(
                 dto.getEmails() == null ? new HashSet<>() : emailAssembler.fromDto(dto.getEmails()))
             .build();
+    auth.setApplications(dto.getApplications() == null ? Collections.emptySet() :
+            auth.getApplications().stream().filter(application -> StringUtils.hasText(application.getId()))
+                    .map(application -> Application.builder().id(application.getId()).name(application.getName()).build())
+                    .collect(Collectors.toSet()));
     return auth;
   }
 
@@ -54,6 +62,10 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
                     ? new HashSet<>()
                     : emailAssembler.fromEntity(entity.getEmails()))
             .build();
+    dto.setApplications(entity.getApplications() == null ? Collections.emptySet() :
+            entity.getApplications().stream().filter(application -> StringUtils.hasText(application.getId()))
+            .map(application -> ApplicationDto.builder().id(application.getId()).name(application.getName()).build())
+            .collect(Collectors.toSet()));
     return dto;
   }
 
