@@ -11,11 +11,11 @@ import reactor.core.publisher.Mono;
 
 public interface CategoryRepoCustom {
 
-  Mono<Category> find(AuthDto authDto, IdRequest id);
+  Mono<Category> find(AuthDto session, IdRequest id);
 
-  Flux<Category> find(AuthDto authDto, CategoryDto dto, Pageable pageable);
+  Flux<Category> find(AuthDto session, CategoryDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto authDto, CategoryDto dto);
+  Mono<Long> countFind(AuthDto session, CategoryDto dto);
 
-  Mono<Boolean> exists(Set<String> ids);
+  Mono<Boolean> exists(AuthDto session, Set<String> ids);
 }

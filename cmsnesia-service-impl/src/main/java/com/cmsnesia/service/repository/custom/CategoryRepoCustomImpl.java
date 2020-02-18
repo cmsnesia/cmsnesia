@@ -4,6 +4,7 @@ import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.cmsnesia.service.util.AppsUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,14 +24,14 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Category> find(AuthDto authDto, IdRequest id) {
-    Query query = buildQuery(authDto, CategoryDto.builder().id(id.getId()).build());
+  public Mono<Category> find(AuthDto session, IdRequest id) {
+    Query query = buildQuery(session, CategoryDto.builder().id(id.getId()).build());
     return reactiveMongoTemplate.findOne(query, Category.class);
   }
 
   @Override
-  public Flux<Category> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
-    Query query = buildQuery(authDto, dto);
+  public Flux<Category> find(AuthDto session, CategoryDto dto, Pageable pageable) {
+    Query query = buildQuery(session, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
     }
@@ -38,24 +39,28 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto authDto, CategoryDto dto) {
-    Query query = buildQuery(authDto, dto);
+  public Mono<Long> countFind(AuthDto session, CategoryDto dto) {
+    Query query = buildQuery(session, dto);
     return reactiveMongoTemplate.count(query, Category.class);
   }
 
   @Override
-  public Mono<Boolean> exists(Set<String> ids) {
+  public Mono<Boolean> exists(AuthDto session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
+    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
     return reactiveMongoTemplate
         .count(query, Category.class)
         .map(count -> count == null ? false : count == ids.size());
   }
 
-  private Query buildQuery(AuthDto authDto, CategoryDto dto) {
+  private Query buildQuery(AuthDto session, CategoryDto dto) {
+
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
+
+    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

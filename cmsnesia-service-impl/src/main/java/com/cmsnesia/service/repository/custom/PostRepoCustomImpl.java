@@ -4,6 +4,7 @@ import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.request.IdRequest;
+import com.cmsnesia.service.util.AppsUtil;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +63,9 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   @Override
   public Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus) {
     Query query = new Query();
+
     query.addCriteria(Criteria.where("id").is(id.getId()));
+    query.addCriteria(Criteria.where("applications.id").is(AppsUtil.appIds(session)));
     return reactiveMongoTemplate
         .exists(query, Post.class)
         .flatMap(
@@ -80,11 +83,13 @@ public class PostRepoCustomImpl implements PostRepoCustom {
             });
   }
 
-  private Query buildQuery(AuthDto authDto, PostDto dto) {
+  private Query buildQuery(AuthDto session, PostDto dto) {
+
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
+    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(Arrays.asList(PostStatus.PUBLISHED.name())));
 

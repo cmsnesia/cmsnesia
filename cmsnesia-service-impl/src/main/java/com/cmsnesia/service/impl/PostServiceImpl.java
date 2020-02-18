@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
 
     postDraft.setCreatedBy(authDto.getId());
     postDraft.setCreatedAt(new Date());
-    postDraft.setStatus(Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
+    postDraft.setStatus(Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
 
     postDraft.getTags().forEach(tag -> tag.setCreatedBy(authDto.getId()));
 
@@ -113,7 +113,7 @@ public class PostServiceImpl implements PostService {
                   PostDraft save = postAssembler.fromPostDto(dto);
 
                   postDraft.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
+                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
 
                   save.audit(postDraft);
 
@@ -181,7 +181,7 @@ public class PostServiceImpl implements PostService {
                   post.setDeletedBy(authDto.getId());
                   post.setDeletedAt(new Date());
                   post.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED).stream().collect(Collectors.toSet()));
+                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
                   return postRepo
                       .save(post)
                       .flatMap(
@@ -301,7 +301,7 @@ public class PostServiceImpl implements PostService {
                                       .flatMap(
                                           saved -> {
                                             postDraft.setStatus(
-                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)));
+                                                new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
                                             return postDraftRepo
                                                 .save(postDraft)
                                                 .map(result -> postAssembler.fromEntity(saved))
@@ -317,7 +317,7 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
-    return postDraftRepo.deleteById(IdRequest.builder().id(dto.getId()).build())
+    return postDraftRepo.deleteById(session, IdRequest.builder().id(dto.getId()).build())
             .flatMap(postDraft -> postRepo.findAndModifyStatus(session, IdRequest.builder().id(dto.getId()).build(), new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
                     .map(post -> Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_SUCCESS))
                     .defaultIfEmpty(Result.build(postAssembler.fromDraft(postDraft), StatusCode.DELETE_FAILED)));

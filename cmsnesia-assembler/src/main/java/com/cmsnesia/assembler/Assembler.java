@@ -1,5 +1,6 @@
 package com.cmsnesia.assembler;
 
+import com.cmsnesia.domain.Audit;
 import com.cmsnesia.domain.model.Application;
 import com.cmsnesia.model.ApplicationDto;
 import com.cmsnesia.model.BaseDto;
@@ -41,11 +42,11 @@ public abstract class Assembler<A, B> {
   }
 
   @Nonnull
-  protected Set<ApplicationDto> applicationsFromModel(BaseDto dto) {
+  protected Set<ApplicationDto> applicationsFromModel(Audit audit) {
     Set<ApplicationDto> applications =
-        dto.getApplications() == null
+        audit.getApplications() == null
             ? Collections.emptySet()
-            : dto.getApplications().stream()
+            : audit.getApplications().stream()
                 .map(
                     model ->
                         ApplicationDto.builder().id(model.getId()).name(model.getName()).build())

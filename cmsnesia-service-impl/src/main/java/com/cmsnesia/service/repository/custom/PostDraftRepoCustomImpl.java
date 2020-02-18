@@ -5,7 +5,7 @@ import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
-import java.util.regex.Pattern;
+import com.cmsnesia.service.util.AppsUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
@@ -43,16 +45,19 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
   }
 
   @Override
-  public Mono<PostDraft> deleteById(IdRequest idRequest) {
+  public Mono<PostDraft> deleteById(AuthDto session, IdRequest idRequest) {
     Query query = new Query(Criteria.where("id").is(idRequest.getId()));
+    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
     return reactiveMongoTemplate.findAndRemove(query, PostDraft.class);
   }
 
-  private Query buildQuery(AuthDto authDto, PostDto dto) {
+  private Query buildQuery(AuthDto session, PostDto dto) {
+
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
+    query.addCriteria(Criteria.where("applications.id").in(AppsUtil.appIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(PostStatus.UNPUBLISHED));
 

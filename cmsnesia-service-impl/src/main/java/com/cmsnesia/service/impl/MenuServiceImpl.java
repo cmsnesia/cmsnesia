@@ -44,7 +44,7 @@ public class MenuServiceImpl implements MenuService {
         dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
 
     return categoryRepo
-        .exists(categoryIds)
+        .exists(session, categoryIds)
         .flatMap(
             exists -> {
               if (exists) {
@@ -72,7 +72,7 @@ public class MenuServiceImpl implements MenuService {
         dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
 
     return categoryRepo
-        .exists(categoryIds)
+        .exists(session, categoryIds)
         .flatMap(
             exists -> {
               if (exists) {

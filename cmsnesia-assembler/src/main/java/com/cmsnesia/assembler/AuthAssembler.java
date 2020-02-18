@@ -43,17 +43,20 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
   @Nonnull
   @Override
   public AuthDto fromEntity(@Nonnull Auth entity) {
-    return AuthDto.builder()
-        .id(entity.getId())
-        .username(entity.getUsername())
-        .password("******")
-        .roles(entity.getRoles())
-        .fullName(entity.getFullName())
-        .emails(
-            entity.getEmails() == null
-                ? new HashSet<>()
-                : emailAssembler.fromEntity(entity.getEmails()))
-        .build();
+    AuthDto dto =
+        AuthDto.builder()
+            .id(entity.getId())
+            .username(entity.getUsername())
+            .password("******")
+            .roles(entity.getRoles())
+            .fullName(entity.getFullName())
+            .emails(
+                entity.getEmails() == null
+                    ? new HashSet<>()
+                    : emailAssembler.fromEntity(entity.getEmails()))
+            .build();
+    dto.setApplications(applicationsFromModel(entity));
+    return dto;
   }
 
   @Nonnull

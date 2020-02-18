@@ -16,5 +16,5 @@ public interface PostDraftRepoCustom {
 
   Mono<Long> countFind(AuthDto authDto, PostDto dto);
 
-  Mono<PostDraft> deleteById(IdRequest idRequest);
+  Mono<PostDraft> deleteById(AuthDto session, IdRequest idRequest);
 }

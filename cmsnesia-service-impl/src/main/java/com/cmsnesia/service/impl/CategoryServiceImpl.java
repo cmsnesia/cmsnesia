@@ -127,7 +127,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public Mono<Result<Boolean>> exists(AuthDto session, Set<IdRequest> ids) {
     return categoryRepo
-        .exists(ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
+        .exists(session, ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
         .map(
             result ->
                 Result.build(result, result ? StatusCode.DATA_FOUND : StatusCode.DATA_NOT_FOUND));

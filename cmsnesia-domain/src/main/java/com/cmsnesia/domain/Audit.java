@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode
-public abstract class Audit<T> implements Serializable {
+public abstract class Audit implements Serializable {
 
   @NotNull @CreatedDate private Date createdAt;
 
