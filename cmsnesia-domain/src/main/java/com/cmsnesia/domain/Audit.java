@@ -1,10 +1,6 @@
 package com.cmsnesia.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
+import com.cmsnesia.domain.model.Application;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +8,14 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,6 +35,8 @@ public abstract class Audit<T> implements Serializable {
   private String deletedBy;
 
   private Set<String> status;
+
+  private Set<Application> applications;
 
   public void audit(Audit audit) {
     if (Objects.nonNull(audit.getCreatedAt())) {
@@ -54,6 +59,9 @@ public abstract class Audit<T> implements Serializable {
     }
     if (!StringUtils.isEmpty(audit.getStatus())) {
       this.setStatus(audit.getStatus());
+    }
+    if (!CollectionUtils.isEmpty(audit.getApplications())) {
+      this.setApplications(audit.getApplications());
     }
   }
 }

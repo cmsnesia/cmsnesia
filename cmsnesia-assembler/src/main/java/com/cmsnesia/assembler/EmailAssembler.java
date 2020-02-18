@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmailAssembler implements Assembler<Email, EmailDto> {
+public class EmailAssembler extends Assembler<Email, EmailDto> {
 
   @Nonnull
   @Override

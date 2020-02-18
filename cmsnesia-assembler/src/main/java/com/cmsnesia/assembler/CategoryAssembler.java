@@ -9,12 +9,14 @@ import javax.annotation.Nonnull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CategoryAssembler implements Assembler<Category, CategoryDto> {
+public class CategoryAssembler extends Assembler<Category, CategoryDto> {
 
   @Nonnull
   @Override
   public Category fromDto(@Nonnull CategoryDto dto) {
-    return Category.builder().id(dto.getId()).name(dto.getName()).build();
+    Category category = Category.builder().id(dto.getId()).name(dto.getName()).build();
+    category.setApplications(applicationsFromDto(dto));
+    return category;
   }
 
   @Nonnull

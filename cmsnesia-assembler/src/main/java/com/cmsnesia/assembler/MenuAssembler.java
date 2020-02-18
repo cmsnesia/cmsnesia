@@ -13,16 +13,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class MenuAssembler implements Assembler<Menu, MenuDto> {
+public class MenuAssembler extends Assembler<Menu, MenuDto> {
 
   @Nonnull
   @Override
   public Menu fromDto(@Nonnull MenuDto dto) {
-    return Menu.builder()
+    Menu menu = Menu.builder()
         .id(dto.getId())
         .name(dto.getName())
         .categories(fromCategoryDto(dto.getCategories()))
         .build();
+    menu.setApplications(applicationsFromDto(dto));
+    return menu;
   }
 
   @Nonnull

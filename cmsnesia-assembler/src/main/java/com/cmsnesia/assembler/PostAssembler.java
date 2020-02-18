@@ -8,16 +8,16 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.util.DateTimeUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
-public class PostAssembler implements Assembler<Post, PostDto> {
+public class PostAssembler extends Assembler<Post, PostDto> {
 
   private final AuthorAssembler authorAssembler;
   private final MediaAssembler mediaAssembler;
@@ -32,20 +32,26 @@ public class PostAssembler implements Assembler<Post, PostDto> {
               .map(tagDto -> Tag.builder().createdAt(new Date()).name(tagDto.getName()).build())
               .collect(Collectors.toSet()));
     }
-    return Post.builder()
-        .id(dto.getId())
-        .title(dto.getTitle())
-        .content(dto.getContent())
-        .authors(
-            dto.getAuthors() == null ? new HashSet<>() : authorAssembler.fromDto(dto.getAuthors()))
-        .medias(dto.getMedias() == null ? new HashSet<>() : mediaAssembler.fromDto(dto.getMedias()))
-        .tags(tags)
-        .categories(fromDto(dto.getCategories()))
-        .viewCount(dto.getViewCount())
-        .likeCount(dto.getLikeCount())
-        .dislikeCount(dto.getDislikeCount())
-        .shareCount(dto.getShareCount())
-        .build();
+    Post post =
+        Post.builder()
+            .id(dto.getId())
+            .title(dto.getTitle())
+            .content(dto.getContent())
+            .authors(
+                dto.getAuthors() == null
+                    ? new HashSet<>()
+                    : authorAssembler.fromDto(dto.getAuthors()))
+            .medias(
+                dto.getMedias() == null ? new HashSet<>() : mediaAssembler.fromDto(dto.getMedias()))
+            .tags(tags)
+            .categories(fromDto(dto.getCategories()))
+            .viewCount(dto.getViewCount())
+            .likeCount(dto.getLikeCount())
+            .dislikeCount(dto.getDislikeCount())
+            .shareCount(dto.getShareCount())
+            .build();
+    post.setApplications(applicationsFromDto(dto));
+    return post;
   }
 
   @Nonnull
@@ -143,9 +149,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
     }
     return categoryDtos.stream()
         .map(
-            categoryDto -> {
-              return Category.builder().id(categoryDto.getId()).name(categoryDto.getName()).build();
-            })
+            categoryDto -> Category.builder().id(categoryDto.getId()).name(categoryDto.getName()).build())
         .collect(Collectors.toSet());
   }
 
@@ -155,9 +159,7 @@ public class PostAssembler implements Assembler<Post, PostDto> {
     }
     return categories.stream()
         .map(
-            category -> {
-              return CategoryDto.builder().id(category.getId()).name(category.getName()).build();
-            })
+            category -> CategoryDto.builder().id(category.getId()).name(category.getName()).build())
         .collect(Collectors.toSet());
   }
 

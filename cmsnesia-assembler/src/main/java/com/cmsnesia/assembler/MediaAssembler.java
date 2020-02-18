@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MediaAssembler implements Assembler<Media, MediaDto> {
+public class MediaAssembler extends Assembler<Media, MediaDto> {
 
   @Nonnull
   @Override

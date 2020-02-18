@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthorAssembler implements Assembler<Author, AuthorDto> {
+public class AuthorAssembler extends Assembler<Author, AuthorDto> {
 
   @Nonnull
   @Override
