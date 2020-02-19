@@ -19,11 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -65,10 +61,9 @@ public class PublicController {
         required = true)
   })
   public Mono<Page<PostDto>> find(
-      ServerRequest request,
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody PostDto postDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    List<String> appIds = request.headers().header(ConstantKeys.APP_ID);
     AuthDto session =
         AuthDto.builder()
             .applications(
@@ -91,8 +86,8 @@ public class PublicController {
           paramType = "header",
           dataType = "string",
           required = true))
-  public Mono<Result<PostDto>> findById(ServerRequest request, @RequestBody IdRequest id) {
-    List<String> appIds = request.headers().header(ConstantKeys.APP_ID);
+  public Mono<Result<PostDto>> findById(
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds, @RequestBody IdRequest id) {
     AuthDto session =
         AuthDto.builder()
             .applications(
@@ -100,7 +95,7 @@ public class PublicController {
                     .map(appId -> ApplicationDto.builder().id(appId).build())
                     .collect(Collectors.toSet()))
             .build();
-    return postService.find(null, id);
+    return postService.find(session, id);
   }
 
   @PostMapping(
@@ -126,10 +121,9 @@ public class PublicController {
         required = true)
   })
   public Mono<Page<CategoryDto>> find(
-      ServerRequest request,
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody CategoryDto categoryDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    List<String> appIds = request.headers().header(ConstantKeys.APP_ID);
     AuthDto session =
         AuthDto.builder()
             .applications(
@@ -164,10 +158,9 @@ public class PublicController {
         required = true)
   })
   public Mono<Page<MenuDto>> find(
-      ServerRequest request,
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody MenuDto menuDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    List<String> appIds = request.headers().header(ConstantKeys.APP_ID);
     AuthDto session =
         AuthDto.builder()
             .applications(

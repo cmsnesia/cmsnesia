@@ -130,7 +130,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
 
       if (dto.getCategories() != null && !dto.getCategories().isEmpty()) {
         if (dto.getCategories().stream()
-            .anyMatch(categoryDto -> Objects.isNull(categoryDto.getId()))) {
+            .anyMatch(categoryDto -> !Objects.isNull(categoryDto.getId()))) {
           Set<String> ids =
               dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
           query.addCriteria(Criteria.where("categories.id").in(ids));
