@@ -89,7 +89,13 @@ public class StoreageController {
                       },
                       clientResponse -> Mono.empty())
                   .bodyToMono(Response.class)
-                  .map(mediaDto -> Result.build(mediaDto, StatusCode.SAVE_SUCCESS));
+                  .map(
+                      response -> {
+                        if (response == null || response.getContent() == null) {
+                          return Result.build(response, StatusCode.SAVE_FAILED);
+                        }
+                        return Result.build(response, StatusCode.SAVE_SUCCESS);
+                      });
             });
   }
 
