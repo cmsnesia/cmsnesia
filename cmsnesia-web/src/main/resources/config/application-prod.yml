@@ -1,6 +1,22 @@
 spring:
   profiles:
     active:
-      - prod
+      - local
     include:
       - common
+  data:
+    mongodb:
+      uri: ''
+
+cmsnesia:
+  token:
+    issuer: 'cmsnesia'
+    accessTokenExparation: 300000
+    refreshTokenExparation: 600000
+    secret: ''
+    max: 0
+
+github:
+  owner: ''
+  repo: ''
+  accessToken: ''

@@ -46,6 +46,7 @@ jobs:
       # Create namespace if doesn't exist
       - run: |
           kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
+          echo "${{ secrets.k8s_deployment_base64 }}" | base64 --decode > .k8s/templates/deployment.yaml
 
       # Create imagepullsecret for Azure Container registry (ACR)
       - uses: azure/k8s-create-secret@v1
