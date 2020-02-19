@@ -26,3 +26,6 @@ cmsnesia:
     refreshTokenExparation: 414720000
     secret: 123456
     max: 0
+
+github:
+  accessToken: d2b8ce2f8418468b928cf0fee52bf2cf10b86611
