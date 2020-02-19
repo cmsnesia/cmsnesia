@@ -8,6 +8,7 @@ public class ConstantKeys {
   public static final String AUTHORIZATION = "Authorization";
   public static final String PAGE = "page";
   public static final String SIZE = "size";
+  public static final String APP_ID = "appid";
 
   public static final String ISSUER = "issuer";
 }
