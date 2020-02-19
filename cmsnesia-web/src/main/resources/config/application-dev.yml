@@ -4,28 +4,28 @@ spring:
       - dev
     include:
       - common
-  data:
-    mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false}
-      #uri: ${SPRING_DATA_MONGODB_URI:mongodb://auth_user:auth_user@cluster0-shard-00-00-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-01-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-02-fjlws.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority}
-
-management:
-  metrics:
-    export:
-      influx:
-        db: ardikars
-        user-name: ardikars
-        password: 123456
-        uri: http://localhost:80862
-        enabled: false
-
-cmsnesia:
-  token:
-    issuer: ardikars
-    accessTokenExparation: 207360000
-    refreshTokenExparation: 414720000
-    secret: 123456
-    max: 0
-
-github:
-  accessToken: d2b8ce2f8418468b928cf0fee52bf2cf10b86611
+#  data:
+#    mongodb:
+#      uri: ${SPRING_DATA_MONGODB_URI:mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false}
+#      #uri: ${SPRING_DATA_MONGODB_URI:mongodb://auth_user:auth_user@cluster0-shard-00-00-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-01-fjlws.gcp.mongodb.net:27017,cluster0-shard-00-02-fjlws.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority}
+#
+#management:
+#  metrics:
+#    export:
+#      influx:
+#        db: ardikars
+#        user-name: ardikars
+#        password: 123456
+#        uri: http://localhost:80862
+#        enabled: false
+#
+#cmsnesia:
+#  token:
+#    issuer: ardikars
+#    accessTokenExparation: 207360000
+#    refreshTokenExparation: 414720000
+#    secret: 123456
+#    max: 0
+#
+#github:
+#  accessToken: d2b8ce2f8418468b928cf0fee52bf2cf10b86611

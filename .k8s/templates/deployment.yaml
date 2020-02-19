@@ -27,6 +27,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: "metadata.namespace"
+            - name: "SPRING_APPLICATION_JSON"
+              value: '{"spring.data.mongodb.uri":"mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false","github.owner":"cmsnesia","github.repo":"assets","github.accessToken":"d2b8ce2f8418468b928cf0fee52bf2cf10b86611","cmsnesia.token.issuer":"ardikars","cmsnesia.token.accessTokenExparation":"207360000","cmsnesia.token.refreshTokenExparation":"414720000","cmsnesia.token.secret":"123456","cmsnesia.token.max":"0"}'
           imagePullPolicy: "IfNotPresent"
           name: "cmsnesia-web"
           image: "cmsnesiacr.azurecr.io/ardikars/cmsnesia-web:latest"
