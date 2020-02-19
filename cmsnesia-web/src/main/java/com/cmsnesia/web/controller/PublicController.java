@@ -6,6 +6,7 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.MenuService;
+import com.cmsnesia.service.PageService;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class PublicController {
 
   private final CategoryService categoryService;
+  private final PageService pageService;
   private final PostService postService;
   private final MenuService menuService;
 
@@ -86,7 +88,7 @@ public class PublicController {
           paramType = "header",
           dataType = "string",
           required = true))
-  public Mono<Result<PostDto>> findById(
+  public Mono<Result<PostDto>> findPostById(
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds, @RequestBody IdRequest id) {
     AuthDto session =
         AuthDto.builder()
@@ -170,5 +172,87 @@ public class PublicController {
             .build();
     return menuService.find(
         session, menuDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+      value = "/pages",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "List pages", response = PageDto.class, notes = "Flux [PageDto]")
+  @ApiImplicitParams({
+    @ApiImplicitParam(
+        name = ConstantKeys.PAGE,
+        defaultValue = "0",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.SIZE,
+        defaultValue = "10",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.APP_ID,
+        paramType = "header",
+        dataType = "string",
+        required = true)
+  })
+  public Mono<Page<PageDto>> find(
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
+      @RequestBody PageDto pageDto,
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+    AuthDto session =
+        AuthDto.builder()
+            .applications(
+                appIds.stream()
+                    .map(id -> ApplicationDto.builder().id(id).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    return pageService.find(
+        session, pageDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+      value = "/pageById",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Page detail", response = PageDto.class, notes = "Mono [PageDto]")
+  @ApiImplicitParams(
+      @ApiImplicitParam(
+          name = ConstantKeys.APP_ID,
+          paramType = "header",
+          dataType = "string",
+          required = true))
+  public Mono<Result<PageDto>> findPageById(
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds, @RequestBody IdRequest id) {
+    AuthDto session =
+        AuthDto.builder()
+            .applications(
+                appIds.stream()
+                    .map(appId -> ApplicationDto.builder().id(appId).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    return pageService.find(session, id);
+  }
+
+  @PostMapping(
+      value = "/findAbout",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Page detail", response = PageDto.class, notes = "Mono [PageDto]")
+  @ApiImplicitParams(
+      @ApiImplicitParam(
+          name = ConstantKeys.APP_ID,
+          paramType = "header",
+          dataType = "string",
+          required = true))
+  public Mono<Result<PageDto>> findAbout(@RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
+    AuthDto session =
+        AuthDto.builder()
+            .applications(
+                appIds.stream()
+                    .map(appId -> ApplicationDto.builder().id(appId).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    return pageService.findAbout(session);
   }
 }
