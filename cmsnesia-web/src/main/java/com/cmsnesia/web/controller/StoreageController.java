@@ -19,16 +19,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -60,7 +55,8 @@ public class StoreageController {
       value = "upload",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<Result<Response>> image(ServerRequest request, @RequestBody Request media) {
+  public Mono<Result<Response>> image(
+      @RequestBody Request media, @RequestParam("fileType") String fileType) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
@@ -68,23 +64,16 @@ public class StoreageController {
             session -> {
               if (!StringUtils.hasText(media.getContent())) {
                 return Mono.empty();
-              }
-
-              String name = UUID.randomUUID().toString();
-
-              Optional<MediaType> mediaTypeOptional = request.headers().contentType();
-              if (mediaTypeOptional.isPresent()) {
-                MediaType mediaType = mediaTypeOptional.get();
-                if (mediaType.includes(MediaType.IMAGE_JPEG)) {
-                  name = "images/" + name.concat(".jpeg");
-                } else if (mediaType.includes(MediaType.IMAGE_PNG)) {
-                  name = "images/" + name.concat(".png");
-                } else if (mediaType.includes(MediaType.IMAGE_GIF)) {
-                  name = "images/" + name.concat(".gif");
-                } else if (mediaType.includes(MediaType.APPLICATION_PDF)) {
-                  name = "docs/" + name.concat(".pdf");
+              } else {
+                int beginIndex = media.getContent().indexOf(";base64,") + 8;
+                if (beginIndex >= 8 && beginIndex < media.getContent().length()) {
+                  String base64 = media.getContent().substring(beginIndex);
+                  media.setContent(base64);
                 }
               }
+
+              String name = UUID.randomUUID().toString().concat(".").concat(fileType);
+
               WebClient.RequestHeadersSpec requestHeadersSpec =
                   webClient
                       .put()
