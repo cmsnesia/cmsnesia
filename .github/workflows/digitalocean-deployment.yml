@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Build container image
-        run: docker build -t ardikars/cmsnesia:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build -t ardikars/cmsnesia:latest .
 
       - name: Docker Login
         env:
@@ -25,27 +25,22 @@ jobs:
       - name: Push image to Docker Hub
         run: docker push ardikars/cmsnesia
 
-      - name: Update deployment file
+      - name: Create deployment configuration
         run: |
+          echo "${{ secrets.k8s_digital_ocean_config }}" | base64 --decode > .kubeconfig
           echo "${{ secrets.k8s_deployment_base64 }}" | base64 --decode > .k8s/templates/deployment.yaml
-          TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|ardikars/cmsnesia:'${TAG}'|' $GITHUB_WORKSPACE/.k8s/templates/deployment.yaml
-
-      - name: Save DigitalOcean kubeconfig
-        uses: digitalocean/action-doctl@master
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-        with:
-          args: kubernetes cluster kubeconfig show cmsnesia-k8s-cluster-01 > $GITHUB_WORKSPACE/.kubeconfig
 
       - name: Deploy to DigitalOcean Kubernetes
         run: |
-          kubectl --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig apply -f $GITHUB_WORKSPACE/.k8s/templates/deployment.yaml
-          kubectl --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig apply -f $GITHUB_WORKSPACE/.k8s/templates/service.yaml
+          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/namespace.yaml
+          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/deployment.yaml
+          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/service.yaml
 
       - name: Verify deployment
-        run: kubectl --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig rollout status deployment/cmsnesia
+        run: kubectl --kubeconfig=.kubeconfig rollout status deployment/cmsnesia-web
 
-      - uses: actions/cache@v1
+      - name: Caching
+        uses: actions/cache@v1
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}

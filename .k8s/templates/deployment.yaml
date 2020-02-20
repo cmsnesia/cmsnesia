@@ -28,12 +28,9 @@ spec:
                 fieldRef:
                   fieldPath: "metadata.namespace"
             - name: "SPRING_APPLICATION_JSON"
-          imagePullPolicy: "IfNotPresent"
           name: "cmsnesia-web"
-          image: <IMAGE>
+          image: "ardikars/cmsnesia:latest"
           ports:
             - containerPort: 8080
               name: "http"
               protocol: "TCP"
-#      imagePullSecrets:
-#        - name: cmsnesiacr-registry-connection
