@@ -6,7 +6,8 @@ metadata:
     app: "cmsnesia-web"
     version: "1.0.0-SNAPSHOT"
     group: "com.cmsnesia"
-  name: "cmsnesia-web"
+  name: "cmsnesia-deployment"
+  namespace: "default"
 spec:
   replicas: 1
   selector:
@@ -28,6 +29,7 @@ spec:
                 fieldRef:
                   fieldPath: "metadata.namespace"
             - name: "SPRING_APPLICATION_JSON"
+              value: ''
           name: "cmsnesia-web"
           image: "ardikars/cmsnesia:latest"
           ports:
