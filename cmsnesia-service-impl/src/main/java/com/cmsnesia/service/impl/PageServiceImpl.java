@@ -2,6 +2,7 @@ package com.cmsnesia.service.impl;
 
 import com.cmsnesia.assembler.PageAssembler;
 import com.cmsnesia.domain.Page;
+import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.api.Result;
@@ -16,9 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -33,6 +33,10 @@ public class PageServiceImpl implements PageService {
     page.setId(UUID.randomUUID().toString());
     page.setCreatedBy(session.getId());
     page.setCreatedAt(new Date());
+    page.setAuthors(
+        Arrays.asList(Author.builder().name(session.getFullName()).modifiedAt(new Date()).build())
+            .stream()
+            .collect(Collectors.toSet()));
     page.setApplications(Sessions.applications(session));
     return pageRepo
         .save(page)
@@ -48,6 +52,16 @@ public class PageServiceImpl implements PageService {
             page -> {
               Page save = pageAssembler.fromDto(dto);
               save.audit(page);
+              Set<Author> authors = page.getAuthors() == null ? new HashSet<>() : page.getAuthors();
+              if (authors.stream()
+                  .map(Author::getName)
+                  .noneMatch(name -> name.equals(session.getFullName()))) {
+                Author author = new Author();
+                author.setName(session.getFullName());
+                author.setModifiedAt(new Date());
+                authors.add(author);
+              }
+              save.setAuthors(authors);
               return pageRepo
                   .save(save)
                   .map(
