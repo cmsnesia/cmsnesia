@@ -76,11 +76,9 @@ public class PageServiceImpl implements PageService {
         .findById(dto.getId())
         .flatMap(
             page -> {
-              Page save = pageAssembler.fromDto(dto);
-              save.audit(page);
-              save.setDeletedAt(new Date());
-              save.setDeletedBy(session.getId());
-              return pageRepo.save(save);
+              page.setDeletedAt(new Date());
+              page.setDeletedBy(session.getId());
+              return pageRepo.save(page);
             })
         .map(pageAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
