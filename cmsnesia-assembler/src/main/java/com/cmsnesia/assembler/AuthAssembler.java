@@ -35,7 +35,7 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
                 dto.getEmails() == null ? new HashSet<>() : emailAssembler.fromDto(dto.getEmails()))
             .build();
     auth.setApplications(dto.getApplications() == null ? Collections.emptySet() :
-            auth.getApplications().stream().filter(application -> StringUtils.hasText(application.getId()))
+            dto.getApplications().stream().filter(application -> StringUtils.hasText(application.getId()))
                     .map(application -> Application.builder().id(application.getId()).name(application.getName()).build())
                     .collect(Collectors.toSet()));
     return auth;
