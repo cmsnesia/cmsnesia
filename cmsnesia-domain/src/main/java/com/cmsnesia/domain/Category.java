@@ -1,11 +1,12 @@
 package com.cmsnesia.domain;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,6 @@ public class Category extends Audit {
 
   @NotBlank(message = "Category name must be not blank")
   @Size(max = 50)
-  @Indexed(unique = true)
+  @Indexed
   private String name;
 }

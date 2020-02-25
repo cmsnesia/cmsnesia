@@ -4,12 +4,13 @@ import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.domain.model.Category;
 import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.Tag;
-import java.util.Set;
-import javax.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.*;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class Post extends Audit {
 
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
-  @Indexed(unique = true)
+  @Indexed
   private String title;
 
   @NotBlank(message = "Post content must be not blank")

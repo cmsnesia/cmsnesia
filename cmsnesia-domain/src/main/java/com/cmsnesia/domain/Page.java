@@ -30,7 +30,7 @@ public class Page extends Audit {
 
   @NotBlank(message = "Menu name must be not blank")
   @Size(max = 50)
-  @Indexed(unique = true)
+  @Indexed
   private String content;
 
   @NotNull private Set<Media> medias;

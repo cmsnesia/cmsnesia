@@ -3,15 +3,16 @@ package com.cmsnesia.domain;
 import com.cmsnesia.domain.model.Category;
 import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.Tag;
-import java.util.Set;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class PostDraft extends Audit {
 
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
-  @Indexed(unique = true)
+  @Indexed
   private String title;
 
   @NotBlank(message = "Post content must be not blank")

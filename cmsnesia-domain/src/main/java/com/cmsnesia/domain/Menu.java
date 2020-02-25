@@ -23,7 +23,7 @@ public class Menu extends Audit {
 
   @NotBlank(message = "Menu name must be not blank")
   @Size(max = 50)
-  @Indexed(unique = true)
+  @Indexed
   private String name;
 
   @NotEmpty private Set<Category> categories;
