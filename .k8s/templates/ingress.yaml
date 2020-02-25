@@ -6,6 +6,11 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Host, X-Request-ID, X-Read-IP, X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Port, X-Forwarded-Proto, X-Scheme, X-Original-Forwarded-For, Accept-Encoding, CF-IPCountry, CF-RAY, CF-Visitor, user-agent, accept, accept-language, access-control-request-method, access-control-request-headers, referer, origin, CF-Connecting-IP, CDN-Loop, TE, Authorization"
 spec:
   tls:
     - hosts:

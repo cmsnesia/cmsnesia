@@ -20,15 +20,16 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
-  private static final String ALLOWED_HEADERS =
-      "x-requested-with, authorization, Content-Type, Authorization, credential, X-XSRF-TOKEN";
-  private static final String ALLOWED_METHODS = "GET, PUT, POST, DELETE, OPTIONS";
+  private static final String ALLOWED_HEADERS = "*";
+  private static final String ALLOWED_EXPOSED_HEADERS = "*";
+  private static final String ALLOWED_REQUEST_HEADERS = "*";
+  private static final String ALLOWED_METHODS = "*";
   private static final String ALLOWED_ORIGIN = "*";
+  private static final String ALLOWED_CREDENTIALS = "true";
   private static final String MAX_AGE = "3600";
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
     registry
         .addResourceHandler("/swagger-ui.html**")
         .addResourceLocations("classpath:/META-INF/resources/");
@@ -46,9 +47,12 @@ public class WebFluxConfig implements WebFluxConfigurer {
         ServerHttpResponse response = ctx.getResponse();
         HttpHeaders headers = response.getHeaders();
         headers.add("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+        headers.add("Access-Control-Allow-Credentials", ALLOWED_CREDENTIALS);
         headers.add("Access-Control-Allow-Methods", ALLOWED_METHODS);
         headers.add("Access-Control-Max-Age", MAX_AGE);
         headers.add("Access-Control-Allow-Headers", ALLOWED_HEADERS);
+        headers.add("Access-Control-Expose-Headers", ALLOWED_EXPOSED_HEADERS);
+        headers.add("Access-Control-Request-Headers", ALLOWED_REQUEST_HEADERS);
         if (request.getMethod() == HttpMethod.OPTIONS) {
           response.setStatusCode(HttpStatus.OK);
           return Mono.empty();
