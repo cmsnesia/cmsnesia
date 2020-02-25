@@ -36,7 +36,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public Mono<Result<MenuDto>> add(AuthDto session, MenuDto dto) {
-    return categoryRepo
+    return menuRepo
         .exists(session, null, dto.getName())
         .flatMap(
             dataExist -> {
@@ -76,7 +76,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public Mono<Result<MenuDto>> edit(AuthDto session, MenuDto dto) {
-    return categoryRepo
+    return menuRepo
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
             dataExist -> {
