@@ -18,6 +18,11 @@ public interface PublicService {
   Mono<Page<PostDto>> findPosts(
       PostDto postDto, @Param("page") Integer page, @Param("size") Integer size);
 
+  @RequestLine("POST /public/popularPosts?page={page}&size={size}")
+  @Headers("Content-Type: application/json")
+  Mono<Page<PostDto>> findPopularPosts(
+      PostDto postDto, @Param("page") Integer page, @Param("size") Integer size);
+
   @RequestLine("POST /public/postById")
   @Headers("Content-Type: application/json")
   Mono<Result<PostDto>> findPostById(IdRequest id);
@@ -31,4 +36,8 @@ public interface PublicService {
   @Headers("Content-Type: application/json")
   Mono<Page<MenuDto>> findMenus(
       MenuDto menuDto, @Param("page") Integer page, @Param("size") Integer size);
+
+  @RequestLine("POST /public/about")
+  @Headers("Content-Type: application/json")
+  Mono<Result<PostDto>> findAbout();
 }

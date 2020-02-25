@@ -274,7 +274,7 @@ public class PublicController {
   }
 
   @PostMapping(
-      value = "/findAbout",
+      value = "/about",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Page detail", response = PageDto.class, notes = "Mono [PageDto]")
