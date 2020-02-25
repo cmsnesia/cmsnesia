@@ -1,7 +1,6 @@
 package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Post;
-import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.request.IdRequest;
@@ -95,7 +94,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     query.addCriteria(Criteria.where("title").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
-    return reactiveMongoTemplate.exists(query, PostDraft.class);
+    return reactiveMongoTemplate.exists(query, Post.class);
   }
 
   private Query buildQuery(AuthDto session, PostDto dto) {
