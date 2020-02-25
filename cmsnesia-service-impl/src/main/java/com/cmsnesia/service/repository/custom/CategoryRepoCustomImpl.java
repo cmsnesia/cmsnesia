@@ -63,6 +63,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     }
     query.addCriteria(Criteria.where("name").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Category.class);
   }
 
