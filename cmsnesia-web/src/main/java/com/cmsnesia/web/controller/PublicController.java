@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
@@ -75,6 +76,44 @@ public class PublicController {
             .build();
     return postService.find(
         session, postDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+          value = "/popularPosts",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "List post", response = PostDto.class, notes = "Flux [PostDto]")
+  @ApiImplicitParams({
+          @ApiImplicitParam(
+                  name = ConstantKeys.PAGE,
+                  defaultValue = "0",
+                  paramType = "query",
+                  dataType = "integer"),
+          @ApiImplicitParam(
+                  name = ConstantKeys.SIZE,
+                  defaultValue = "10",
+                  paramType = "query",
+                  dataType = "integer"),
+          @ApiImplicitParam(
+                  name = ConstantKeys.APP_ID,
+                  paramType = "header",
+                  dataType = "string",
+                  required = true)
+  })
+  public Mono<Page<PostDto>> findPopularPosts(
+          @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
+          @RequestBody PostDto postDto,
+          @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+    AuthDto session =
+            AuthDto.builder()
+                    .applications(
+                            appIds.stream()
+                                    .map(id -> ApplicationDto.builder().id(id).build())
+                                    .collect(Collectors.toSet()))
+                    .build();
+    Pageable pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), Sort.by(Sort.Order.desc("viewCount")));
+    return postService.find(
+            session, postDto, pageRequest);
   }
 
   @PostMapping(

@@ -33,7 +33,9 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   @Override
   public Mono<Post> find(AuthDto authDto, IdRequest id) {
     Query query = buildQuery(authDto, PostDto.builder().id(id.getId()).build());
-    return reactiveMongoTemplate.findOne(query, Post.class);
+    Update update = new Update();
+    update.inc("viewCount", 1);
+    return reactiveMongoTemplate.findAndModify(query, update, Post.class);
   }
 
   @Override
