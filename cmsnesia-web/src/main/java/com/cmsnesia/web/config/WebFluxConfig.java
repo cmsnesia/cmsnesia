@@ -53,6 +53,14 @@ public class WebFluxConfig implements WebFluxConfigurer {
         headers.add("Access-Control-Allow-Headers", ALLOWED_HEADERS);
         headers.add("Access-Control-Expose-Headers", ALLOWED_EXPOSED_HEADERS);
         headers.add("Access-Control-Request-Headers", ALLOWED_REQUEST_HEADERS);
+
+        headers.add("Content-Security-Policy", "upgrade-insecure-requests");
+        headers.add("Strict-Transport-Security", "max-age=1000");
+        headers.add("X-Xss-Protection", "1; mode=block");
+        headers.add("X-Frame-Options", "DENY");
+        headers.add("X-Content-Type-Options", "nosniff");
+        headers.add("Referrer-Policy", "strict-origin-when-cross-origin");
+
         if (request.getMethod() == HttpMethod.OPTIONS) {
           response.setStatusCode(HttpStatus.OK);
           return Mono.empty();
