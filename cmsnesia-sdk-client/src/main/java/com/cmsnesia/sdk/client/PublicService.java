@@ -2,6 +2,7 @@ package com.cmsnesia.sdk.client;
 
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.MenuDto;
+import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
@@ -39,5 +40,5 @@ public interface PublicService {
 
   @RequestLine("POST /public/about")
   @Headers("Content-Type: application/json")
-  Mono<Result<PostDto>> findAbout();
+  Mono<Result<PageDto>> findAbout();
 }
