@@ -5,6 +5,7 @@ import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.web.util.ConstantKeys;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -129,8 +130,11 @@ public class StoreageController {
     private String sha;
     private String size;
     private String url;
+    @JsonProperty("html_url")
     private String htmlUrl;
+    @JsonProperty("git_url")
     private String gitUrl;
+    @JsonProperty("download_url")
     private String downloadUrl;
     private String type;
   }
