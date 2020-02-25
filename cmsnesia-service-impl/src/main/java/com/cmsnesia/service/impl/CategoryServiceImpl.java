@@ -10,13 +10,6 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.repository.CategoryRepo;
 import com.cmsnesia.service.repository.PostRepo;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -36,39 +36,59 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public Mono<Result<CategoryDto>> add(AuthDto session, CategoryDto dto) {
-    Category category = categoryAssembler.fromDto(dto);
-    category.setId(UUID.randomUUID().toString());
-    category.setCreatedBy(session.getId());
-    category.setCreatedAt(new Date());
-    category.setApplications(Sessions.applications(session));
     return categoryRepo
-        .save(category)
-        .map(categoryAssembler::fromEntity)
-        .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+        .exists(session, null, dto.getName())
+        .flatMap(
+            exists -> {
+              if (!exists) {
+                Category category = categoryAssembler.fromDto(dto);
+                category.setId(UUID.randomUUID().toString());
+                category.setCreatedBy(session.getId());
+                category.setCreatedAt(new Date());
+                category.setApplications(Sessions.applications(session));
+                return categoryRepo
+                    .save(category)
+                    .map(categoryAssembler::fromEntity)
+                    .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
+            });
   }
 
   @Transactional
   @Override
   public Mono<Result<CategoryDto>> edit(AuthDto session, CategoryDto dto) {
     return categoryRepo
-        .findById(dto.getId())
+        .exists(session, dto.getId(), dto.getName())
         .flatMap(
-            (Function<Category, Mono<Result<CategoryDto>>>)
-                category -> {
-                  Category save = categoryAssembler.fromDto(dto);
-                  save.audit(category);
-                  save.setModifiedBy(session.getId());
-                  save.setModifiedAt(new Date());
-                  return postRepo
-                      .findAndModifyCategory(session, dto)
-                      .flatMap(
-                          updateResult -> {
-                            return categoryRepo
-                                .save(save)
-                                .map(saved -> categoryAssembler.fromEntity(saved))
-                                .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
-                          });
-                });
+            exists -> {
+              if (!exists) {
+                return categoryRepo
+                    .findById(dto.getId())
+                    .flatMap(
+                        (Function<Category, Mono<Result<CategoryDto>>>)
+                            category -> {
+                              Category save = categoryAssembler.fromDto(dto);
+                              save.audit(category);
+                              save.setModifiedBy(session.getId());
+                              save.setModifiedAt(new Date());
+                              return postRepo
+                                  .findAndModifyCategory(session, dto)
+                                  .flatMap(
+                                      updateResult -> {
+                                        return categoryRepo
+                                            .save(save)
+                                            .map(saved -> categoryAssembler.fromEntity(saved))
+                                            .map(
+                                                result ->
+                                                    Result.build(result, StatusCode.SAVE_SUCCESS));
+                                      });
+                            });
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
+            });
   }
 
   @Override

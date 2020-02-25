@@ -4,6 +4,7 @@ import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
+import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +53,17 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     return reactiveMongoTemplate
         .count(query, Category.class)
         .map(count -> count == null ? false : count == ids.size());
+  }
+
+  @Override
+  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+    Query query = new Query();
+    if (!StringUtils.isEmpty(id)) {
+      query.addCriteria(Criteria.where("id").ne(id));
+    }
+    query.addCriteria(Criteria.where("name").is(name));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    return reactiveMongoTemplate.exists(query, Category.class);
   }
 
   private Query buildQuery(AuthDto session, CategoryDto dto) {

@@ -38,52 +38,68 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> add(AuthDto session, PostDto dto) {
-    PostDraft postDraft = postAssembler.fromPostDto(dto);
-
-    postDraft.setId(UUID.randomUUID().toString());
-
-    postDraft.setCreatedBy(session.getId());
-    postDraft.setCreatedAt(new Date());
-    postDraft.setStatus(
-        Arrays.asList(PostStatus.UNPUBLISHED.name()).stream().collect(Collectors.toSet()));
-
-    postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
-
-    Set<IdRequest> categoryIds =
-        dto.getCategories().stream()
-            .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
-            .collect(Collectors.toSet());
-    return categoryService
-        .exists(session, categoryIds)
+    return postRepo
+        .exists(session, null, dto.getTitle())
         .flatMap(
-            categotyIsExist -> {
-              if (categotyIsExist != null
-                  && categotyIsExist.getData() != null
-                  && categotyIsExist.getData()) {
+            exists -> {
+              if (!exists) {
+                PostDraft postDraft = postAssembler.fromPostDto(dto);
+
+                postDraft.setId(UUID.randomUUID().toString());
+
+                postDraft.setCreatedBy(session.getId());
+                postDraft.setCreatedAt(new Date());
+                postDraft.setStatus(
+                    Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                        .collect(Collectors.toSet()));
+
+                postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
+
+                Set<IdRequest> categoryIds =
+                    dto.getCategories().stream()
+                        .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
+                        .collect(Collectors.toSet());
                 return categoryService
-                    .findByIds(session, categoryIds)
+                    .exists(session, categoryIds)
                     .flatMap(
-                        categoryDtos -> {
-                          postDraft
-                              .getCategories()
-                              .forEach(
-                                  category -> {
-                                    categoryDtos.forEach(
-                                        categoryDto -> {
-                                          if (categoryDto.getId().equals(category.getId())) {
-                                            category.setName(categoryDto.getName());
-                                          }
-                                        });
-                                  });
-                          postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
-                          postDraft.setApplications(Sessions.applications(session));
-                          return postDraftRepo
-                              .save(postDraft)
-                              .map(postAssembler::fromDraft)
-                              .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+                        categotyIsExist -> {
+                          if (categotyIsExist != null
+                              && categotyIsExist.getData() != null
+                              && categotyIsExist.getData()) {
+                            return categoryService
+                                .findByIds(session, categoryIds)
+                                .flatMap(
+                                    categoryDtos -> {
+                                      postDraft
+                                          .getCategories()
+                                          .forEach(
+                                              category -> {
+                                                categoryDtos.forEach(
+                                                    categoryDto -> {
+                                                      if (categoryDto
+                                                          .getId()
+                                                          .equals(category.getId())) {
+                                                        category.setName(categoryDto.getName());
+                                                      }
+                                                    });
+                                              });
+                                      postDraft
+                                          .getTags()
+                                          .forEach(tag -> tag.setCreatedBy(session.getId()));
+                                      postDraft.setApplications(Sessions.applications(session));
+                                      return postDraftRepo
+                                          .save(postDraft)
+                                          .map(postAssembler::fromDraft)
+                                          .map(
+                                              result ->
+                                                  Result.build(result, StatusCode.SAVE_SUCCESS));
+                                    });
+                          } else {
+                            return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+                          }
                         });
               } else {
-                return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
             });
   }
@@ -92,89 +108,118 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> edit(AuthDto session, PostDto dto) {
     return postRepo
-        .findById(dto.getId())
+        .exists(session, dto.getId(), dto.getTitle())
         .flatMap(
-            post -> {
-              PostDraft postDraft = postAssembler.fromPost(post);
-              postDraft.setApplications(Sessions.applications(session));
-              return postDraftRepo.save(postDraft);
-            })
-        .flatMap(
-            postDraft -> {
-              PostDto postDto = postAssembler.fromDraft(postDraft);
-              return editDraft(session, postDto);
+            exists -> {
+              if (!exists) {
+                return postRepo
+                    .findById(dto.getId())
+                    .flatMap(
+                        post -> {
+                          PostDraft postDraft = postAssembler.fromPost(post);
+                          postDraft.setApplications(Sessions.applications(session));
+                          return postDraftRepo.save(postDraft);
+                        })
+                    .flatMap(
+                        postDraft -> {
+                          PostDto postDto = postAssembler.fromDraft(postDraft);
+                          return editDraft(session, postDto);
+                        });
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
             });
   }
 
   @Transactional
   @Override
   public Mono<Result<PostDto>> editDraft(AuthDto session, PostDto dto) {
-    return postDraftRepo
-        .findById(dto.getId())
+    return postRepo
+        .exists(session, dto.getId(), dto.getTitle())
         .flatMap(
-            (Function<PostDraft, Mono<Result<PostDto>>>)
-                postDraft -> {
-                  PostDraft save = postAssembler.fromPostDto(dto);
+            exists -> {
+              if (!exists) {
+                return postDraftRepo
+                    .findById(dto.getId())
+                    .flatMap(
+                        (Function<PostDraft, Mono<Result<PostDto>>>)
+                            postDraft -> {
+                              PostDraft save = postAssembler.fromPostDto(dto);
 
-                  postDraft.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
-                          .collect(Collectors.toSet()));
+                              postDraft.setStatus(
+                                  Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                                      .collect(Collectors.toSet()));
 
-                  save.audit(postDraft);
+                              save.audit(postDraft);
 
-                  save.setModifiedBy(session.getId());
-                  save.setModifiedAt(new Date());
+                              save.setModifiedBy(session.getId());
+                              save.setModifiedAt(new Date());
 
-                  Set<IdRequest> categoryIds =
-                      dto.getCategories().stream()
-                          .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
-                          .collect(Collectors.toSet());
-                  return categoryService
-                      .exists(session, categoryIds)
-                      .flatMap(
-                          categotyIsExist -> {
-                            if (categotyIsExist != null
-                                && categotyIsExist.getData() != null
-                                && categotyIsExist.getData()) {
+                              Set<IdRequest> categoryIds =
+                                  dto.getCategories().stream()
+                                      .map(
+                                          categoryDto ->
+                                              IdRequest.builder().id(categoryDto.getId()).build())
+                                      .collect(Collectors.toSet());
                               return categoryService
-                                  .findByIds(session, categoryIds)
+                                  .exists(session, categoryIds)
                                   .flatMap(
-                                      categoryDtos -> {
-                                        save.getCategories()
-                                            .forEach(
-                                                category -> {
-                                                  categoryDtos.forEach(
-                                                      categoryDto -> {
-                                                        if (categoryDto
-                                                            .getId()
-                                                            .equals(category.getId())) {
-                                                          category.setName(categoryDto.getName());
-                                                        }
-                                                      });
-                                                });
-                                        return postRepo
-                                            .findAndModifyStatus(
-                                                session,
-                                                IdRequest.builder().id(save.getId()).build(),
-                                                new HashSet<>(
-                                                    Arrays.asList(
-                                                        PostStatus.PUBLISHED, PostStatus.DRAFTED)))
-                                            .flatMap(
-                                                savedStatus -> {
-                                                  return postDraftRepo
-                                                      .save(save)
-                                                      .map(saved -> postAssembler.fromDraft(saved))
-                                                      .map(
-                                                          result ->
-                                                              Result.build(
-                                                                  result, StatusCode.SAVE_SUCCESS));
-                                                });
+                                      categotyIsExist -> {
+                                        if (categotyIsExist != null
+                                            && categotyIsExist.getData() != null
+                                            && categotyIsExist.getData()) {
+                                          return categoryService
+                                              .findByIds(session, categoryIds)
+                                              .flatMap(
+                                                  categoryDtos -> {
+                                                    save.getCategories()
+                                                        .forEach(
+                                                            category -> {
+                                                              categoryDtos.forEach(
+                                                                  categoryDto -> {
+                                                                    if (categoryDto
+                                                                        .getId()
+                                                                        .equals(category.getId())) {
+                                                                      category.setName(
+                                                                          categoryDto.getName());
+                                                                    }
+                                                                  });
+                                                            });
+                                                    return postRepo
+                                                        .findAndModifyStatus(
+                                                            session,
+                                                            IdRequest.builder()
+                                                                .id(save.getId())
+                                                                .build(),
+                                                            new HashSet<>(
+                                                                Arrays.asList(
+                                                                    PostStatus.PUBLISHED,
+                                                                    PostStatus.DRAFTED)))
+                                                        .flatMap(
+                                                            savedStatus -> {
+                                                              return postDraftRepo
+                                                                  .save(save)
+                                                                  .map(
+                                                                      saved ->
+                                                                          postAssembler.fromDraft(
+                                                                              saved))
+                                                                  .map(
+                                                                      result ->
+                                                                          Result.build(
+                                                                              result,
+                                                                              StatusCode
+                                                                                  .SAVE_SUCCESS));
+                                                            });
+                                                  });
+                                        } else {
+                                          return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+                                        }
                                       });
-                            } else {
-                              return Mono.just(Result.build(StatusCode.SAVE_FAILED));
-                            }
-                          });
-                });
+                            });
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
+            });
   }
 
   @Transactional

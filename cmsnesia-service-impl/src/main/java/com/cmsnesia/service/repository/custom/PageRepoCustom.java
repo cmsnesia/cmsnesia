@@ -17,4 +17,6 @@ public interface PageRepoCustom {
   Mono<Long> countFind(AuthDto session, PageDto dto);
 
   Mono<Page> findAbout(AuthDto session);
+
+  Mono<Boolean> exists(AuthDto session, String id, String name);
 }

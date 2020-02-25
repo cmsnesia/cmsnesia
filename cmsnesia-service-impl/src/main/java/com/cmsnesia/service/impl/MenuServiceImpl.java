@@ -36,62 +36,82 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public Mono<Result<MenuDto>> add(AuthDto session, MenuDto dto) {
-
-    if (Collections.isEmpty(dto.getCategories())) {
-      return Mono.empty();
-    }
-
-    Set<String> categoryIds =
-        dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
-
     return categoryRepo
-        .exists(session, categoryIds)
+        .exists(session, null, dto.getName())
         .flatMap(
-            exists -> {
-              if (exists) {
-                Menu menu = menuAssembler.fromDto(dto);
-                menu.setId(UUID.randomUUID().toString());
-                menu.setCreatedAt(new Date());
-                menu.setCreatedBy(session.getId());
-                menu.setApplications(Sessions.applications(session));
-                return menuRepo
-                    .save(menu)
-                    .map(menuAssembler::fromEntity)
-                    .map(menuDto -> Result.build(menuDto, StatusCode.SAVE_SUCCESS));
+            dataExist -> {
+              if (!dataExist) {
+                if (Collections.isEmpty(dto.getCategories())) {
+                  return Mono.empty();
+                }
+
+                Set<String> categoryIds =
+                    dto.getCategories().stream()
+                        .map(CategoryDto::getId)
+                        .collect(Collectors.toSet());
+
+                return categoryRepo
+                    .exists(session, categoryIds)
+                    .flatMap(
+                        exists -> {
+                          if (exists) {
+                            Menu menu = menuAssembler.fromDto(dto);
+                            menu.setId(UUID.randomUUID().toString());
+                            menu.setCreatedAt(new Date());
+                            menu.setCreatedBy(session.getId());
+                            menu.setApplications(Sessions.applications(session));
+                            return menuRepo
+                                .save(menu)
+                                .map(menuAssembler::fromEntity)
+                                .map(menuDto -> Result.build(menuDto, StatusCode.SAVE_SUCCESS));
+                          } else {
+                            return Mono.empty();
+                          }
+                        });
               } else {
-                return Mono.empty();
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
             });
   }
 
   @Override
   public Mono<Result<MenuDto>> edit(AuthDto session, MenuDto dto) {
-
-    if (Collections.isEmpty(dto.getCategories())) {
-      return Mono.empty();
-    }
-    Set<String> categoryIds =
-        dto.getCategories().stream().map(CategoryDto::getId).collect(Collectors.toSet());
-
     return categoryRepo
-        .exists(session, categoryIds)
+        .exists(session, dto.getId(), dto.getName())
         .flatMap(
-            exists -> {
-              if (exists) {
-                return menuRepo
-                    .findById(dto.getId())
+            dataExist -> {
+              if (!dataExist) {
+                if (Collections.isEmpty(dto.getCategories())) {
+                  return Mono.empty();
+                }
+                Set<String> categoryIds =
+                    dto.getCategories().stream()
+                        .map(CategoryDto::getId)
+                        .collect(Collectors.toSet());
+
+                return categoryRepo
+                    .exists(session, categoryIds)
                     .flatMap(
-                        menu -> {
-                          Menu save = menuAssembler.fromDto(dto);
-                          save.audit(menu);
-                          save.setModifiedAt(new Date());
-                          save.setModifiedBy(session.getId());
-                          return menuRepo.save(save);
-                        })
-                    .map(menuAssembler::fromEntity)
-                    .map(menuDto -> Result.build(menuDto, StatusCode.SAVE_SUCCESS));
+                        exists -> {
+                          if (exists) {
+                            return menuRepo
+                                .findById(dto.getId())
+                                .flatMap(
+                                    menu -> {
+                                      Menu save = menuAssembler.fromDto(dto);
+                                      save.audit(menu);
+                                      save.setModifiedAt(new Date());
+                                      save.setModifiedBy(session.getId());
+                                      return menuRepo.save(save);
+                                    })
+                                .map(menuAssembler::fromEntity)
+                                .map(menuDto -> Result.build(menuDto, StatusCode.SAVE_SUCCESS));
+                          } else {
+                            return Mono.empty();
+                          }
+                        });
               } else {
-                return Mono.empty();
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
             });
   }

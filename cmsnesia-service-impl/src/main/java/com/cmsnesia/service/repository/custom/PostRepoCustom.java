@@ -23,4 +23,6 @@ public interface PostRepoCustom {
   Mono<UpdateResult> findAndModifyCategory(AuthDto session, CategoryDto categoryDto);
 
   Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus);
+
+  Mono<Boolean> exists(AuthDto session, String id, String name);
 }

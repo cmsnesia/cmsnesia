@@ -43,6 +43,17 @@ public class MenuRepoCustomImpl implements MenuRepoCustom {
     return reactiveMongoTemplate.count(query, Menu.class);
   }
 
+  @Override
+  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+    Query query = new Query();
+    if (!StringUtils.isEmpty(id)) {
+      query.addCriteria(Criteria.where("id").ne(id));
+    }
+    query.addCriteria(Criteria.where("name").is(name));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    return reactiveMongoTemplate.exists(query, Menu.class);
+  }
+
   private Query buildQuery(AuthDto session, MenuDto dto) {
 
     Query query = new Query();

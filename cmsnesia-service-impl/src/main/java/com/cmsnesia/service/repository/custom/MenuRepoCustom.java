@@ -15,4 +15,6 @@ public interface MenuRepoCustom {
   Flux<Menu> find(AuthDto authDto, MenuDto dto, Pageable pageable);
 
   Mono<Long> countFind(AuthDto authDto, MenuDto dto);
+
+  Mono<Boolean> exists(AuthDto session, String id, String name);
 }

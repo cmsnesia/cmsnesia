@@ -29,44 +29,69 @@ public class PageServiceImpl implements PageService {
 
   @Override
   public Mono<Result<PageDto>> add(AuthDto session, PageDto dto) {
-    com.cmsnesia.domain.Page page = pageAssembler.fromDto(dto);
-    page.setId(UUID.randomUUID().toString());
-    page.setCreatedBy(session.getId());
-    page.setCreatedAt(new Date());
-    page.setAuthors(
-        Arrays.asList(Author.builder().name(session.getFullName()).modifiedAt(new Date()).build())
-            .stream()
-            .collect(Collectors.toSet()));
-    page.setApplications(Sessions.applications(session));
     return pageRepo
-        .save(page)
-        .map(pageAssembler::fromEntity)
-        .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+        .exists(session, null, dto.getName())
+        .flatMap(
+            exists -> {
+              if (!exists) {
+                com.cmsnesia.domain.Page page = pageAssembler.fromDto(dto);
+                page.setId(UUID.randomUUID().toString());
+                page.setCreatedBy(session.getId());
+                page.setCreatedAt(new Date());
+                page.setAuthors(
+                    Arrays.asList(
+                            Author.builder()
+                                .name(session.getFullName())
+                                .modifiedAt(new Date())
+                                .build())
+                        .stream()
+                        .collect(Collectors.toSet()));
+                page.setApplications(Sessions.applications(session));
+                return pageRepo
+                    .save(page)
+                    .map(pageAssembler::fromEntity)
+                    .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
+            });
   }
 
   @Override
   public Mono<Result<PageDto>> edit(AuthDto session, PageDto dto) {
     return pageRepo
-        .findById(dto.getId())
+        .exists(session, dto.getId(), dto.getName())
         .flatMap(
-            page -> {
-              Page save = pageAssembler.fromDto(dto);
-              save.audit(page);
-              Set<Author> authors = page.getAuthors() == null ? new HashSet<>() : page.getAuthors();
-              if (authors.stream()
-                  .map(Author::getName)
-                  .noneMatch(name -> name.equals(session.getFullName()))) {
-                Author author = new Author();
-                author.setName(session.getFullName());
-                author.setModifiedAt(new Date());
-                authors.add(author);
+            exists -> {
+              if (!exists) {
+                return pageRepo
+                    .findById(dto.getId())
+                    .flatMap(
+                        page -> {
+                          Page save = pageAssembler.fromDto(dto);
+                          save.audit(page);
+                          Set<Author> authors =
+                              page.getAuthors() == null ? new HashSet<>() : page.getAuthors();
+                          if (authors.stream()
+                              .map(Author::getName)
+                              .noneMatch(name -> name.equals(session.getFullName()))) {
+                            Author author = new Author();
+                            author.setName(session.getFullName());
+                            author.setModifiedAt(new Date());
+                            authors.add(author);
+                          }
+                          save.setAuthors(authors);
+                          return pageRepo
+                              .save(save)
+                              .map(
+                                  result ->
+                                      Result.build(
+                                          pageAssembler.fromEntity(result),
+                                          StatusCode.SAVE_SUCCESS));
+                        });
+              } else {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
-              save.setAuthors(authors);
-              return pageRepo
-                  .save(save)
-                  .map(
-                      result ->
-                          Result.build(pageAssembler.fromEntity(result), StatusCode.SAVE_SUCCESS));
             });
   }
 

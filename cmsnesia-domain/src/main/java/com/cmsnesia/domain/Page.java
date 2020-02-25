@@ -25,7 +25,7 @@ public class Page extends Audit {
 
   @NotBlank(message = "Page name must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
-  @Indexed(unique = true)
+  @Indexed
   private String name;
 
   @NotBlank(message = "Menu name must be not blank")

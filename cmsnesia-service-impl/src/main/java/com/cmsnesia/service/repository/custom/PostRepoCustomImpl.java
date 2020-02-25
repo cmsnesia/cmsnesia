@@ -1,6 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Post;
+import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.request.IdRequest;
@@ -83,6 +84,17 @@ public class PostRepoCustomImpl implements PostRepoCustom {
                 return Mono.just(Post.builder().id(id.getId()).build());
               }
             });
+  }
+
+  @Override
+  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+    Query query = new Query();
+    if (!StringUtils.isEmpty(id)) {
+      query.addCriteria(Criteria.where("id").ne(id));
+    }
+    query.addCriteria(Criteria.where("title").is(name));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    return reactiveMongoTemplate.exists(query, PostDraft.class);
   }
 
   private Query buildQuery(AuthDto session, PostDto dto) {
