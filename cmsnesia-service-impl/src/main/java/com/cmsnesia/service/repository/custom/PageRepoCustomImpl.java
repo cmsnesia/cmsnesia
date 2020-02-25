@@ -51,6 +51,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
     Query query = new Query();
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     query.addCriteria(Criteria.where("name").is("About"));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.findOne(query, Page.class);
   }
 
