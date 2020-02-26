@@ -10,6 +10,9 @@ FROM openjdk:8-jre-alpine
 LABEL APP="cmsnesia-web"
 LABEL DOMAIN="cmsnesia"
 
+RUN apk add --no-cache tzdata
+RUN echo "Asia/Jakarta" > /etc/timezone
+
 RUN addgroup -S cmsnesia && adduser -S cmsnesia-web -G cmsnesia
 USER cmsnesia-web:cmsnesia
 
