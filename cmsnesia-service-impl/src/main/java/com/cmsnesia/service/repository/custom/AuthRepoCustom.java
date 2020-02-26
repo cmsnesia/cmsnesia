@@ -10,15 +10,17 @@ import reactor.core.publisher.Mono;
 
 public interface AuthRepoCustom {
 
-  Mono<Auth> find(AuthDto authDto, IdRequest id);
+  Mono<Auth> find(AuthDto session, IdRequest id);
 
-  Flux<Auth> find(AuthDto authDto, AuthDto dto, Pageable pageable);
+  Flux<Auth> find(AuthDto session, AuthDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto authDto, AuthDto dto);
+  Mono<Long> countFind(AuthDto session, AuthDto dto);
 
-  Mono<Auth> findByAccessTokenAndType(AuthDto authDto, String accessToken, String tokenType);
+  Mono<Auth> findByAccessTokenAndType(AuthDto session, String accessToken, String tokenType);
 
-  Mono<Auth> findByRefreshTokenAndTokenType(AuthDto authDto, String refreshToken, String tokenType);
+  Mono<Auth> findByRefreshTokenAndTokenType(AuthDto session, String refreshToken, String tokenType);
 
-  Mono<Auth> findByAccessTokenAndRefreshTokenAndTokenType(AuthDto authDto, TokenResponse token);
+  Mono<Auth> findByAccessTokenAndRefreshTokenAndTokenType(AuthDto session, TokenResponse token);
+
+  Mono<Auth> changePassword(AuthDto session, String newPassword);
 }

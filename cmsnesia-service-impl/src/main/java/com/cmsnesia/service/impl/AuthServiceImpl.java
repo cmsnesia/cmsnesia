@@ -8,11 +8,6 @@ import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.repository.AuthRepo;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Function;
-
 import com.cmsnesia.service.util.Sessions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +15,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
@@ -108,5 +108,12 @@ public class AuthServiceImpl implements AuthService {
               authDto.setPassword(auth.getPassword());
               return Result.build(authDto, StatusCode.DATA_FOUND);
             });
+  }
+
+  @Override
+  public Mono<Result<AuthDto>> changePassword(AuthDto session, String newPassword) {
+    return authRepo
+        .changePassword(session, newPassword)
+        .map(auth -> Result.build(authAssembler.fromEntity(auth), StatusCode.SAVE_SUCCESS));
   }
 }

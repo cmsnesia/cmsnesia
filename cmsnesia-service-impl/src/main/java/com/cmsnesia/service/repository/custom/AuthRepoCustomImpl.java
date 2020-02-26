@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -68,6 +69,15 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
             token.getRefreshToken(),
             token.getTokenType());
     return reactiveMongoTemplate.findOne(query, Auth.class);
+  }
+
+  @Override
+  public Mono<Auth> changePassword(AuthDto session, String newPassword) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").is(session.getId()));
+    Update update = new Update();
+    update.set("password", newPassword);
+    return reactiveMongoTemplate.findAndModify(query, update, Auth.class);
   }
 
   private Query buildQuery(

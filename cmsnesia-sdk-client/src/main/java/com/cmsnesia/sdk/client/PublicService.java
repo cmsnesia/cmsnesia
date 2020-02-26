@@ -41,4 +41,8 @@ public interface PublicService {
   @RequestLine("POST /public/about")
   @Headers("Content-Type: application/json")
   Mono<Result<PageDto>> findAbout();
+
+  @RequestLine("POST /public/pageById")
+  @Headers("Content-Type: application/json")
+  Mono<Result<PageDto>> findPageById(IdRequest id);
 }

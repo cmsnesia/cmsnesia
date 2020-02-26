@@ -7,4 +7,6 @@ import reactor.core.publisher.Mono;
 public interface AuthService extends BaseService<AuthDto> {
 
   Mono<Result<AuthDto>> findByUsername(String username);
+
+  Mono<Result<AuthDto>> changePassword(AuthDto session, String newPassword);
 }
