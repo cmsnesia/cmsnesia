@@ -1,9 +1,6 @@
 package com.cmsnesia.sdk.client;
 
-import com.cmsnesia.model.CategoryDto;
-import com.cmsnesia.model.MenuDto;
-import com.cmsnesia.model.PageDto;
-import com.cmsnesia.model.PostDto;
+import com.cmsnesia.model.*;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.sdk.client.domain.Page;
@@ -41,6 +38,10 @@ public interface PublicService {
   @RequestLine("POST /public/about")
   @Headers("Content-Type: application/json")
   Mono<Result<PageDto>> findAbout();
+
+  @RequestLine("POST /public/profile")
+  @Headers("Content-Type: application/json")
+  Mono<Result<ProfileDto>> findProfile();
 
   @RequestLine("POST /public/pageById")
   @Headers("Content-Type: application/json")
