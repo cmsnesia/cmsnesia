@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ProfileDto extends BaseDto {
 
     private String id;
+    private String title;
     private String description;
-
+    private Set<MediaDto> medias;
 }

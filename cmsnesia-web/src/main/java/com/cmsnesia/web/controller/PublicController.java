@@ -4,10 +4,7 @@ import com.cmsnesia.model.*;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
-import com.cmsnesia.service.CategoryService;
-import com.cmsnesia.service.MenuService;
-import com.cmsnesia.service.PageService;
-import com.cmsnesia.service.PostService;
+import com.cmsnesia.service.*;
 import com.cmsnesia.web.util.ConstantKeys;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,6 +37,7 @@ public class PublicController {
   private final PageService pageService;
   private final PostService postService;
   private final MenuService menuService;
+  private final ProfileService profileService;
 
   @PostMapping(
       value = "/posts",
@@ -293,5 +291,27 @@ public class PublicController {
                     .collect(Collectors.toSet()))
             .build();
     return pageService.findAbout(session);
+  }
+
+  @GetMapping(
+          value = "/profile",
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Profile", response = PostDto.class, notes = "Mono [ProfileDto]")
+  @ApiImplicitParams({
+          @ApiImplicitParam(
+                  name = ConstantKeys.APP_ID,
+                  paramType = "header",
+                  dataType = "string",
+                  required = true)
+  })
+  public Mono<Result<ProfileDto>> findProfile(@RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
+    AuthDto session =
+            AuthDto.builder()
+                    .applications(
+                            appIds.stream()
+                                    .map(appId -> ApplicationDto.builder().id(appId).build())
+                                    .collect(Collectors.toSet()))
+                    .build();
+    return profileService.find(session, null);
   }
 }
