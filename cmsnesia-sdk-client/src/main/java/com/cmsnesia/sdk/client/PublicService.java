@@ -35,11 +35,7 @@ public interface PublicService {
   Mono<Page<MenuDto>> findMenus(
       MenuDto menuDto, @Param("page") Integer page, @Param("size") Integer size);
 
-  @RequestLine("POST /public/about")
-  @Headers("Content-Type: application/json")
-  Mono<Result<PageDto>> findAbout();
-
-  @RequestLine("POST /public/profile")
+  @RequestLine("GET /public/profile")
   @Headers("Content-Type: application/json")
   Mono<Result<ProfileDto>> findProfile();
 
