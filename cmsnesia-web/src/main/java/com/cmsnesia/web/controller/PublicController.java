@@ -271,28 +271,6 @@ public class PublicController {
     return pageService.find(session, id);
   }
 
-  @PostMapping(
-      value = "/about",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "Page detail", response = PageDto.class, notes = "Mono [PageDto]")
-  @ApiImplicitParams(
-      @ApiImplicitParam(
-          name = ConstantKeys.APP_ID,
-          paramType = "header",
-          dataType = "string",
-          required = true))
-  public Mono<Result<PageDto>> findAbout(@RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
-    AuthDto session =
-        AuthDto.builder()
-            .applications(
-                appIds.stream()
-                    .map(appId -> ApplicationDto.builder().id(appId).build())
-                    .collect(Collectors.toSet()))
-            .build();
-    return pageService.findAbout(session);
-  }
-
   @GetMapping(
           value = "/profile",
           produces = MediaType.APPLICATION_JSON_VALUE)

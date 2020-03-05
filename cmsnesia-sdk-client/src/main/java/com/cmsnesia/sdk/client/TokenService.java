@@ -1,5 +1,6 @@
 package com.cmsnesia.sdk.client;
 
+import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
@@ -20,4 +21,8 @@ public interface TokenService {
   @RequestLine("DELETE /token/destroy")
   @Headers("Content-Type: application/json")
   Mono<TokenResponse> destroy(TokenResponse request);
+
+  @RequestLine("POST /token/validate")
+  @Headers("Content-Type: application/json")
+  Mono<AuthDto> validate(TokenResponse request);
 }

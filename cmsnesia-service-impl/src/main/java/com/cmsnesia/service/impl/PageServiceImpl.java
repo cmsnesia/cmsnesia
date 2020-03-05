@@ -132,12 +132,4 @@ public class PageServiceImpl implements PageService {
         .map(page -> pageAssembler.fromEntity(page))
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
-
-  @Override
-  public Mono<Result<PageDto>> findAbout(AuthDto session) {
-    return pageRepo
-        .findAbout(session)
-        .map(pageAssembler::fromEntity)
-        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
-  }
 }
