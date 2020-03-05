@@ -140,7 +140,7 @@ public class AuthController {
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getVerifyNewPassword())) {
+              if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())) {
                 return authService.changePassword(session, passwordEncoder.encode(changePasswordRequest.getNewPassword()));
               } else {
                 return Mono.just(Result.build(StatusCode.SAVE_FAILED));
