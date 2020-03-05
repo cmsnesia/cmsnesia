@@ -3,6 +3,7 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
+import com.cmsnesia.model.request.ChangePasswordRequest;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.AuthService;
@@ -133,15 +134,14 @@ public class AuthController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/changePassword")
-  public Mono<Result<AuthDto>> changePassword(
-      @RequestParam String newPassword, String verifyNewaPassword) {
+  public Mono<Result<AuthDto>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              if (newPassword.equals(verifyNewaPassword)) {
-                return authService.changePassword(session, passwordEncoder.encode(newPassword));
+              if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getVerifyNewPassword())) {
+                return authService.changePassword(session, passwordEncoder.encode(changePasswordRequest.getNewPassword()));
               } else {
                 return Mono.just(Result.build(StatusCode.SAVE_FAILED));
               }

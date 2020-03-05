@@ -1,5 +1,6 @@
 package com.cmsnesia.web.controller;
 
+import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
@@ -53,34 +54,8 @@ public class TokenController {
     return Mono.just(ResponseEntity.ok(tokenService.destroy(tokenResponse)));
   }
 
-  //  @PostMapping("/dummy")
-  //  public Mono<AuthDto> dummy() {
-  //    AuthDto dto =
-  //        AuthDto.builder()
-  //            .username("ardikars")
-  //            .password(passwordEncoder.encode("123456"))
-  //            .fullName("Ardika Rommy Sanjaya")
-  //            .emails(
-  //                Arrays.asList(
-  //                        EmailDto.builder()
-  //                            .address("ardikars@gmail.com")
-  //                            .status("VERIFIED")
-  //                            .types(
-  //                                Arrays.asList("NOTIFICATION", "PROMOTION").stream()
-  //                                    .collect(Collectors.toSet()))
-  //                            .build(),
-  //                        EmailDto.builder()
-  //                            .address("contact@ardikars.com")
-  //                            .status("VERIFIED")
-  //
-  // .types(Arrays.asList("PRIMARY").stream().collect(Collectors.toSet()))
-  //                            .build())
-  //                    .stream()
-  //                    .collect(Collectors.toSet()))
-  //            .roles(Arrays.asList("ADMIN").stream().collect(Collectors.toSet()))
-  //            .build();
-  //
-  //    categoryService.add(dto, CategoryDto.builder().name("Inspirasi").build()).block();
-  //    return authService.add(dto, dto);
-  //  }
+  @PostMapping("/validate")
+  public Mono<ResponseEntity<?>> validate(TokenResponse tokenResponse) {
+    return Mono.just(ResponseEntity.ok(tokenService.validate(tokenResponse)));
+  }
 }
