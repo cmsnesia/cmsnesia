@@ -36,12 +36,12 @@ public class ProfileController {
             @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
     })
     @GetMapping("/findById")
-    public Mono<Result<ProfileDto>> findById(@RequestParam("id") String id) {
+    public Mono<Result<ProfileDto>> findById() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .map(authentication -> (AuthDto) authentication.getPrincipal())
                 .flatMap(
-                        session -> profileService.find(session, IdRequest.builder().id(id).build()));
+                        session -> profileService.find(session, null));
     }
 
     @ApiOperation(value = "Add Profile", response = ProfileDto.class, notes = "Result<ProfileDto>")
