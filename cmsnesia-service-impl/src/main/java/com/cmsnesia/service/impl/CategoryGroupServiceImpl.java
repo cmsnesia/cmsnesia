@@ -78,17 +78,13 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   @Override
   public Mono<Result<CategoryGroupDto>> delete(AuthDto session, CategoryGroupDto dto) {
     return categoryGroupRepo
-        .exists(session, dto.getId(), dto.getName())
+        .find(session, IdRequest.builder().id(dto.getId()).build())
         .flatMap(
-            exists -> {
-              if (exists) {
-                return categoryGroupRepo
-                    .deleteById(dto.getId())
-                    .map(aVoid -> Result.build(StatusCode.DELETE_SUCCESS));
-              } else {
-                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
-              }
-            });
+            categoryGroup ->
+                categoryGroupRepo
+                    .deleteById(categoryGroup.getId())
+                    .map(aVoid -> Result.build(dto, StatusCode.DELETE_SUCCESS)))
+        .defaultIfEmpty(Result.build(dto, StatusCode.DELETE_SUCCESS));
   }
 
   @Override
