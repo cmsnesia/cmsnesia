@@ -29,11 +29,3 @@ jobs:
         run: |
           echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
           ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-web,!cmsnesia-tests,!cmsnesia-service-spec,!cmsnesia-service-impl,!cmsnesia-domain,!cmsnesia-assembler clean package deploy -DskipTests
-
-      - name: Caching
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven
