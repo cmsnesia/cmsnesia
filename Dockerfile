@@ -20,4 +20,4 @@ WORKDIR /app
 
 COPY --from=builder /workspace/cmsnesia-web/target/cmsnesia-web-*.jar /app/cmsnesia-web.jar
 
-ENTRYPOINT ["java", "-jar", "/app/cmsnesia-web.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app/cmsnesia-web.jar"]
