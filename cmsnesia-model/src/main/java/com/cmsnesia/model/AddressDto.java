@@ -1,12 +1,11 @@
 package com.cmsnesia.model;
 
+import java.io.Serializable;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -14,9 +13,9 @@ import java.util.Set;
 @Builder
 public class AddressDto implements Serializable {
 
-    private String country;
-    private String city;
-    private String street;
-    private Set<EmailDto> emails;
-    private Set<PhoneDto> phones;
+  private String country;
+  private String city;
+  private String street;
+  private Set<EmailDto> emails;
+  private Set<PhoneDto> phones;
 }

@@ -1,9 +1,8 @@
 package com.cmsnesia.domain;
 
+import java.util.Set;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,8 +12,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class CategoryGroup extends Audit {
 
-    private String id;
-    private String name;
-    private Set<String> categoryIds;
-
+  private String id;
+  private String name;
+  private Set<String> categoryIds;
 }

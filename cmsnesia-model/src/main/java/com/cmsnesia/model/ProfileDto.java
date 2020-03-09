@@ -1,11 +1,10 @@
 package com.cmsnesia.model;
 
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,9 +12,9 @@ import java.util.Set;
 @Builder
 public class ProfileDto extends BaseDto {
 
-    private String id;
-    private String title;
-    private String description;
-    private Set<AddressDto> addresses;
-    private Set<MediaDto> medias;
+  private String id;
+  private String title;
+  private String description;
+  private Set<AddressDto> addresses;
+  private Set<MediaDto> medias;
 }

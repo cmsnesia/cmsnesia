@@ -4,14 +4,13 @@ import com.cmsnesia.domain.Menu;
 import com.cmsnesia.domain.model.Category;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.MenuDto;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MenuAssembler extends Assembler<Menu, MenuDto> {
@@ -19,18 +18,21 @@ public class MenuAssembler extends Assembler<Menu, MenuDto> {
   @Nonnull
   @Override
   public Menu fromDto(@Nonnull MenuDto dto) {
-    Menu menu = Menu.builder()
-        .id(dto.getId())
-        .name(dto.getName())
-        .categories(fromCategoryDto(dto.getCategories()))
-        .build();
+    Menu menu =
+        Menu.builder()
+            .id(dto.getId())
+            .name(dto.getName())
+            .categories(fromCategoryDto(dto.getCategories()))
+            .build();
     return menu;
   }
 
   @Nonnull
   @Override
   public Set<Menu> fromDto(@Nonnull Collection<MenuDto> dtos) {
-    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null
+        ? new HashSet<>()
+        : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -46,7 +48,9 @@ public class MenuAssembler extends Assembler<Menu, MenuDto> {
   @Nonnull
   @Override
   public Set<MenuDto> fromEntity(@Nonnull Collection<Menu> entities) {
-    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null
+        ? new HashSet<>()
+        : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
   private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {

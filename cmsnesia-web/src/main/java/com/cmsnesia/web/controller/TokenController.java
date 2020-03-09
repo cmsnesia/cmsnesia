@@ -1,6 +1,5 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;

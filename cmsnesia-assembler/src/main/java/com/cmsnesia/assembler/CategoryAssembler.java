@@ -22,7 +22,9 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public Set<Category> fromDto(@Nonnull Collection<CategoryDto> dtos) {
-    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null
+        ? new HashSet<>()
+        : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -34,6 +36,8 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public Set<CategoryDto> fromEntity(@Nonnull Collection<Category> entities) {
-    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null
+        ? new HashSet<>()
+        : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

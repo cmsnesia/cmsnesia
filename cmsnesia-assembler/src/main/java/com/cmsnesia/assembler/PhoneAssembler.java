@@ -2,13 +2,12 @@ package com.cmsnesia.assembler;
 
 import com.cmsnesia.domain.model.Phone;
 import com.cmsnesia.model.PhoneDto;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PhoneAssembler extends Assembler<Phone, PhoneDto> {
@@ -26,7 +25,9 @@ public class PhoneAssembler extends Assembler<Phone, PhoneDto> {
   @Nonnull
   @Override
   public Set<Phone> fromDto(@Nonnull Collection<PhoneDto> list) {
-    return list == null ? new HashSet<>() : list.stream().map(this::fromDto).collect(Collectors.toSet());
+    return list == null
+        ? new HashSet<>()
+        : list.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -42,6 +43,8 @@ public class PhoneAssembler extends Assembler<Phone, PhoneDto> {
   @Nonnull
   @Override
   public Set<PhoneDto> fromEntity(@Nonnull Collection<Phone> entity) {
-    return entity == null ? new HashSet<>() : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entity == null
+        ? new HashSet<>()
+        : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

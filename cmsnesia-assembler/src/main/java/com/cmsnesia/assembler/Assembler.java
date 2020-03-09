@@ -1,7 +1,7 @@
 package com.cmsnesia.assembler;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
+import javax.annotation.Nonnull;
 
 public abstract class Assembler<A, B> {
 

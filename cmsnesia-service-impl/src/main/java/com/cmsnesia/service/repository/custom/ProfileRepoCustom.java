@@ -7,8 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface ProfileRepoCustom {
 
-    Mono<Boolean> exists(AuthDto session);
+  Mono<Boolean> exists(AuthDto session);
 
-    Mono<Profile> find(AuthDto session, IdRequest idRequest);
-
+  Mono<Profile> find(AuthDto session, IdRequest idRequest);
 }

@@ -97,7 +97,10 @@ public class CategoryController {
             });
   }
 
-  @ApiOperation(value = "Edit category", response = CategoryDto.class, notes = "Result<CategoryDto>")
+  @ApiOperation(
+      value = "Edit category",
+      response = CategoryDto.class,
+      notes = "Result<CategoryDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })

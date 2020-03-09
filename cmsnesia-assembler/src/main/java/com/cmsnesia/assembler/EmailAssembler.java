@@ -25,7 +25,9 @@ public class EmailAssembler extends Assembler<Email, EmailDto> {
   @Nonnull
   @Override
   public Set<Email> fromDto(@Nonnull Collection<EmailDto> list) {
-    return list == null ? new HashSet<>() : list.stream().map(this::fromDto).collect(Collectors.toSet());
+    return list == null
+        ? new HashSet<>()
+        : list.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -41,6 +43,8 @@ public class EmailAssembler extends Assembler<Email, EmailDto> {
   @Nonnull
   @Override
   public Set<EmailDto> fromEntity(@Nonnull Collection<Email> entity) {
-    return entity == null ? new HashSet<>() : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entity == null
+        ? new HashSet<>()
+        : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

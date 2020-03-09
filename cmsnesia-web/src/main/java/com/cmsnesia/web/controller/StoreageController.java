@@ -10,6 +10,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.io.Serializable;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,9 +25,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.io.Serializable;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "storeage")
@@ -130,12 +129,16 @@ public class StoreageController {
     private String sha;
     private String size;
     private String url;
+
     @JsonProperty("html_url")
     private String htmlUrl;
+
     @JsonProperty("git_url")
     private String gitUrl;
+
     @JsonProperty("download_url")
     private String downloadUrl;
+
     private String type;
   }
 }

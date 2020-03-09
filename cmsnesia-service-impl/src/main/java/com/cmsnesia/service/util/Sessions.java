@@ -3,7 +3,6 @@ package com.cmsnesia.service.util;
 import com.cmsnesia.domain.model.Application;
 import com.cmsnesia.model.ApplicationDto;
 import com.cmsnesia.model.AuthDto;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -4,13 +4,12 @@ import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.domain.model.Category;
 import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.Tag;
+import java.util.Set;
+import javax.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.*;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor

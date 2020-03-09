@@ -8,12 +8,11 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.util.DateTimeUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
@@ -56,7 +55,9 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   @Nonnull
   @Override
   public Set<Post> fromDto(@Nonnull Collection<PostDto> dtos) {
-    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null
+        ? new HashSet<>()
+        : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -86,7 +87,9 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   @Nonnull
   @Override
   public Set<PostDto> fromEntity(@Nonnull Collection<Post> entities) {
-    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null
+        ? new HashSet<>()
+        : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
   public PostDto fromDraft(PostDraft postDraft) {
@@ -148,7 +151,8 @@ public class PostAssembler extends Assembler<Post, PostDto> {
     }
     return categoryDtos.stream()
         .map(
-            categoryDto -> Category.builder().id(categoryDto.getId()).name(categoryDto.getName()).build())
+            categoryDto ->
+                Category.builder().id(categoryDto.getId()).name(categoryDto.getName()).build())
         .collect(Collectors.toSet());
   }
 

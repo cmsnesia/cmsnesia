@@ -4,7 +4,6 @@ import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryGroupDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.model.request.NameRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.CategoryGroupService;
 import com.cmsnesia.web.util.ConstantKeys;
@@ -53,7 +52,10 @@ public class CategoryGroupController {
   }
 
   @PostMapping("/find")
-  @ApiOperation(value = "List category group", response = CategoryGroupDto.class, notes = "Page<CategoryGroupDto>")
+  @ApiOperation(
+      value = "List category group",
+      response = CategoryGroupDto.class,
+      notes = "Page<CategoryGroupDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -76,11 +78,16 @@ public class CategoryGroupController {
         .flatMap(
             session -> {
               return categoryGroupService.find(
-                  session, categoryGroupDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+                  session,
+                  categoryGroupDto,
+                  PageRequest.of(pageable.getPage(), pageable.getSize()));
             });
   }
 
-  @ApiOperation(value = "Add category group", response = CategoryGroupDto.class, notes = "Result<CategoryGroupDto>")
+  @ApiOperation(
+      value = "Add category group",
+      response = CategoryGroupDto.class,
+      notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -95,7 +102,10 @@ public class CategoryGroupController {
             });
   }
 
-  @ApiOperation(value = "Edit category group", response = CategoryGroupDto.class, notes = "Result<CategoryGroupDto>")
+  @ApiOperation(
+      value = "Edit category group",
+      response = CategoryGroupDto.class,
+      notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })

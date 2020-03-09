@@ -10,6 +10,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,9 +22,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "public")
@@ -77,41 +76,42 @@ public class PublicController {
   }
 
   @PostMapping(
-          value = "/popularPosts",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = "/popularPosts",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "List post", response = PostDto.class, notes = "Flux [PostDto]")
   @ApiImplicitParams({
-          @ApiImplicitParam(
-                  name = ConstantKeys.PAGE,
-                  defaultValue = "0",
-                  paramType = "query",
-                  dataType = "integer"),
-          @ApiImplicitParam(
-                  name = ConstantKeys.SIZE,
-                  defaultValue = "10",
-                  paramType = "query",
-                  dataType = "integer"),
-          @ApiImplicitParam(
-                  name = ConstantKeys.APP_ID,
-                  paramType = "header",
-                  dataType = "string",
-                  required = true)
+    @ApiImplicitParam(
+        name = ConstantKeys.PAGE,
+        defaultValue = "0",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.SIZE,
+        defaultValue = "10",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.APP_ID,
+        paramType = "header",
+        dataType = "string",
+        required = true)
   })
   public Mono<Page<PostDto>> findPopularPosts(
-          @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
-          @RequestBody PostDto postDto,
-          @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
+      @RequestBody PostDto postDto,
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     AuthDto session =
-            AuthDto.builder()
-                    .applications(
-                            appIds.stream()
-                                    .map(id -> ApplicationDto.builder().id(id).build())
-                                    .collect(Collectors.toSet()))
-                    .build();
-    Pageable pageRequest = PageRequest.of(pageable.getPage(), pageable.getSize(), Sort.by(Sort.Order.desc("viewCount")));
-    return postService.find(
-            session, postDto, pageRequest);
+        AuthDto.builder()
+            .applications(
+                appIds.stream()
+                    .map(id -> ApplicationDto.builder().id(id).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    Pageable pageRequest =
+        PageRequest.of(
+            pageable.getPage(), pageable.getSize(), Sort.by(Sort.Order.desc("viewCount")));
+    return postService.find(session, postDto, pageRequest);
   }
 
   @PostMapping(
@@ -271,25 +271,24 @@ public class PublicController {
     return pageService.find(session, id);
   }
 
-  @GetMapping(
-          value = "/profile",
-          produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Profile", response = PostDto.class, notes = "Mono [ProfileDto]")
   @ApiImplicitParams({
-          @ApiImplicitParam(
-                  name = ConstantKeys.APP_ID,
-                  paramType = "header",
-                  dataType = "string",
-                  required = true)
+    @ApiImplicitParam(
+        name = ConstantKeys.APP_ID,
+        paramType = "header",
+        dataType = "string",
+        required = true)
   })
-  public Mono<Result<ProfileDto>> findProfile(@RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
+  public Mono<Result<ProfileDto>> findProfile(
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
     AuthDto session =
-            AuthDto.builder()
-                    .applications(
-                            appIds.stream()
-                                    .map(appId -> ApplicationDto.builder().id(appId).build())
-                                    .collect(Collectors.toSet()))
-                    .build();
+        AuthDto.builder()
+            .applications(
+                appIds.stream()
+                    .map(appId -> ApplicationDto.builder().id(appId).build())
+                    .collect(Collectors.toSet()))
+            .build();
     return profileService.find(session, null);
   }
 }

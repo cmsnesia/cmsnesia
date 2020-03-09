@@ -286,8 +286,7 @@ public class TokenServiceImpl implements TokenService {
             auth -> {
               Set<Token> tokens =
                   auth.getTokens().stream()
-                      .filter(
-                          token -> validate(token.getAccessToken()) != null)
+                      .filter(token -> validate(token.getAccessToken()) != null)
                       .collect(Collectors.toSet());
               if (auth.getTokens().size() == tokens.size()) {
                 return validate(accessToken);
@@ -296,8 +295,7 @@ public class TokenServiceImpl implements TokenService {
               return authRepo
                   .save(auth)
                   .map(Auth::getTokens)
-                  .flatMap(
-                      token -> validate(accessToken));
+                  .flatMap(token -> validate(accessToken));
             });
   }
 
@@ -308,8 +306,7 @@ public class TokenServiceImpl implements TokenService {
             auth -> {
               Set<Token> tokens =
                   auth.getTokens().stream()
-                      .filter(
-                          token -> validate(token.getAccessToken()) != null)
+                      .filter(token -> validate(token.getAccessToken()) != null)
                       .collect(Collectors.toSet());
               if (auth.getTokens().size() == tokens.size()) {
                 return validate(accessToken);
@@ -318,8 +315,7 @@ public class TokenServiceImpl implements TokenService {
               return authRepo
                   .save(auth)
                   .map(Auth::getTokens)
-                  .flatMap(
-                      token -> validate(accessToken));
+                  .flatMap(token -> validate(accessToken));
             });
   }
 }

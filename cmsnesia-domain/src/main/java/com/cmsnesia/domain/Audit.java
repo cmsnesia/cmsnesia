@@ -1,6 +1,11 @@
 package com.cmsnesia.domain;
 
 import com.cmsnesia.domain.model.Application;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,12 +15,6 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @Setter

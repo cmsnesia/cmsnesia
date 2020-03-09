@@ -30,7 +30,9 @@ public class AuthorAssembler extends Assembler<Author, AuthorDto> {
   @Nonnull
   @Override
   public Set<Author> fromDto(@Nonnull Collection<AuthorDto> dtos) {
-    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null
+        ? new HashSet<>()
+        : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -45,6 +47,8 @@ public class AuthorAssembler extends Assembler<Author, AuthorDto> {
   @Nonnull
   @Override
   public Set<AuthorDto> fromEntity(@Nonnull Collection<Author> entities) {
-    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null
+        ? new HashSet<>()
+        : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

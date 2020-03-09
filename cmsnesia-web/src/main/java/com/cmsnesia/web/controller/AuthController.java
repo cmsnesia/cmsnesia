@@ -134,14 +134,18 @@ public class AuthController {
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
   @PutMapping("/changePassword")
-  public Mono<Result<AuthDto>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+  public Mono<Result<AuthDto>> changePassword(
+      @RequestBody ChangePasswordRequest changePasswordRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (AuthDto) authentication.getPrincipal())
         .flatMap(
             session -> {
-              if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())) {
-                return authService.changePassword(session, passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+              if (changePasswordRequest
+                  .getNewPassword()
+                  .equals(changePasswordRequest.getConfirmNewPassword())) {
+                return authService.changePassword(
+                    session, passwordEncoder.encode(changePasswordRequest.getNewPassword()));
               } else {
                 return Mono.just(Result.build(StatusCode.SAVE_FAILED));
               }

@@ -26,7 +26,9 @@ public class MediaAssembler extends Assembler<Media, MediaDto> {
   @Nonnull
   @Override
   public Set<Media> fromDto(@Nonnull Collection<MediaDto> dtos) {
-    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null
+        ? new HashSet<>()
+        : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -42,6 +44,8 @@ public class MediaAssembler extends Assembler<Media, MediaDto> {
   @Nonnull
   @Override
   public Set<MediaDto> fromEntity(@Nonnull Collection<Media> entities) {
-    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null
+        ? new HashSet<>()
+        : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }
