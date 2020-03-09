@@ -4,6 +4,7 @@ import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.enums.MediaType;
 import com.cmsnesia.model.MediaDto;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ public class MediaAssembler extends Assembler<Media, MediaDto> {
   @Nonnull
   @Override
   public Set<Media> fromDto(@Nonnull Collection<MediaDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -41,6 +42,6 @@ public class MediaAssembler extends Assembler<Media, MediaDto> {
   @Nonnull
   @Override
   public Set<MediaDto> fromEntity(@Nonnull Collection<Media> entities) {
-    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

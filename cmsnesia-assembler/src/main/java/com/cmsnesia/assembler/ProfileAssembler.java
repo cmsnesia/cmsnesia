@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Component
 public class ProfileAssembler extends Assembler<Profile, ProfileDto> {
 
-    private final AuthorAssembler authorAssembler;
     private final MediaAssembler mediaAssembler;
+    private final AddressAssembler addressAssembler;
 
     @Nonnull
     @Override
@@ -25,6 +25,7 @@ public class ProfileAssembler extends Assembler<Profile, ProfileDto> {
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .medias(mediaAssembler.fromDto(dto.getMedias()))
+                .addresses(addressAssembler.fromDto(dto.getAddresses()))
                 .build();
     }
 
@@ -42,6 +43,7 @@ public class ProfileAssembler extends Assembler<Profile, ProfileDto> {
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .medias(mediaAssembler.fromEntity(entity.getMedias()))
+                .addresses(addressAssembler.fromEntity(entity.getAddresses()))
                 .build();
     }
 

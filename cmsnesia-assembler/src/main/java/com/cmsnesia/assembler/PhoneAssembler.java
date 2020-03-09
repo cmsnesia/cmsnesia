@@ -1,22 +1,23 @@
 package com.cmsnesia.assembler;
 
-import com.cmsnesia.domain.model.Email;
-import com.cmsnesia.model.EmailDto;
+import com.cmsnesia.domain.model.Phone;
+import com.cmsnesia.model.PhoneDto;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import org.springframework.stereotype.Component;
 
 @Component
-public class EmailAssembler extends Assembler<Email, EmailDto> {
+public class PhoneAssembler extends Assembler<Phone, PhoneDto> {
 
   @Nonnull
   @Override
-  public Email fromDto(@Nonnull EmailDto dto) {
-    return Email.builder()
-        .address(dto.getAddress())
+  public Phone fromDto(@Nonnull PhoneDto dto) {
+    return Phone.builder()
+        .number(dto.getNumber())
         .types(dto.getTypes())
         .status(dto.getStatus())
         .build();
@@ -24,15 +25,15 @@ public class EmailAssembler extends Assembler<Email, EmailDto> {
 
   @Nonnull
   @Override
-  public Set<Email> fromDto(@Nonnull Collection<EmailDto> list) {
+  public Set<Phone> fromDto(@Nonnull Collection<PhoneDto> list) {
     return list == null ? new HashSet<>() : list.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
   @Override
-  public EmailDto fromEntity(@Nonnull Email entity) {
-    return EmailDto.builder()
-        .address(entity.getAddress())
+  public PhoneDto fromEntity(@Nonnull Phone entity) {
+    return PhoneDto.builder()
+        .number(entity.getNumber())
         .types(entity.getTypes())
         .status(entity.getStatus())
         .build();
@@ -40,7 +41,7 @@ public class EmailAssembler extends Assembler<Email, EmailDto> {
 
   @Nonnull
   @Override
-  public Set<EmailDto> fromEntity(@Nonnull Collection<Email> entity) {
+  public Set<PhoneDto> fromEntity(@Nonnull Collection<Phone> entity) {
     return entity == null ? new HashSet<>() : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

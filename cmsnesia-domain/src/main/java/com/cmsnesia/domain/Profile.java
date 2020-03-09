@@ -1,5 +1,6 @@
 package com.cmsnesia.domain;
 
+import com.cmsnesia.domain.model.Address;
 import com.cmsnesia.domain.model.Media;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,9 @@ public class Profile extends Audit {
 
     @NotBlank(message = "Profile description must be not blank")
     private String description;
+
+    @NotNull
+    private Set<Address> addresses;
 
     @NotNull
     private Set<Media> medias;

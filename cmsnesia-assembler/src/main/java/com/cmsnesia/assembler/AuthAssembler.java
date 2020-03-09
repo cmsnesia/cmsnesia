@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -43,8 +43,8 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
 
   @Nonnull
   @Override
-  public List<Auth> fromDto(@Nonnull Collection<AuthDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toList());
+  public Set<Auth> fromDto(@Nonnull Collection<AuthDto> dtos) {
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -71,7 +71,7 @@ public class AuthAssembler extends Assembler<Auth, AuthDto> {
 
   @Nonnull
   @Override
-  public List<AuthDto> fromEntity(@Nonnull Collection<Auth> entity) {
-    return entity.stream().map(this::fromEntity).collect(Collectors.toList());
+  public Set<AuthDto> fromEntity(@Nonnull Collection<Auth> entity) {
+    return entity == null ? new HashSet<>() : entity.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

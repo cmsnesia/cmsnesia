@@ -22,7 +22,6 @@ public class PageAssembler extends Assembler<Page, PageDto> {
   @Nonnull
   @Override
   public Page fromDto(@Nonnull PageDto dto) {
-    Set<Tag> tags = new HashSet<>();
     Page post =
         Page.builder()
             .id(dto.getId())

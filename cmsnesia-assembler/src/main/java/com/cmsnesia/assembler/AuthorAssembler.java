@@ -5,6 +5,7 @@ import com.cmsnesia.model.AuthorDto;
 import com.cmsnesia.model.util.DateTimeUtils;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -29,7 +30,7 @@ public class AuthorAssembler extends Assembler<Author, AuthorDto> {
   @Nonnull
   @Override
   public Set<Author> fromDto(@Nonnull Collection<AuthorDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -44,6 +45,6 @@ public class AuthorAssembler extends Assembler<Author, AuthorDto> {
   @Nonnull
   @Override
   public Set<AuthorDto> fromEntity(@Nonnull Collection<Author> entities) {
-    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

@@ -16,5 +16,6 @@ public class ProfileDto extends BaseDto {
     private String id;
     private String title;
     private String description;
+    private Set<AddressDto> addresses;
     private Set<MediaDto> medias;
 }

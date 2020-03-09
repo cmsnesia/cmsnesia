@@ -3,6 +3,7 @@ package com.cmsnesia.assembler;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.CategoryDto;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -21,7 +22,7 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public Set<Category> fromDto(@Nonnull Collection<CategoryDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -33,6 +34,6 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public Set<CategoryDto> fromEntity(@Nonnull Collection<Category> entities) {
-    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 }

@@ -56,7 +56,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   @Nonnull
   @Override
   public Set<Post> fromDto(@Nonnull Collection<PostDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -86,7 +86,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   @Nonnull
   @Override
   public Set<PostDto> fromEntity(@Nonnull Collection<Post> entities) {
-    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
   public PostDto fromDraft(PostDraft postDraft) {

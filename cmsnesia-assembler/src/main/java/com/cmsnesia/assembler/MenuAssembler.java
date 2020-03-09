@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class MenuAssembler extends Assembler<Menu, MenuDto> {
   @Nonnull
   @Override
   public Set<Menu> fromDto(@Nonnull Collection<MenuDto> dtos) {
-    return dtos.stream().map(this::fromDto).collect(Collectors.toSet());
+    return dtos == null ? new HashSet<>() : dtos.stream().map(this::fromDto).collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -44,8 +45,8 @@ public class MenuAssembler extends Assembler<Menu, MenuDto> {
 
   @Nonnull
   @Override
-  public Collection<MenuDto> fromEntity(@Nonnull Collection<Menu> entities) {
-    return entities.stream().map(this::fromEntity).collect(Collectors.toSet());
+  public Set<MenuDto> fromEntity(@Nonnull Collection<Menu> entities) {
+    return entities == null ? new HashSet<>() : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
   private Set<CategoryDto> fromCategoryModel(Set<Category> categories) {
