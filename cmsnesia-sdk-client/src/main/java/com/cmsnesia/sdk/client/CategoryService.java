@@ -10,7 +10,13 @@ import feign.Param;
 import feign.RequestLine;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 public interface CategoryService {
+
+  @RequestLine("POST /category/findByIds")
+  @Headers("Content-Type: application/json")
+  Mono<Set<CategoryDto>> findByIds(Set<IdRequest> ids);
 
   @RequestLine("GET /category/find?page={page}&size={size}")
   @Headers("Content-Type: application/json")
