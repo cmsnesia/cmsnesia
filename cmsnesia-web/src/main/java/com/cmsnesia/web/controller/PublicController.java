@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 public class PublicController {
 
   private final CategoryService categoryService;
+  private final CategoryGroupService categoryGroupService;
   private final PageService pageService;
   private final PostService postService;
   private final MenuService menuService;
@@ -172,6 +173,43 @@ public class PublicController {
             .build();
     return categoryService.find(
         session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+  }
+
+  @PostMapping(
+          value = "/category/group",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "List category group", response = CategoryGroupDto.class, notes = "Flux [CategoryGroupDto]")
+  @ApiImplicitParams({
+          @ApiImplicitParam(
+                  name = ConstantKeys.PAGE,
+                  defaultValue = "0",
+                  paramType = "query",
+                  dataType = "integer"),
+          @ApiImplicitParam(
+                  name = ConstantKeys.SIZE,
+                  defaultValue = "10",
+                  paramType = "query",
+                  dataType = "integer"),
+          @ApiImplicitParam(
+                  name = ConstantKeys.APP_ID,
+                  paramType = "header",
+                  dataType = "string",
+                  required = true)
+  })
+  public Mono<Page<CategoryGroupDto>> find(
+          @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
+          @RequestBody CategoryGroupDto categoryGroupDto,
+          @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+    AuthDto session =
+            AuthDto.builder()
+                    .applications(
+                            appIds.stream()
+                                    .map(id -> ApplicationDto.builder().id(id).build())
+                                    .collect(Collectors.toSet()))
+                    .build();
+    return categoryGroupService.find(
+            session, categoryGroupDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
   }
 
   @PostMapping(

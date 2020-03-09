@@ -30,6 +30,11 @@ public interface PublicService {
   Mono<Page<CategoryDto>> findCategories(
       CategoryDto categoryDto, @Param("page") Integer page, @Param("size") Integer size);
 
+  @RequestLine("POST /public/category/group?page={page}&size={size}")
+  @Headers("Content-Type: application/json")
+  Mono<Page<CategoryGroupDto>> findCategoryGroups(
+          CategoryGroupDto categoryGroupDto, @Param("page") Integer page, @Param("size") Integer size);
+
   @RequestLine("POST /public/menus?page={page}&size={size}")
   @Headers("Content-Type: application/json")
   Mono<Page<MenuDto>> findMenus(
