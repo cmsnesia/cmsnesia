@@ -24,114 +24,134 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping(value = "category")
 @Api(
-    value = "Category API",
-    tags = {"Category"})
+        value = "Category API",
+        tags = {"Category"})
 @Slf4j
 @RequiredArgsConstructor
 public class CategoryController {
 
-  private final CategoryService categoryService;
+    private final CategoryService categoryService;
 
-  @ApiOperation(
-      value = "Get category by ID",
-      response = CategoryDto.class,
-      notes = "Result<CategoryDto>")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
-  })
-  @GetMapping("/findById")
-  public Mono<Result<CategoryDto>> findById(@RequestParam("id") String id) {
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
-        .flatMap(
-            session -> {
-              return categoryService.find(session, IdRequest.builder().id(id).build());
-            });
-  }
+    @ApiOperation(
+            value = "Get category by ID",
+            response = CategoryDto.class,
+            notes = "Result<CategoryDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @GetMapping("/findById")
+    public Mono<Result<CategoryDto>> findById(@RequestParam("id") String id) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            return categoryService.find(session, IdRequest.builder().id(id).build());
+                        });
+    }
 
-  @PostMapping("/find")
-  @ApiOperation(value = "List category", response = CategoryDto.class, notes = "Page<CategoryDto>")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
-    @ApiImplicitParam(
-        name = ConstantKeys.PAGE,
-        defaultValue = "0",
-        paramType = "query",
-        dataType = "integer"),
-    @ApiImplicitParam(
-        name = ConstantKeys.SIZE,
-        defaultValue = "10",
-        paramType = "query",
-        dataType = "integer")
-  })
-  public Mono<Page<CategoryDto>> find(
-      @RequestBody CategoryDto categoryDto,
-      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
-        .flatMap(
-            session -> {
-              return categoryService.find(
-                  session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
-            });
-  }
+    @ApiOperation(
+            value = "Get category by IDs",
+            response = CategoryDto.class,
+            notes = "Result<Set<CategoryDto>>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @PostMapping("/findByIds")
+    public Mono<Set<CategoryDto>> findByIds(@RequestBody Set<IdRequest> ids) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            return categoryService.findByIds(session, ids);
+                        });
+    }
 
-  @ApiOperation(value = "Add category", response = CategoryDto.class, notes = "Result<CategoryDto>")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
-  })
-  @PostMapping("/add")
-  public Mono<Result<CategoryDto>> add(@RequestBody NameRequest nameRequest) {
-    CategoryDto categoryDto = CategoryDto.builder().name(nameRequest.getName()).build();
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
-        .flatMap(
-            session -> {
-              return categoryService.add(session, categoryDto);
-            });
-  }
+    @PostMapping("/find")
+    @ApiOperation(value = "List category", response = CategoryDto.class, notes = "Page<CategoryDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+            @ApiImplicitParam(
+                    name = ConstantKeys.PAGE,
+                    defaultValue = "0",
+                    paramType = "query",
+                    dataType = "integer"),
+            @ApiImplicitParam(
+                    name = ConstantKeys.SIZE,
+                    defaultValue = "10",
+                    paramType = "query",
+                    dataType = "integer")
+    })
+    public Mono<Page<CategoryDto>> find(
+            @RequestBody CategoryDto categoryDto,
+            @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            return categoryService.find(
+                                    session, categoryDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+                        });
+    }
 
-  @ApiOperation(
-      value = "Edit category",
-      response = CategoryDto.class,
-      notes = "Result<CategoryDto>")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
-  })
-  @PutMapping("/edit")
-  public Mono<Result<CategoryDto>> edit(@RequestBody CategoryDto categoryDto) {
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
-        .flatMap(
-            session -> {
-              return categoryService.edit(session, categoryDto);
-            });
-  }
+    @ApiOperation(value = "Add category", response = CategoryDto.class, notes = "Result<CategoryDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @PostMapping("/add")
+    public Mono<Result<CategoryDto>> add(@RequestBody NameRequest nameRequest) {
+        CategoryDto categoryDto = CategoryDto.builder().name(nameRequest.getName()).build();
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            return categoryService.add(session, categoryDto);
+                        });
+    }
 
-  @ApiOperation(
-      value = "Soft delete category",
-      response = CategoryGroupDto.class,
-      notes = "Result<CategoryDto>")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
-  })
-  @PutMapping("/delete")
-  public Mono<Result<CategoryDto>> delete(@RequestBody IdRequest idRequest) {
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
-        .flatMap(
-            session -> {
-              CategoryDto dto = new CategoryDto();
-              dto.setId(idRequest.getId());
-              return categoryService.delete(session, dto);
-            });
-  }
+    @ApiOperation(
+            value = "Edit category",
+            response = CategoryDto.class,
+            notes = "Result<CategoryDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @PutMapping("/edit")
+    public Mono<Result<CategoryDto>> edit(@RequestBody CategoryDto categoryDto) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            return categoryService.edit(session, categoryDto);
+                        });
+    }
+
+    @ApiOperation(
+            value = "Soft delete category",
+            response = CategoryGroupDto.class,
+            notes = "Result<CategoryDto>")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    })
+    @PutMapping("/delete")
+    public Mono<Result<CategoryDto>> delete(@RequestBody IdRequest idRequest) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> (AuthDto) authentication.getPrincipal())
+                .flatMap(
+                        session -> {
+                            CategoryDto dto = new CategoryDto();
+                            dto.setId(idRequest.getId());
+                            return categoryService.delete(session, dto);
+                        });
+    }
 }

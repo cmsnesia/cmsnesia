@@ -13,8 +13,8 @@ spring:
 cmsnesia:
   token:
     issuer: 'cmsnesia'
-    accessTokenExparation: 300000
-    refreshTokenExparation: 600000
+    accessTokenExparation: 3000000
+    refreshTokenExparation: 6000000
     secret: 'bo7tcynit34'
     max: 0
 

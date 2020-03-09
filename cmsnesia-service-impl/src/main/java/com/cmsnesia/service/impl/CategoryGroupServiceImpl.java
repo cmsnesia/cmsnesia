@@ -55,7 +55,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
             exists -> {
-              if (exists) {
+              if (!exists) {
                 return categoryGroupRepo
                     .findById(dto.getId())
                     .flatMap(
