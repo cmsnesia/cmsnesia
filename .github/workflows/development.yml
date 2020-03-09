@@ -1,0 +1,39 @@
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+
+  build:
+    name: Build and push
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout master
+        uses: actions/checkout@master
+
+      - name: Build container image
+        run: docker build -t ardikars/cmsnesia:snapshot .
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      - name: Push image to Docker Hub
+        run: docker push ardikars/cmsnesia
+
+      - name: Deploy artifact to github package registry
+        run: |
+          echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
+          ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-web,!cmsnesia-tests,!cmsnesia-service-spec,!cmsnesia-service-impl,!cmsnesia-domain,!cmsnesia-assembler clean package deploy -DskipTests
+
+      - name: Caching
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven

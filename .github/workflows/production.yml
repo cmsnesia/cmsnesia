@@ -25,20 +25,6 @@ jobs:
       - name: Push image to Docker Hub
         run: docker push ardikars/cmsnesia
 
-#      - name: Create deployment configuration
-#        run: |
-#          echo "${{ secrets.k8s_digital_ocean_config }}" | base64 --decode > .kubeconfig
-#          echo "${{ secrets.k8s_deployment_base64 }}" | base64 --decode > .k8s/templates/deployment.yaml
-#
-#      - name: Deploy to DigitalOcean Kubernetes
-#        run: |
-#          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/namespace.yaml
-#          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/deployment.yaml
-#          kubectl --kubeconfig=.kubeconfig apply -f .k8s/templates/service.yaml
-#
-#      - name: Verify deployment
-#        run: kubectl --kubeconfig=.kubeconfig rollout status deployment/cmsnesia-web
-
       - name: Deploy artifact to github package registry
         run: |
           echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
