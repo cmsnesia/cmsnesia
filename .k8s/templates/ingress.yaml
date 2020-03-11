@@ -15,6 +15,7 @@ spec:
   tls:
     - hosts:
         - "api.cmsnesia.com"
+        - "admin.cmsnesia.com"
       secretName: cmsnesia-tls
   rules:
     - host: "api.cmsnesia.com"
@@ -24,3 +25,10 @@ spec:
             backend:
               serviceName: "cmsnesia-service"
               servicePort: 8080
+    - host: "admin.cmsnesia.com"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: "cmsnesia-admin-service"
+              servicePort: 80
