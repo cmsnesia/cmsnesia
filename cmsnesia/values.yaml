@@ -30,13 +30,9 @@ ingress:
   tls:
     - hosts:
         - "api.cmsnesia.com"
-        - "apivtwo.cmsnesia.com"
       secretName: cmsnesia-tls
   hosts:
     - host: "api.cmsnesia.com"
-      paths:
-        - "/"
-    - host: "apivtwo.cmsnesia.com"
       paths:
         - "/"
 
