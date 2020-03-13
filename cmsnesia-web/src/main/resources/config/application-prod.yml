@@ -1,18 +1,20 @@
 spring:
   profiles:
     active:
-      - local
+      - default
     include:
       - common
   data:
     mongodb:
       uri: ''
+  codec:
+    max-in-memory-size: 5MB
 
 cmsnesia:
   token:
     issuer: 'cmsnesia'
-    accessTokenExparation: 300000
-    refreshTokenExparation: 600000
+    accessTokenExparation: 3000000
+    refreshTokenExparation: 6000000
     secret: ''
     max: 0
 

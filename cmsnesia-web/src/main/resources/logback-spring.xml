@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-<!--    <property name="LOG_PATH" value="${gri.logging.path}"/>-->
+<!--    <property name="LOG_PATH" value="${cmsnesia.logging.path}"/>-->
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
