@@ -34,7 +34,7 @@ ingress:
   hosts:
     - host: "api.cmsnesia.com"
       paths:
-        - "/"
+        - "/auth/v1"
 
 resources:
   limits:
