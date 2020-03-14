@@ -123,6 +123,7 @@
         <root level="info">
 <!--            <appender-ref ref="FILE_INFO"/>-->
 <!--            <appender-ref ref="FILE_ERROR"/>-->
+            <appender-ref ref="STDOUT"/>
         </root>
     </springProfile>
 
