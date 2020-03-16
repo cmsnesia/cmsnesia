@@ -58,8 +58,8 @@ public class LoggingFilterConfig implements WebFilter {
           .filter(exchangeDecorator)
           .doOnSuccess(
               aVoid -> {
-                // logResponse(startTime, exchangeDecorator.getResponse(),
-                // exchangeDecorator.getResponse().getStatusCode().value());
+                 logResponse(startTime, exchangeDecorator.getResponse(),
+                 exchangeDecorator.getResponse().getStatusCode().value());
               })
           .doOnError(
               throwable -> {

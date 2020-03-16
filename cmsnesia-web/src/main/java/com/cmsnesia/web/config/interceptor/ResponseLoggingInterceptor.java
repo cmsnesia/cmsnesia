@@ -34,19 +34,17 @@ public class ResponseLoggingInterceptor extends ServerHttpResponseDecorator {
               ByteArrayOutputStream baos = new ByteArrayOutputStream();
               try {
                 Channels.newChannel(baos).write(dataBuffer.asByteBuffer().asReadOnlyBuffer());
-                String bodyRes = IOUtils.toString(baos.toByteArray(), "UTF-8");
+                // String bodyRes = IOUtils.toString(baos.toByteArray(), "UTF-8");
                 if (logHeaders) {
                   log.info(
                       "Response({} ms): status={}, payload={}",
                       "X-Response-Time:" + (System.currentTimeMillis() - startTime),
-                      "X-Response-Status:" + getStatusCode(),
-                      bodyRes);
+                      "X-Response-Status:" + getStatusCode());
                 } else {
                   log.info(
                       "Response({} ms): status={}, payload={}",
                       "X-Response-Time:" + (System.currentTimeMillis() - startTime),
-                      "X-Response-Status:" + getStatusCode(),
-                      bodyRes);
+                      "X-Response-Status:" + getStatusCode());
                 }
               } catch (IOException e) {
                 log.error(e.getMessage());
