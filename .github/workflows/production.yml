@@ -6,12 +6,17 @@ on:
 jobs:
 
   build:
-    name: Build, push, and deploy
+    name: Build and deploy
     runs-on: ubuntu-latest
     steps:
 
       - name: Checkout master
         uses: actions/checkout@master
+
+      - name: Deploy artifact to github package registry
+        run: |
+          echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
+          ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-web,!cmsnesia-tests,!cmsnesia-service-spec,!cmsnesia-service-impl,!cmsnesia-domain,!cmsnesia-assembler clean package deploy -DskipTests
 
       - name: Build container image
         run: docker build -t ardikars/cmsnesia:latest .
@@ -25,7 +30,11 @@ jobs:
       - name: Push image to Docker Hub
         run: docker push ardikars/cmsnesia
 
-      - name: Deploy artifact to github package registry
+      - name: Deploy application to production environment
         run: |
-          echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
-          ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-web,!cmsnesia-tests,!cmsnesia-service-spec,!cmsnesia-service-impl,!cmsnesia-domain,!cmsnesia-assembler clean package deploy -DskipTests
+          mkdir -p ~/.kube
+          echo "${{ secrets.kube_config }}" | base64 --decode > ~/.kube/config
+          echo "${{ secrets.helm_production }}" | base64 --decode > cmsnesia/values.yaml
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+          sed -i.bak 's/^\(\s*appVersion\s*:\s*\).*/\1 latest/' cmsnesia/Chart.yaml
+          helm upgrade --install cmsnesia cmsnesia -n production
