@@ -69,7 +69,7 @@ public class TokenController {
   @PostMapping("/validate")
   public Mono<ResponseEntity<?>> validate(ServerHttpRequest serverRequest) {
     String path = serverRequest.getPath().toString();
-    if (path.startsWith("/token")) {
+    if (path.startsWith("/token") && !path.equals("/token/validate")) {
       return Mono.just(ResponseEntity.ok().build());
     }
     List<String> tokens = serverRequest.getHeaders().get(HttpHeaders.AUTHORIZATION);
