@@ -14,7 +14,7 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
 
 ingress:
   enabled: true
@@ -35,16 +35,16 @@ ingress:
       more_set_headers "Referrer-Policy: no-referrer";
     nginx.ingress.kubernetes.io/auth-method: "POST"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-User-Data"
-    nginx.ingress.kubernetes.io/auth-url: https://api.cmsnesia.com/auth/v2/token/validate
+    nginx.ingress.kubernetes.io/auth-url: http://cmsnesia-accounts.development.svc.cluster.local/token/validate
 
   tls:
     - hosts:
-        - "api.cmsnesia.com"
+        - "api.ardikars.com"
       secretName: cmsnesia-tls
   hosts:
-    - host: "api.cmsnesia.com"
+    - host: "api.ardikars.com"
       paths:
-        - "/auth/v1(/|$)(.*)"
+        - "/blogs/v1(/|$)(.*)"
 
 resources:
   limits:
