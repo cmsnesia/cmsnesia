@@ -1,11 +1,10 @@
-FROM maven:3.6.1-jdk-8-alpine AS builder
+FROM adoptopenjdk/openjdk11 AS builder
 
 WORKDIR /workspace
 COPY . .
-RUN mvn -e -B -s .mvn/release-settings.xml clean package -DskipTests
+RUN ./mvnw -e -B -s .mvn/release-settings.xml clean package -DskipTests
 
-#FROM openjdk:14-jdk-alpine
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
 LABEL APP="cmsnesia-web"
 LABEL DOMAIN="cmsnesia"
@@ -20,4 +19,4 @@ WORKDIR /app
 
 COPY --from=builder /workspace/cmsnesia-web/target/cmsnesia-web-*.jar /app/cmsnesia-web.jar
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "-Dserver.port=80", "/app/cmsnesia-web.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app/cmsnesia-web.jar"]
