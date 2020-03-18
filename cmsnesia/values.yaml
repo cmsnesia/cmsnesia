@@ -12,6 +12,19 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+rbac:
+  create: true
+  readSecrets: false
+
 service:
   type: ClusterIP
   port: 80
@@ -58,4 +71,4 @@ resources:
 cmsnesia:
   spring:
     application:
-      json: '{"spring.data.mongodb.uri":"mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false","github.owner":"cmsnesia","github.repo":"assets","github.accessToken":"secret","cmsnesia.token.issuer":"ardikars","cmsnesia.token.accessTokenExparation":"207360000","cmsnesia.token.refreshTokenExparation":"414720000","cmsnesia.token.secret":"47uDxE74","cmsnesia.token.max":"0"}'
+      json: '{"spring.application.name":"cmsnesia","spring.data.mongodb.uri":"mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false","github.owner":"cmsnesia","github.repo":"assets","github.accessToken":"secret","cmsnesia.token.issuer":"ardikars","cmsnesia.token.accessTokenExparation":"207360000","cmsnesia.token.refreshTokenExparation":"414720000","cmsnesia.token.secret":"47uDxE74","cmsnesia.token.max":"0"}'

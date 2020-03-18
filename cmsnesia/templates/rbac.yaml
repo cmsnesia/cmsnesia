@@ -1,0 +1,44 @@
+{{ if .Values.rbac.create }}
+  {{- $serviceName := include "cmsnesia.fullname" . -}}
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $serviceName }}-discovery-client
+  labels:
+    {{- include "cmsnesia.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["services", "pods", "configmaps", "endpoints"]
+    verbs: ["get", "watch", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $serviceName }}-discovery-client
+  labels:
+    {{- include "cmsnesia.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["services", "pods", "endpoints"]
+    verbs: ["get", "list", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $serviceName }}-discovery-client
+  labels:
+    {{- include "cmsnesia.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $serviceName }}-discovery-client
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "cmsnesia.serviceAccountName" .}}
+
+{{ end }}
