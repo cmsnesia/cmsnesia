@@ -12,10 +12,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -34,6 +39,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PublicController {
 
+  private final DiscoveryClient discoveryClient;
   private final CategoryService categoryService;
   private final CategoryGroupService categoryGroupService;
   private final PageService pageService;
@@ -333,5 +339,35 @@ public class PublicController {
                     .collect(Collectors.toSet()))
             .build();
     return profileService.find(session, null);
+  }
+
+  @GetMapping("/services")
+  public Flux<List<Map<String, Object>>> services() {
+    return Flux.fromStream(
+        discoveryClient.getServices().stream()
+            .map(
+                serviceId -> {
+                  Map<String, Object> service = new HashMap<>();
+                  List<Map<String, Object>> instances =
+                      discoveryClient.getInstances(serviceId).stream()
+                          .map(
+                              serviceInstance -> {
+                                Map<String, Object> instance = new HashMap<>();
+                                instance.put("host", serviceInstance.getHost());
+                                instance.put("instanceId", serviceInstance.getInstanceId());
+                                instance.put("metaData", serviceInstance.getMetadata());
+                                instance.put("scheme", serviceInstance.getScheme());
+                                return instance;
+                              })
+                          .collect(Collectors.toList());
+                  service.put("serviceId", serviceId);
+                  service.put("instances", instances);
+                  return instances;
+                }));
+  }
+
+  @GetMapping("/description")
+  public Mono<String> description() {
+    return Mono.just(discoveryClient.description());
   }
 }
