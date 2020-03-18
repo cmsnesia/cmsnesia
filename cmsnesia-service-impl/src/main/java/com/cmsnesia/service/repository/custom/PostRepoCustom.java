@@ -1,8 +1,8 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
@@ -14,15 +14,15 @@ import reactor.core.publisher.Mono;
 
 public interface PostRepoCustom {
 
-  Mono<Post> find(AuthDto session, IdRequest id);
+  Mono<Post> find(Session session, IdRequest id);
 
-  Flux<Post> find(AuthDto session, PostDto dto, Pageable pageable);
+  Flux<Post> find(Session session, PostDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto session, PostDto dto);
+  Mono<Long> countFind(Session session, PostDto dto);
 
-  Mono<UpdateResult> findAndModifyCategory(AuthDto session, CategoryDto categoryDto);
+  Mono<UpdateResult> findAndModifyCategory(Session session, CategoryDto categoryDto);
 
-  Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus);
+  Mono<Post> findAndModifyStatus(Session session, IdRequest id, Set<PostStatus> postStatus);
 
-  Mono<Boolean> exists(AuthDto session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name);
 }

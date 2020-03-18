@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Category;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import java.util.Set;
@@ -11,13 +11,13 @@ import reactor.core.publisher.Mono;
 
 public interface CategoryRepoCustom {
 
-  Mono<Category> find(AuthDto session, IdRequest id);
+  Mono<Category> find(Session session, IdRequest id);
 
-  Flux<Category> find(AuthDto session, CategoryDto dto, Pageable pageable);
+  Flux<Category> find(Session session, CategoryDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto session, CategoryDto dto);
+  Mono<Long> countFind(Session session, CategoryDto dto);
 
-  Mono<Boolean> exists(AuthDto session, Set<String> ids);
+  Mono<Boolean> exists(Session session, Set<String> ids);
 
-  Mono<Boolean> exists(AuthDto session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name);
 }

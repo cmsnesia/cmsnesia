@@ -1,8 +1,8 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.CategoryGroupAssembler;
 import com.cmsnesia.domain.CategoryGroup;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryGroupDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -28,7 +28,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   private final CategoryGroupRepo categoryGroupRepo;
 
   @Override
-  public Mono<Result<CategoryGroupDto>> add(AuthDto session, CategoryGroupDto dto) {
+  public Mono<Result<CategoryGroupDto>> add(Session session, CategoryGroupDto dto) {
     return categoryGroupRepo
         .exists(session, null, dto.getName())
         .flatMap(
@@ -50,7 +50,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   }
 
   @Override
-  public Mono<Result<CategoryGroupDto>> edit(AuthDto session, CategoryGroupDto dto) {
+  public Mono<Result<CategoryGroupDto>> edit(Session session, CategoryGroupDto dto) {
     return categoryGroupRepo
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
@@ -76,7 +76,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   }
 
   @Override
-  public Mono<Result<CategoryGroupDto>> delete(AuthDto session, CategoryGroupDto dto) {
+  public Mono<Result<CategoryGroupDto>> delete(Session session, CategoryGroupDto dto) {
     return categoryGroupRepo
         .find(session, IdRequest.builder().id(dto.getId()).build())
         .flatMap(
@@ -89,7 +89,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
   @Override
   public Mono<Page<CategoryGroupDto>> find(
-      AuthDto session, CategoryGroupDto dto, Pageable pageable) {
+      Session session, CategoryGroupDto dto, Pageable pageable) {
     return categoryGroupRepo
         .countFind(session, dto)
         .flatMap(
@@ -106,7 +106,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   }
 
   @Override
-  public Mono<Result<CategoryGroupDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<CategoryGroupDto>> find(Session session, IdRequest idRequest) {
     return categoryGroupRepo
         .find(session, idRequest)
         .map(categoryGroupAssembler::fromEntity)

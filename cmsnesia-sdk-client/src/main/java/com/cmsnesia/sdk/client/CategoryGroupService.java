@@ -14,7 +14,7 @@ public interface CategoryGroupService {
   @RequestLine("GET /category/group/find?page={page}&size={size}")
   @Headers("Content-Type: application/json")
   Mono<Page<CategoryGroupDto>> find(
-          CategoryGroupDto categoryGroupDto, @Param("page") Integer page, @Param("size") Integer size);
+      CategoryGroupDto categoryGroupDto, @Param("page") Integer page, @Param("size") Integer size);
 
   @RequestLine("POST /category/group/add")
   @Headers("Content-Type: application/json")

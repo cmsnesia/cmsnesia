@@ -1,15 +1,15 @@
 package com.cmsnesia.service.util;
 
+import com.cmsnesia.accounts.model.ApplicationDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.model.Application;
-import com.cmsnesia.model.ApplicationDto;
-import com.cmsnesia.model.AuthDto;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Sessions {
 
-  public static Set<String> applicationIds(AuthDto session) {
+  public static Set<String> applicationIds(Session session) {
     Set<String> appIds =
         session == null || session.getApplications() == null
             ? Collections.emptySet()
@@ -19,7 +19,7 @@ public class Sessions {
     return appIds;
   }
 
-  public static Set<Application> applications(AuthDto session) {
+  public static Set<Application> applications(Session session) {
     Set<Application> applications =
         session.getApplications() == null
             ? Collections.emptySet()

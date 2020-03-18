@@ -2,7 +2,7 @@ FROM maven:3.6.1-jdk-8-alpine AS builder
 
 WORKDIR /workspace
 COPY . .
-RUN mvn -e -B clean package -DskipTests
+RUN mvn -e -B -s .mvn/release-settings.xml clean package -DskipTests
 
 #FROM openjdk:14-jdk-alpine
 FROM openjdk:8-jre-alpine

@@ -1,9 +1,9 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.PageAssembler;
 import com.cmsnesia.domain.Page;
 import com.cmsnesia.domain.model.Author;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -27,7 +27,7 @@ public class PageServiceImpl implements PageService {
   private final PageRepo pageRepo;
 
   @Override
-  public Mono<Result<PageDto>> add(AuthDto session, PageDto dto) {
+  public Mono<Result<PageDto>> add(Session session, PageDto dto) {
     return pageRepo
         .exists(session, null, dto.getName())
         .flatMap(
@@ -57,7 +57,7 @@ public class PageServiceImpl implements PageService {
   }
 
   @Override
-  public Mono<Result<PageDto>> edit(AuthDto session, PageDto dto) {
+  public Mono<Result<PageDto>> edit(Session session, PageDto dto) {
     return pageRepo
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
@@ -95,7 +95,7 @@ public class PageServiceImpl implements PageService {
   }
 
   @Override
-  public Mono<Result<PageDto>> delete(AuthDto session, PageDto dto) {
+  public Mono<Result<PageDto>> delete(Session session, PageDto dto) {
     return pageRepo
         .findById(dto.getId())
         .flatMap(
@@ -110,7 +110,7 @@ public class PageServiceImpl implements PageService {
 
   @Override
   public Mono<org.springframework.data.domain.Page<PageDto>> find(
-      AuthDto session, PageDto dto, Pageable pageable) {
+      Session session, PageDto dto, Pageable pageable) {
     return pageRepo
         .countFind(session, dto)
         .flatMap(
@@ -125,7 +125,7 @@ public class PageServiceImpl implements PageService {
   }
 
   @Override
-  public Mono<Result<PageDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<PageDto>> find(Session session, IdRequest idRequest) {
     return pageRepo
         .findById(idRequest.getId())
         .map(page -> pageAssembler.fromEntity(page))

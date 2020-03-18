@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Page;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.AuthorDto;
 import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.request.IdRequest;
@@ -25,13 +25,13 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Page> find(AuthDto authDto, IdRequest id) {
+  public Mono<Page> find(Session authDto, IdRequest id) {
     Query query = buildQuery(authDto, PageDto.builder().id(id.getId()).build());
     return reactiveMongoTemplate.findOne(query, Page.class);
   }
 
   @Override
-  public Flux<Page> find(AuthDto authDto, PageDto dto, Pageable pageable) {
+  public Flux<Page> find(Session authDto, PageDto dto, Pageable pageable) {
     Query query = buildQuery(authDto, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
@@ -40,13 +40,13 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto authDto, PageDto dto) {
+  public Mono<Long> countFind(Session authDto, PageDto dto) {
     Query query = buildQuery(authDto, dto);
     return reactiveMongoTemplate.count(query, Page.class);
   }
 
   @Override
-  public Mono<Page> findAbout(AuthDto session) {
+  public Mono<Page> findAbout(Session session) {
     Query query = new Query();
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     query.addCriteria(Criteria.where("name").is("About"));
@@ -55,7 +55,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
@@ -66,7 +66,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
     return reactiveMongoTemplate.exists(query, Page.class);
   }
 
-  private Query buildQuery(AuthDto session, PageDto dto) {
+  private Query buildQuery(Session session, PageDto dto) {
 
     Query query = new Query();
 

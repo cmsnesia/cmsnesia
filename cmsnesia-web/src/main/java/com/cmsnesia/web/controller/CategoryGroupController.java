@@ -1,6 +1,6 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.CategoryGroupDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
@@ -44,7 +44,7 @@ public class CategoryGroupController {
   public Mono<Result<CategoryGroupDto>> findById(@RequestParam("id") String id) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return categoryGroupService.find(session, IdRequest.builder().id(id).build());
@@ -74,7 +74,7 @@ public class CategoryGroupController {
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return categoryGroupService.find(
@@ -95,7 +95,7 @@ public class CategoryGroupController {
   public Mono<Result<CategoryGroupDto>> add(@RequestBody CategoryGroupDto categoryGroupDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return categoryGroupService.add(session, categoryGroupDto);
@@ -113,7 +113,7 @@ public class CategoryGroupController {
   public Mono<Result<CategoryGroupDto>> edit(@RequestBody CategoryGroupDto categoryGroupDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return categoryGroupService.edit(session, categoryGroupDto);
@@ -131,7 +131,7 @@ public class CategoryGroupController {
   public Mono<Result<CategoryGroupDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               CategoryGroupDto dto = new CategoryGroupDto();

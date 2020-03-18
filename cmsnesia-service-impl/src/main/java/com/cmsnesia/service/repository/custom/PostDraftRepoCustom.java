@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.PostDraft;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,13 +10,13 @@ import reactor.core.publisher.Mono;
 
 public interface PostDraftRepoCustom {
 
-  Mono<PostDraft> find(AuthDto authDto, IdRequest id);
+  Mono<PostDraft> find(Session session, IdRequest id);
 
-  Flux<PostDraft> find(AuthDto authDto, PostDto dto, Pageable pageable);
+  Flux<PostDraft> find(Session session, PostDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto authDto, PostDto dto);
+  Mono<Long> countFind(Session session, PostDto dto);
 
-  Mono<PostDraft> deleteById(AuthDto session, IdRequest idRequest);
+  Mono<PostDraft> deleteById(Session session, IdRequest idRequest);
 
-  Mono<Boolean> exists(AuthDto session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name);
 }

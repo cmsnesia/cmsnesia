@@ -1,11 +1,11 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.Author;
 import com.cmsnesia.domain.model.enums.PostStatus;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -36,7 +36,7 @@ public class PostServiceImpl implements PostService {
   private final CategoryService categoryService;
 
   @Override
-  public Mono<Result<PostDto>> add(AuthDto session, PostDto dto) {
+  public Mono<Result<PostDto>> add(Session session, PostDto dto) {
     return postRepo
         .exists(session, null, dto.getTitle())
         .flatMap(
@@ -105,7 +105,7 @@ public class PostServiceImpl implements PostService {
 
   @Transactional
   @Override
-  public Mono<Result<PostDto>> edit(AuthDto session, PostDto dto) {
+  public Mono<Result<PostDto>> edit(Session session, PostDto dto) {
     return postRepo
         .exists(session, dto.getId(), dto.getTitle())
         .flatMap(
@@ -132,7 +132,7 @@ public class PostServiceImpl implements PostService {
 
   @Transactional
   @Override
-  public Mono<Result<PostDto>> editDraft(AuthDto session, PostDto dto) {
+  public Mono<Result<PostDto>> editDraft(Session session, PostDto dto) {
     return postRepo
         .exists(session, dto.getId(), dto.getTitle())
         .flatMap(
@@ -223,7 +223,7 @@ public class PostServiceImpl implements PostService {
 
   @Transactional
   @Override
-  public Mono<Result<PostDto>> delete(AuthDto authDto, PostDto dto) {
+  public Mono<Result<PostDto>> delete(Session authDto, PostDto dto) {
     return postRepo
         .findById(dto.getId())
         .flatMap(
@@ -249,7 +249,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Page<PostDto>> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+  public Mono<Page<PostDto>> find(Session authDto, PostDto dto, Pageable pageable) {
     return postRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -264,7 +264,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Page<PostDto>> findDraft(AuthDto authDto, PostDto dto, Pageable pageable) {
+  public Mono<Page<PostDto>> findDraft(Session authDto, PostDto dto, Pageable pageable) {
     return postDraftRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -279,7 +279,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Result<PostDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<PostDto>> find(Session session, IdRequest idRequest) {
     return postRepo
         .find(session, idRequest)
         .map(postAssembler::fromEntity)
@@ -287,7 +287,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Result<PostDto>> findDraft(AuthDto authDto, IdRequest idRequest) {
+  public Mono<Result<PostDto>> findDraft(Session authDto, IdRequest idRequest) {
     return postDraftRepo
         .find(authDto, idRequest)
         .map(postAssembler::fromDraft)
@@ -296,7 +296,7 @@ public class PostServiceImpl implements PostService {
 
   @Transactional
   @Override
-  public Mono<Result<PostDto>> publish(AuthDto session, IdRequest id) {
+  public Mono<Result<PostDto>> publish(Session session, IdRequest id) {
     return postDraftRepo
         .findById(id.getId())
         .flatMap(
@@ -370,7 +370,7 @@ public class PostServiceImpl implements PostService {
   }
 
   @Override
-  public Mono<Result<PostDto>> deleteDraft(AuthDto session, PostDto dto) {
+  public Mono<Result<PostDto>> deleteDraft(Session session, PostDto dto) {
     return postDraftRepo
         .deleteById(session, IdRequest.builder().id(dto.getId()).build())
         .flatMap(

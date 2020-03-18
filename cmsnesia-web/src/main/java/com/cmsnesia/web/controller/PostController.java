@@ -1,6 +1,6 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
@@ -38,7 +38,7 @@ public class PostController {
 
   private final PostService postService;
 
-  @ApiOperation(value = "Get post by ID", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Get post by ID", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -46,14 +46,14 @@ public class PostController {
   public Mono<Result<PostDto>> findById(@RequestParam("id") String id) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.find(session, IdRequest.builder().id(id).build());
             });
   }
 
-  @ApiOperation(value = "Get draft by ID", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Get draft by ID", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -61,7 +61,7 @@ public class PostController {
   public Mono<Result<PostDto>> findDraftById(@RequestParam("id") String id) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.findDraft(session, IdRequest.builder().id(id).build());
@@ -69,7 +69,7 @@ public class PostController {
   }
 
   @PostMapping("/find")
-  @ApiOperation(value = "List post", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "List post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -88,7 +88,7 @@ public class PostController {
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.find(
@@ -97,7 +97,7 @@ public class PostController {
   }
 
   @PostMapping("/findDraft")
-  @ApiOperation(value = "List draft", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "List draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
@@ -116,7 +116,7 @@ public class PostController {
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.findDraft(
@@ -124,7 +124,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Add post", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Add post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -146,14 +146,14 @@ public class PostController {
             .build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.add(session, postDto);
             });
   }
 
-  @ApiOperation(value = "Edit post", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Edit post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -161,14 +161,14 @@ public class PostController {
   public Mono<Result<PostDto>> edit(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.edit(session, PostDto.builder().id(idRequest.getId()).build());
             });
   }
 
-  @ApiOperation(value = "Edit draft", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Edit draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -191,14 +191,14 @@ public class PostController {
             .build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.editDraft(session, postDto);
             });
   }
 
-  @ApiOperation(value = "Soft delete post", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Soft delete post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -206,7 +206,7 @@ public class PostController {
   public Mono<Result<PostDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               PostDto dto = new PostDto();
@@ -215,7 +215,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Delete draft", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Delete draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -223,7 +223,7 @@ public class PostController {
   public Mono<Result<PostDto>> deleteDraft(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               PostDto dto = new PostDto();
@@ -232,7 +232,7 @@ public class PostController {
             });
   }
 
-  @ApiOperation(value = "Publish post", response = AuthDto.class, notes = "Result<PostDto>")
+  @ApiOperation(value = "Publish post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
     @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
   })
@@ -240,7 +240,7 @@ public class PostController {
   public Mono<Result<PostDto>> publish(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return postService.publish(session, idRequest);

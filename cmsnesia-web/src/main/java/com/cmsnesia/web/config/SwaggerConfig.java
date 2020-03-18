@@ -10,7 +10,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
 
 @Configuration
 @EnableSwagger2WebFlux
-//@Profile({"local", "dev"})
+// @Profile({"local", "dev"})
 public class SwaggerConfig {
 
   @Bean

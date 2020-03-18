@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Page;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.request.IdRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,13 +10,13 @@ import reactor.core.publisher.Mono;
 
 public interface PageRepoCustom {
 
-  Mono<Page> find(AuthDto session, IdRequest id);
+  Mono<Page> find(Session session, IdRequest id);
 
-  Flux<Page> find(AuthDto session, PageDto dto, Pageable pageable);
+  Flux<Page> find(Session session, PageDto dto, Pageable pageable);
 
-  Mono<Long> countFind(AuthDto session, PageDto dto);
+  Mono<Long> countFind(Session session, PageDto dto);
 
-  Mono<Page> findAbout(AuthDto session);
+  Mono<Page> findAbout(Session session);
 
-  Mono<Boolean> exists(AuthDto session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name);
 }

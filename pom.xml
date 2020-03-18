@@ -56,6 +56,13 @@
         <dependencies>
             <dependency>
                 <groupId>com.cmsnesia</groupId>
+                <artifactId>cmsnesia-accounts</artifactId>
+                <version>1.0.1-SNAPSHOT</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>com.cmsnesia</groupId>
                 <artifactId>cmsnesia-assembler</artifactId>
                 <version>1.0.1-SNAPSHOT</version>
             </dependency>

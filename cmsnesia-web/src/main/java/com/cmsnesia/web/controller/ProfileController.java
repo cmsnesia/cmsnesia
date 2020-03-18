@@ -1,6 +1,6 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.ProfileDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.service.ProfileService;
@@ -38,7 +38,7 @@ public class ProfileController {
   public Mono<Result<ProfileDto>> findById() {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(session -> profileService.find(session, null));
   }
 
@@ -50,7 +50,7 @@ public class ProfileController {
   public Mono<Result<ProfileDto>> add(@RequestBody ProfileDto profileDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(session -> profileService.add(session, profileDto));
   }
 
@@ -62,7 +62,7 @@ public class ProfileController {
   public Mono<Result<ProfileDto>> edit(@RequestBody ProfileDto profileDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(session -> profileService.edit(session, profileDto));
   }
 }

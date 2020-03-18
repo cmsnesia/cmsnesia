@@ -1,8 +1,8 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.ProfileAssembler;
 import com.cmsnesia.domain.Profile;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.ProfileDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -26,7 +26,7 @@ public class ProfileServiceImpl implements ProfileService {
   private final ProfileRepo profileRepo;
 
   @Override
-  public Mono<Result<ProfileDto>> add(AuthDto session, ProfileDto dto) {
+  public Mono<Result<ProfileDto>> add(Session session, ProfileDto dto) {
     return profileRepo
         .exists(session)
         .flatMap(
@@ -49,7 +49,7 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   @Override
-  public Mono<Result<ProfileDto>> edit(AuthDto session, ProfileDto dto) {
+  public Mono<Result<ProfileDto>> edit(Session session, ProfileDto dto) {
     return profileRepo
         .exists(session)
         .flatMap(
@@ -77,17 +77,17 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   @Override
-  public Mono<Result<ProfileDto>> delete(AuthDto session, ProfileDto dto) {
+  public Mono<Result<ProfileDto>> delete(Session session, ProfileDto dto) {
     throw new UnsupportedOperationException("Couldn't delete profile! Operation not supported.");
   }
 
   @Override
-  public Mono<Page<ProfileDto>> find(AuthDto session, ProfileDto dto, Pageable pageable) {
+  public Mono<Page<ProfileDto>> find(Session session, ProfileDto dto, Pageable pageable) {
     throw new UnsupportedOperationException("Couldn't find profile! Operation not supported.");
   }
 
   @Override
-  public Mono<Result<ProfileDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<ProfileDto>> find(Session session, IdRequest idRequest) {
     return profileRepo
         .find(session, idRequest)
         .map(profile -> Result.build(profileAssembler.fromEntity(profile), StatusCode.DATA_FOUND));

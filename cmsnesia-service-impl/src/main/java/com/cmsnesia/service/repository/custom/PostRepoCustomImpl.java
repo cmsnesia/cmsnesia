@@ -1,5 +1,6 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
@@ -30,7 +31,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Post> find(AuthDto authDto, IdRequest id) {
+  public Mono<Post> find(Session authDto, IdRequest id) {
     Query query = buildQuery(authDto, PostDto.builder().id(id.getId()).build());
     Update update = new Update();
     update.inc("viewCount", 1);
@@ -38,7 +39,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Flux<Post> find(AuthDto authDto, PostDto dto, Pageable pageable) {
+  public Flux<Post> find(Session authDto, PostDto dto, Pageable pageable) {
     Query query = buildQuery(authDto, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
@@ -47,13 +48,13 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto authDto, PostDto dto) {
-    Query query = buildQuery(authDto, dto);
+  public Mono<Long> countFind(Session session, PostDto dto) {
+    Query query = buildQuery(session, dto);
     return reactiveMongoTemplate.count(query, Post.class);
   }
 
   @Override
-  public Mono<UpdateResult> findAndModifyCategory(AuthDto authDto, CategoryDto categoryDto) {
+  public Mono<UpdateResult> findAndModifyCategory(Session session, CategoryDto categoryDto) {
     Query query = new Query();
     query.addCriteria(Criteria.where("categories.id").is(categoryDto.getId()));
     Update update = new Update();
@@ -62,7 +63,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Mono<Post> findAndModifyStatus(AuthDto session, IdRequest id, Set<PostStatus> postStatus) {
+  public Mono<Post> findAndModifyStatus(Session session, IdRequest id, Set<PostStatus> postStatus) {
     Query query = new Query();
 
     query.addCriteria(Criteria.where("id").is(id.getId()));
@@ -85,7 +86,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
@@ -96,7 +97,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     return reactiveMongoTemplate.exists(query, Post.class);
   }
 
-  private Query buildQuery(AuthDto session, PostDto dto) {
+  private Query buildQuery(Session session, PostDto dto) {
 
     Query query = new Query();
 

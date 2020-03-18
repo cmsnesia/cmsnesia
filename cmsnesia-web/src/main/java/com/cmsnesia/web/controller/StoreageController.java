@@ -1,6 +1,6 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -59,7 +59,7 @@ public class StoreageController {
       @RequestBody Request media, @RequestParam("fileType") String fileType) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               if (!StringUtils.hasText(media.getContent())) {

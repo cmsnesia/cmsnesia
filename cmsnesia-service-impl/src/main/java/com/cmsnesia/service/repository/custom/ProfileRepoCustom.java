@@ -1,13 +1,13 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Profile;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.request.IdRequest;
 import reactor.core.publisher.Mono;
 
 public interface ProfileRepoCustom {
 
-  Mono<Boolean> exists(AuthDto session);
+  Mono<Boolean> exists(Session session);
 
-  Mono<Profile> find(AuthDto session, IdRequest idRequest);
+  Mono<Profile> find(Session session, IdRequest idRequest);
 }

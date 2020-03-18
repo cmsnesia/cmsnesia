@@ -1,6 +1,6 @@
 package com.cmsnesia.service;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import java.io.Serializable;
@@ -10,13 +10,13 @@ import reactor.core.publisher.Mono;
 
 public interface BaseService<T extends Serializable> {
 
-  Mono<Result<T>> add(AuthDto session, T dto);
+  Mono<Result<T>> add(Session session, T dto);
 
-  Mono<Result<T>> edit(AuthDto session, T dto);
+  Mono<Result<T>> edit(Session session, T dto);
 
-  Mono<Result<T>> delete(AuthDto session, T dto);
+  Mono<Result<T>> delete(Session session, T dto);
 
-  Mono<Page<T>> find(AuthDto session, T dto, Pageable pageable);
+  Mono<Page<T>> find(Session session, T dto, Pageable pageable);
 
-  Mono<Result<T>> find(AuthDto session, IdRequest idRequest);
+  Mono<Result<T>> find(Session session, IdRequest idRequest);
 }

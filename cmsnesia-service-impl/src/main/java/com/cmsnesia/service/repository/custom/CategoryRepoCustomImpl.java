@@ -1,7 +1,7 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Category;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.util.Sessions;
@@ -23,13 +23,13 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Category> find(AuthDto session, IdRequest id) {
+  public Mono<Category> find(Session session, IdRequest id) {
     Query query = buildQuery(session, CategoryDto.builder().id(id.getId()).build());
     return reactiveMongoTemplate.findOne(query, Category.class);
   }
 
   @Override
-  public Flux<Category> find(AuthDto session, CategoryDto dto, Pageable pageable) {
+  public Flux<Category> find(Session session, CategoryDto dto, Pageable pageable) {
     Query query = buildQuery(session, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
@@ -38,13 +38,13 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto session, CategoryDto dto) {
+  public Mono<Long> countFind(Session session, CategoryDto dto) {
     Query query = buildQuery(session, dto);
     return reactiveMongoTemplate.count(query, Category.class);
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, Set<String> ids) {
+  public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
@@ -54,7 +54,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
@@ -65,7 +65,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     return reactiveMongoTemplate.exists(query, Category.class);
   }
 
-  private Query buildQuery(AuthDto session, CategoryDto dto) {
+  private Query buildQuery(Session session, CategoryDto dto) {
 
     Query query = new Query();
 

@@ -1,5 +1,7 @@
 package com.cmsnesia.web.controller;
 
+import com.cmsnesia.accounts.model.ApplicationDto;
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
@@ -65,8 +67,8 @@ public class PublicController {
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody PostDto postDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(id -> ApplicationDto.builder().id(id).build())
@@ -102,8 +104,8 @@ public class PublicController {
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody PostDto postDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(id -> ApplicationDto.builder().id(id).build())
@@ -128,8 +130,8 @@ public class PublicController {
           required = true))
   public Mono<Result<PostDto>> findPostById(
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds, @RequestBody IdRequest id) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(appId -> ApplicationDto.builder().id(appId).build())
@@ -164,8 +166,8 @@ public class PublicController {
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody CategoryDto categoryDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(id -> ApplicationDto.builder().id(id).build())
@@ -176,40 +178,43 @@ public class PublicController {
   }
 
   @PostMapping(
-          value = "/category/group",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "List category group", response = CategoryGroupDto.class, notes = "Flux [CategoryGroupDto]")
+      value = "/category/group",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(
+      value = "List category group",
+      response = CategoryGroupDto.class,
+      notes = "Flux [CategoryGroupDto]")
   @ApiImplicitParams({
-          @ApiImplicitParam(
-                  name = ConstantKeys.PAGE,
-                  defaultValue = "0",
-                  paramType = "query",
-                  dataType = "integer"),
-          @ApiImplicitParam(
-                  name = ConstantKeys.SIZE,
-                  defaultValue = "10",
-                  paramType = "query",
-                  dataType = "integer"),
-          @ApiImplicitParam(
-                  name = ConstantKeys.APP_ID,
-                  paramType = "header",
-                  dataType = "string",
-                  required = true)
+    @ApiImplicitParam(
+        name = ConstantKeys.PAGE,
+        defaultValue = "0",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.SIZE,
+        defaultValue = "10",
+        paramType = "query",
+        dataType = "integer"),
+    @ApiImplicitParam(
+        name = ConstantKeys.APP_ID,
+        paramType = "header",
+        dataType = "string",
+        required = true)
   })
   public Mono<Page<CategoryGroupDto>> find(
-          @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
-          @RequestBody CategoryGroupDto categoryGroupDto,
-          @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-            AuthDto.builder()
-                    .applications(
-                            appIds.stream()
-                                    .map(id -> ApplicationDto.builder().id(id).build())
-                                    .collect(Collectors.toSet()))
-                    .build();
+      @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
+      @RequestBody CategoryGroupDto categoryGroupDto,
+      @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
+    Session session =
+        Session.builder()
+            .applications(
+                appIds.stream()
+                    .map(id -> ApplicationDto.builder().id(id).build())
+                    .collect(Collectors.toSet()))
+            .build();
     return categoryGroupService.find(
-            session, categoryGroupDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
+        session, categoryGroupDto, PageRequest.of(pageable.getPage(), pageable.getSize()));
   }
 
   @PostMapping(
@@ -238,8 +243,8 @@ public class PublicController {
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody MenuDto menuDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(id -> ApplicationDto.builder().id(id).build())
@@ -275,8 +280,8 @@ public class PublicController {
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds,
       @RequestBody PageDto pageDto,
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(id -> ApplicationDto.builder().id(id).build())
@@ -299,8 +304,8 @@ public class PublicController {
           required = true))
   public Mono<Result<PageDto>> findPageById(
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds, @RequestBody IdRequest id) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(appId -> ApplicationDto.builder().id(appId).build())
@@ -320,8 +325,8 @@ public class PublicController {
   })
   public Mono<Result<ProfileDto>> findProfile(
       @RequestHeader(ConstantKeys.APP_ID) List<String> appIds) {
-    AuthDto session =
-        AuthDto.builder()
+    Session session =
+        Session.builder()
             .applications(
                 appIds.stream()
                     .map(appId -> ApplicationDto.builder().id(appId).build())

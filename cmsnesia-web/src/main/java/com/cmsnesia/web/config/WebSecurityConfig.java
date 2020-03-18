@@ -1,6 +1,7 @@
 package com.cmsnesia.web.config;
 
 import com.cmsnesia.web.config.security.SecurityContextRepository;
+import java.net.MalformedURLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
-
-import java.net.MalformedURLException;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -42,30 +41,36 @@ public class WebSecurityConfig {
   @Bean
   public SecurityWebFilterChain securitygWebFilterChain(
       ServerHttpSecurity http, SecurityContextRepository contextRepository) {
-      Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
+    Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
     return http.exceptionHandling()
         .authenticationEntryPoint(
             (swe, e) ->
                 Mono.fromRunnable(
                     () -> {
-                    try {
-                      ServerHttpRequest request = swe.getRequest();
-                      logger.info("ID      : {}", request.getPath());
-                      logger.info("Path    : {}", request.getId());
-                      logger.info("URI     : {}", request.getURI().toString());
-                      logger.info("URL     : {}", request.getURI().toURL().toString());
-                      logger.info("Method  : {}", request.getMethod());
-                      logger.info("Headers :");
-                      request.getHeaders().forEach((name, httpHeaders) -> {
-                        logger.info(" >> header = {} : {}", name, httpHeaders);
-                      });
-                      logger.info("Cookies : ");
-                      request.getCookies().forEach((name, httpCookies) -> {
-                        logger.info(" >> cookie = {} : {}", name, httpCookies);
-                      });
-                    } catch (MalformedURLException ex) {
-                    }
-                    swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                      try {
+                        ServerHttpRequest request = swe.getRequest();
+                        logger.info("ID      : {}", request.getPath());
+                        logger.info("Path    : {}", request.getId());
+                        logger.info("URI     : {}", request.getURI().toString());
+                        logger.info("URL     : {}", request.getURI().toURL().toString());
+                        logger.info("Method  : {}", request.getMethod());
+                        logger.info("Headers :");
+                        request
+                            .getHeaders()
+                            .forEach(
+                                (name, httpHeaders) -> {
+                                  logger.info(" >> header = {} : {}", name, httpHeaders);
+                                });
+                        logger.info("Cookies : ");
+                        request
+                            .getCookies()
+                            .forEach(
+                                (name, httpCookies) -> {
+                                  logger.info(" >> cookie = {} : {}", name, httpCookies);
+                                });
+                      } catch (MalformedURLException ex) {
+                      }
+                      swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     }))
         .accessDeniedHandler(
             (swe, e) ->

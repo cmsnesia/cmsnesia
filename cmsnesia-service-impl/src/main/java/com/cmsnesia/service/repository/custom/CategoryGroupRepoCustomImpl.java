@@ -1,8 +1,8 @@
 package com.cmsnesia.service.repository.custom;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.domain.CategoryGroup;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryGroupDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.util.Sessions;
@@ -24,13 +24,13 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<CategoryGroup> find(AuthDto session, IdRequest id) {
+  public Mono<CategoryGroup> find(Session session, IdRequest id) {
     Query query = buildQuery(session, CategoryGroupDto.builder().id(id.getId()).build());
     return reactiveMongoTemplate.findOne(query, CategoryGroup.class);
   }
 
   @Override
-  public Flux<CategoryGroup> find(AuthDto session, CategoryGroupDto dto, Pageable pageable) {
+  public Flux<CategoryGroup> find(Session session, CategoryGroupDto dto, Pageable pageable) {
     Query query = buildQuery(session, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
@@ -39,13 +39,13 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto session, CategoryGroupDto dto) {
+  public Mono<Long> countFind(Session session, CategoryGroupDto dto) {
     Query query = buildQuery(session, dto);
     return reactiveMongoTemplate.count(query, CategoryGroup.class);
   }
 
   @Override
-  public Mono<Boolean> exists(AuthDto session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
@@ -56,7 +56,7 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
     return reactiveMongoTemplate.exists(query, Category.class);
   }
 
-  private Query buildQuery(AuthDto session, CategoryGroupDto dto) {
+  private Query buildQuery(Session session, CategoryGroupDto dto) {
 
     Query query = new Query();
 

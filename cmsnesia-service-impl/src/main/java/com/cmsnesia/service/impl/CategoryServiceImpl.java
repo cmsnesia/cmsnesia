@@ -1,8 +1,8 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.CategoryAssembler;
 import com.cmsnesia.domain.Category;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
   private final PostRepo postRepo;
 
   @Override
-  public Mono<Result<CategoryDto>> add(AuthDto session, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> add(Session session, CategoryDto dto) {
     return categoryRepo
         .exists(session, null, dto.getName())
         .flatMap(
@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Transactional
   @Override
-  public Mono<Result<CategoryDto>> edit(AuthDto session, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> edit(Session session, CategoryDto dto) {
     return categoryRepo
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
@@ -91,13 +91,13 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> delete(AuthDto authDto, CategoryDto dto) {
+  public Mono<Result<CategoryDto>> delete(Session session, CategoryDto dto) {
     return categoryRepo
         .findById(dto.getId())
         .flatMap(
             (Function<Category, Mono<Result<CategoryDto>>>)
                 category -> {
-                  category.setDeletedBy(authDto.getId());
+                  category.setDeletedBy(session.getId());
                   category.setDeletedAt(new Date());
                   return categoryRepo
                       .save(category)
@@ -107,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Page<CategoryDto>> find(AuthDto authDto, CategoryDto dto, Pageable pageable) {
+  public Mono<Page<CategoryDto>> find(Session authDto, CategoryDto dto, Pageable pageable) {
     return categoryRepo
         .countFind(authDto, dto)
         .flatMap(
@@ -123,7 +123,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<CategoryDto>> find(Session session, IdRequest idRequest) {
     return categoryRepo
         .find(session, idRequest)
         .map(categoryAssembler::fromEntity)
@@ -131,7 +131,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> findById(AuthDto session, IdRequest id) {
+  public Mono<Result<CategoryDto>> findById(Session session, IdRequest id) {
     return categoryRepo
         .findById(id.getId())
         .map(category -> categoryAssembler.fromEntity(category))
@@ -139,7 +139,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Set<CategoryDto>> findByIds(AuthDto session, Set<IdRequest> ids) {
+  public Mono<Set<CategoryDto>> findByIds(Session session, Set<IdRequest> ids) {
     return categoryRepo
         .findAllById(ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
         .collectList()
@@ -147,7 +147,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<Boolean>> exists(AuthDto session, Set<IdRequest> ids) {
+  public Mono<Result<Boolean>> exists(Session session, Set<IdRequest> ids) {
     return categoryRepo
         .exists(session, ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
         .map(

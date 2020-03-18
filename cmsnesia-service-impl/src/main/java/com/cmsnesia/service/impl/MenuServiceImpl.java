@@ -1,8 +1,8 @@
 package com.cmsnesia.service.impl;
 
+import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.MenuAssembler;
 import com.cmsnesia.domain.Menu;
-import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.api.Result;
@@ -34,7 +34,7 @@ public class MenuServiceImpl implements MenuService {
   private final CategoryRepo categoryRepo;
 
   @Override
-  public Mono<Result<MenuDto>> add(AuthDto session, MenuDto dto) {
+  public Mono<Result<MenuDto>> add(Session session, MenuDto dto) {
     return menuRepo
         .exists(session, null, dto.getName())
         .flatMap(
@@ -74,7 +74,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public Mono<Result<MenuDto>> edit(AuthDto session, MenuDto dto) {
+  public Mono<Result<MenuDto>> edit(Session session, MenuDto dto) {
     return menuRepo
         .exists(session, dto.getId(), dto.getName())
         .flatMap(
@@ -116,7 +116,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public Mono<Result<MenuDto>> delete(AuthDto session, MenuDto dto) {
+  public Mono<Result<MenuDto>> delete(Session session, MenuDto dto) {
     return menuRepo
         .findById(dto.getId())
         .flatMap(
@@ -132,7 +132,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public Mono<Page<MenuDto>> find(AuthDto session, MenuDto dto, Pageable pageable) {
+  public Mono<Page<MenuDto>> find(Session session, MenuDto dto, Pageable pageable) {
     return menuRepo
         .countFind(session, dto)
         .flatMap(
@@ -147,7 +147,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public Mono<Result<MenuDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<MenuDto>> find(Session session, IdRequest idRequest) {
     return menuRepo
         .find(session, idRequest)
         .map(menuAssembler::fromEntity)
@@ -155,7 +155,7 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public Mono<Result<MenuDto>> findById(AuthDto session, IdRequest id) {
+  public Mono<Result<MenuDto>> findById(Session session, IdRequest id) {
     return menuRepo
         .findById(id.getId())
         .map(menuAssembler::fromEntity)
