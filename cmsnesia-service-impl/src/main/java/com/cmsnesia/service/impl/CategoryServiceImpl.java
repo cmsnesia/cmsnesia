@@ -11,10 +11,8 @@ import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.repository.CategoryRepo;
 import com.cmsnesia.service.repository.PostRepo;
 import com.cmsnesia.service.util.Sessions;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -93,17 +91,26 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public Mono<Result<CategoryDto>> delete(Session session, CategoryDto dto) {
     return categoryRepo
-        .findById(dto.getId())
+        .exists(session, new HashSet<>(Arrays.asList(dto.getId())))
         .flatMap(
-            (Function<Category, Mono<Result<CategoryDto>>>)
-                category -> {
-                  category.setDeletedBy(session.getId());
-                  category.setDeletedAt(new Date());
-                  return categoryRepo
-                      .save(category)
-                      .map(saved -> categoryAssembler.fromEntity(saved))
-                      .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
-                });
+            exists -> {
+              if (exists) {
+                return categoryRepo
+                    .findById(dto.getId())
+                    .flatMap(
+                        (Function<Category, Mono<Result<CategoryDto>>>)
+                            category -> {
+                              category.setDeletedBy(session.getId());
+                              category.setDeletedAt(new Date());
+                              return categoryRepo
+                                  .save(category)
+                                  .map(saved -> categoryAssembler.fromEntity(saved))
+                                  .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
+                            });
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
+            });
   }
 
   @Override
