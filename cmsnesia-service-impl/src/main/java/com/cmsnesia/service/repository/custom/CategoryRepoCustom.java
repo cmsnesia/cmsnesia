@@ -13,6 +13,8 @@ public interface CategoryRepoCustom {
 
   Mono<Category> find(Session session, IdRequest id);
 
+  Flux<Category> find(Session session, Set<IdRequest> ids);
+
   Flux<Category> find(Session session, CategoryDto dto, Pageable pageable);
 
   Mono<Long> countFind(Session session, CategoryDto dto);

@@ -7,6 +7,8 @@ import com.cmsnesia.model.CategoryGroupDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.util.Sessions;
 import io.jsonwebtoken.lang.Collections;
+
+import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +56,15 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Category.class);
+  }
+
+  @Override
+  public Mono<Boolean> exists(Session session, Set<String> ids) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").in(ids));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
+    return reactiveMongoTemplate.exists(query, CategoryGroup.class);
   }
 
   private Query buildQuery(Session session, CategoryGroupDto dto) {

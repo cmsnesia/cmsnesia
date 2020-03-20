@@ -112,7 +112,7 @@ public class PostServiceImpl implements PostService {
             exists -> {
               if (!exists) {
                 return postRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         post -> {
                           PostDraft postDraft = postAssembler.fromPost(post);
@@ -139,7 +139,7 @@ public class PostServiceImpl implements PostService {
             exists -> {
               if (!exists) {
                 return postDraftRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         (Function<PostDraft, Mono<Result<PostDto>>>)
                             postDraft -> {
@@ -225,27 +225,37 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> delete(Session authDto, PostDto dto) {
     return postRepo
-        .findById(dto.getId())
+        .exists(authDto, new HashSet<>(Arrays.asList(dto.getId())))
         .flatMap(
-            (Function<Post, Mono<Result<PostDto>>>)
-                post -> {
-                  post.setDeletedBy(authDto.getId());
-                  post.setDeletedAt(new Date());
-                  post.setStatus(
-                      Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
-                          .collect(Collectors.toSet()));
-                  return postRepo
-                      .save(post)
-                      .flatMap(
-                          saved -> {
-                            return postDraftRepo
-                                .deleteById(post.getId())
-                                .map(
-                                    result -> {
-                                      return Result.build(dto, StatusCode.DELETE_SUCCESS);
-                                    });
-                          });
-                });
+            exist -> {
+              if (exist) {
+                return postRepo
+                    .find(authDto, IdRequest.builder().id(dto.getId()).build())
+                    .flatMap(
+                        (Function<Post, Mono<Result<PostDto>>>)
+                            post -> {
+                              post.setDeletedBy(authDto.getId());
+                              post.setDeletedAt(new Date());
+                              post.setStatus(
+                                  Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                                      .collect(Collectors.toSet()));
+                              return postRepo
+                                  .save(post)
+                                  .flatMap(
+                                      saved -> {
+                                        return postDraftRepo
+                                            .deleteById(post.getId())
+                                            .map(
+                                                result -> {
+                                                  return Result.build(
+                                                      dto, StatusCode.DELETE_SUCCESS);
+                                                });
+                                      });
+                            });
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
+            });
   }
 
   @Override
@@ -298,74 +308,95 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> publish(Session session, IdRequest id) {
     return postDraftRepo
-        .findById(id.getId())
+        .exists(session, new HashSet<>(Arrays.asList(id.getId())))
         .flatMap(
-            postDraft -> {
-              Post newPost = postAssembler.fromDto(postAssembler.fromDraft(postDraft));
-              newPost.setCreatedAt(new Date());
-              newPost.setCreatedBy(session.getId());
-              return postRepo
-                  .findById(id.getId())
-                  .defaultIfEmpty(newPost)
-                  .flatMap(
-                      post -> {
-                        Set<Author> authors =
-                            post.getAuthors() == null ? new HashSet<>() : post.getAuthors();
-                        if (authors.stream()
-                            .map(Author::getName)
-                            .noneMatch(name -> name.equals(session.getFullName()))) {
-                          Author author = new Author();
-                          author.setName(session.getFullName());
-                          author.setModifiedAt(new Date());
-                          authors.add(author);
-                        }
-                        Post exitingPost =
-                            postAssembler.fromDto(postAssembler.fromDraft(postDraft));
-                        exitingPost.setAuthors(authors);
-                        exitingPost.audit(post);
-                        exitingPost.setModifiedAt(new Date());
-                        exitingPost.setModifiedBy(session.getId());
-                        exitingPost.setStatus(
-                            new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
-                        Set<IdRequest> ids =
-                            exitingPost.getCategories().stream()
-                                .map(category -> IdRequest.builder().id(category.getId()).build())
-                                .collect(Collectors.toSet());
-                        return categoryService
-                            .findByIds(session, ids)
-                            .flatMap(
-                                categoryDtos -> {
-                                  categoryDtos.forEach(
-                                      categoryDto -> {
-                                        exitingPost
-                                            .getCategories()
-                                            .forEach(
-                                                category -> {
-                                                  if (category
-                                                      .getId()
-                                                      .equals(categoryDto.getId())) {
-                                                    category.setName(categoryDto.getName());
-                                                  }
-                                                });
-                                      });
-                                  exitingPost.setApplications(Sessions.applications(session));
-                                  return postRepo
-                                      .save(exitingPost)
-                                      .flatMap(
-                                          saved -> {
-                                            postDraft.setStatus(
-                                                new HashSet<>(
-                                                    Arrays.asList(PostStatus.PUBLISHED.name())));
-                                            return postDraftRepo
-                                                .save(postDraft)
-                                                .map(result -> postAssembler.fromEntity(saved))
-                                                .map(
-                                                    returned ->
-                                                        Result.build(
-                                                            returned, StatusCode.SAVE_SUCCESS));
-                                          });
-                                });
-                      });
+            exists -> {
+              if (exists) {
+                return postDraftRepo
+                    .find(session, id)
+                    .flatMap(
+                        postDraft -> {
+                          Post newPost = postAssembler.fromDto(postAssembler.fromDraft(postDraft));
+                          newPost.setCreatedAt(new Date());
+                          newPost.setCreatedBy(session.getId());
+                          return postRepo
+                              .find(session, id)
+                              .defaultIfEmpty(newPost)
+                              .flatMap(
+                                  post -> {
+                                    Set<Author> authors =
+                                        post.getAuthors() == null
+                                            ? new HashSet<>()
+                                            : post.getAuthors();
+                                    if (authors.stream()
+                                        .map(Author::getName)
+                                        .noneMatch(name -> name.equals(session.getFullName()))) {
+                                      Author author = new Author();
+                                      author.setName(session.getFullName());
+                                      author.setModifiedAt(new Date());
+                                      authors.add(author);
+                                    }
+                                    Post exitingPost =
+                                        postAssembler.fromDto(postAssembler.fromDraft(postDraft));
+                                    exitingPost.setAuthors(authors);
+                                    exitingPost.audit(post);
+                                    exitingPost.setModifiedAt(new Date());
+                                    exitingPost.setModifiedBy(session.getId());
+                                    exitingPost.setStatus(
+                                        new HashSet<>(Arrays.asList(PostStatus.PUBLISHED.name())));
+                                    Set<IdRequest> ids =
+                                        exitingPost.getCategories().stream()
+                                            .map(
+                                                category ->
+                                                    IdRequest.builder()
+                                                        .id(category.getId())
+                                                        .build())
+                                            .collect(Collectors.toSet());
+                                    return categoryService
+                                        .findByIds(session, ids)
+                                        .flatMap(
+                                            categoryDtos -> {
+                                              categoryDtos.forEach(
+                                                  categoryDto -> {
+                                                    exitingPost
+                                                        .getCategories()
+                                                        .forEach(
+                                                            category -> {
+                                                              if (category
+                                                                  .getId()
+                                                                  .equals(categoryDto.getId())) {
+                                                                category.setName(
+                                                                    categoryDto.getName());
+                                                              }
+                                                            });
+                                                  });
+                                              exitingPost.setApplications(
+                                                  Sessions.applications(session));
+                                              return postRepo
+                                                  .save(exitingPost)
+                                                  .flatMap(
+                                                      saved -> {
+                                                        postDraft.setStatus(
+                                                            new HashSet<>(
+                                                                Arrays.asList(
+                                                                    PostStatus.PUBLISHED.name())));
+                                                        return postDraftRepo
+                                                            .save(postDraft)
+                                                            .map(
+                                                                result ->
+                                                                    postAssembler.fromEntity(saved))
+                                                            .map(
+                                                                returned ->
+                                                                    Result.build(
+                                                                        returned,
+                                                                        StatusCode.SAVE_SUCCESS));
+                                                      });
+                                            });
+                                  });
+                        });
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
             });
   }
 

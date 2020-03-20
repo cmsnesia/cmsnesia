@@ -13,10 +13,8 @@ import com.cmsnesia.service.repository.CategoryRepo;
 import com.cmsnesia.service.repository.MenuRepo;
 import com.cmsnesia.service.util.Sessions;
 import io.jsonwebtoken.lang.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -94,7 +92,7 @@ public class MenuServiceImpl implements MenuService {
                         exists -> {
                           if (exists) {
                             return menuRepo
-                                .findById(dto.getId())
+                                .find(session, IdRequest.builder().id(dto.getId()).build())
                                 .flatMap(
                                     menu -> {
                                       Menu save = menuAssembler.fromDto(dto);
@@ -118,17 +116,26 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public Mono<Result<MenuDto>> delete(Session session, MenuDto dto) {
     return menuRepo
-        .findById(dto.getId())
+        .exists(session, new HashSet<>(Arrays.asList(dto.getId())))
         .flatMap(
-            menu -> {
-              Menu save = menuAssembler.fromDto(dto);
-              save.audit(menu);
-              save.setDeletedAt(new Date());
-              save.setDeletedBy(session.getId());
-              return menuRepo.save(save);
-            })
-        .map(menuAssembler::fromEntity)
-        .map(menuDto -> Result.build(menuDto, StatusCode.DELETE_SUCCESS));
+            exists -> {
+              if (exists) {
+                return menuRepo
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .flatMap(
+                        menu -> {
+                          Menu save = menuAssembler.fromDto(dto);
+                          save.audit(menu);
+                          save.setDeletedAt(new Date());
+                          save.setDeletedBy(session.getId());
+                          return menuRepo.save(save);
+                        })
+                    .map(menuAssembler::fromEntity)
+                    .map(menuDto -> Result.build(menuDto, StatusCode.DELETE_SUCCESS));
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
+            });
   }
 
   @Override
@@ -150,14 +157,6 @@ public class MenuServiceImpl implements MenuService {
   public Mono<Result<MenuDto>> find(Session session, IdRequest idRequest) {
     return menuRepo
         .find(session, idRequest)
-        .map(menuAssembler::fromEntity)
-        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
-  }
-
-  @Override
-  public Mono<Result<MenuDto>> findById(Session session, IdRequest id) {
-    return menuRepo
-        .findById(id.getId())
         .map(menuAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

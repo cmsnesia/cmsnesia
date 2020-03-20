@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 public interface PostDraftRepoCustom {
 
   Mono<PostDraft> find(Session session, IdRequest id);
@@ -19,4 +21,6 @@ public interface PostDraftRepoCustom {
   Mono<PostDraft> deleteById(Session session, IdRequest idRequest);
 
   Mono<Boolean> exists(Session session, String id, String name);
+
+  Mono<Boolean> exists(Session session, Set<String> ids);
 }

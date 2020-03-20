@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
             exists -> {
               if (!exists) {
                 return categoryRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         (Function<Category, Mono<Result<CategoryDto>>>)
                             category -> {
@@ -96,7 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
             exists -> {
               if (exists) {
                 return categoryRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         (Function<Category, Mono<Result<CategoryDto>>>)
                             category -> {
@@ -138,19 +138,8 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Mono<Result<CategoryDto>> findById(Session session, IdRequest id) {
-    return categoryRepo
-        .findById(id.getId())
-        .map(category -> categoryAssembler.fromEntity(category))
-        .map(result -> Result.build(result, StatusCode.DATA_FOUND));
-  }
-
-  @Override
   public Mono<Set<CategoryDto>> findByIds(Session session, Set<IdRequest> ids) {
-    return categoryRepo
-        .findAllById(ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
-        .collectList()
-        .map(categoryAssembler::fromEntity);
+    return categoryRepo.find(session, ids).collectList().map(categoryAssembler::fromEntity);
   }
 
   @Override

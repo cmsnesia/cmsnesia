@@ -7,6 +7,8 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.util.Sessions;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +28,15 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   public Mono<Category> find(Session session, IdRequest id) {
     Query query = buildQuery(session, CategoryDto.builder().id(id.getId()).build());
     return reactiveMongoTemplate.findOne(query, Category.class);
+  }
+
+  @Override
+  public Flux<Category> find(Session session, Set<IdRequest> ids) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("id").in(ids.stream().map(IdRequest::getId).collect(Collectors.toSet())));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    return reactiveMongoTemplate.find(query, Category.class);
   }
 
   @Override

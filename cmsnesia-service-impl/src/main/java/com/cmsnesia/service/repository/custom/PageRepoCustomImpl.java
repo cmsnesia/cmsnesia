@@ -66,6 +66,15 @@ public class PageRepoCustomImpl implements PageRepoCustom {
     return reactiveMongoTemplate.exists(query, Page.class);
   }
 
+  @Override
+  public Mono<Boolean> exists(Session session, Set<String> ids) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").in(ids));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
+    return reactiveMongoTemplate.exists(query, Page.class);
+  }
+
   private Query buildQuery(Session session, PageDto dto) {
 
     Query query = new Query();

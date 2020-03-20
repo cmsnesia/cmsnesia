@@ -6,6 +6,8 @@ import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.util.Sessions;
+
+import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +59,15 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
       query.addCriteria(Criteria.where("id").is(id));
     }
     query.addCriteria(Criteria.where("title").is(name));
+    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
+    return reactiveMongoTemplate.exists(query, PostDraft.class);
+  }
+
+  @Override
+  public Mono<Boolean> exists(Session session, Set<String> ids) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").in(ids));
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, PostDraft.class);

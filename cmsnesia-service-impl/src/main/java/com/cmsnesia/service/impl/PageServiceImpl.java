@@ -64,7 +64,7 @@ public class PageServiceImpl implements PageService {
             exists -> {
               if (!exists) {
                 return pageRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         page -> {
                           Page save = pageAssembler.fromDto(dto);
@@ -97,15 +97,24 @@ public class PageServiceImpl implements PageService {
   @Override
   public Mono<Result<PageDto>> delete(Session session, PageDto dto) {
     return pageRepo
-        .findById(dto.getId())
+        .exists(session, new HashSet<>(Arrays.asList(dto.getId())))
         .flatMap(
-            page -> {
-              page.setDeletedAt(new Date());
-              page.setDeletedBy(session.getId());
-              return pageRepo.save(page);
-            })
-        .map(pageAssembler::fromEntity)
-        .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
+            exists -> {
+              if (exists) {
+                return pageRepo
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .flatMap(
+                        page -> {
+                          page.setDeletedAt(new Date());
+                          page.setDeletedBy(session.getId());
+                          return pageRepo.save(page);
+                        })
+                    .map(pageAssembler::fromEntity)
+                    .map(result -> Result.build(result, StatusCode.DELETE_SUCCESS));
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
+            });
   }
 
   @Override
@@ -127,7 +136,7 @@ public class PageServiceImpl implements PageService {
   @Override
   public Mono<Result<PageDto>> find(Session session, IdRequest idRequest) {
     return pageRepo
-        .findById(idRequest.getId())
+        .find(session, idRequest)
         .map(page -> pageAssembler.fromEntity(page))
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

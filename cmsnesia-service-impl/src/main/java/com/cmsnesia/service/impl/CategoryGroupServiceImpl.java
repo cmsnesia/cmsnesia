@@ -10,9 +10,9 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryGroupService;
 import com.cmsnesia.service.repository.CategoryGroupRepo;
 import com.cmsnesia.service.util.Sessions;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -57,7 +57,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
             exists -> {
               if (!exists) {
                 return categoryGroupRepo
-                    .findById(dto.getId())
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
                     .flatMap(
                         categoryGroup -> {
                           CategoryGroup save = categoryGroupAssembler.fromDto(dto);
@@ -78,13 +78,21 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   @Override
   public Mono<Result<CategoryGroupDto>> delete(Session session, CategoryGroupDto dto) {
     return categoryGroupRepo
-        .find(session, IdRequest.builder().id(dto.getId()).build())
+        .exists(session, new HashSet<>(Arrays.asList(dto.getId())))
         .flatMap(
-            categoryGroup ->
-                categoryGroupRepo
-                    .deleteById(categoryGroup.getId())
-                    .map(aVoid -> Result.build(dto, StatusCode.DELETE_SUCCESS)))
-        .defaultIfEmpty(Result.build(dto, StatusCode.DELETE_SUCCESS));
+            exists -> {
+              if (exists) {
+                return categoryGroupRepo
+                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .flatMap(
+                        categoryGroup ->
+                            categoryGroupRepo
+                                .deleteById(categoryGroup.getId())
+                                .map(aVoid -> Result.build(dto, StatusCode.DELETE_SUCCESS)));
+              } else {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              }
+            });
   }
 
   @Override

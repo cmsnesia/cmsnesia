@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 public interface PageRepoCustom {
 
   Mono<Page> find(Session session, IdRequest id);
@@ -19,4 +21,6 @@ public interface PageRepoCustom {
   Mono<Page> findAbout(Session session);
 
   Mono<Boolean> exists(Session session, String id, String name);
+
+  Mono<Boolean> exists(Session session, Set<String> ids);
 }
