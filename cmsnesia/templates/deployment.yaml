@@ -30,4 +30,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: "SPRING_APPLICATION_JSON"
-              value: '{{ .Values.cmsnesia.spring.application.json }}'
+              valueFrom:
+                secretKeyRef:
+                  key: "spring.application.json"
+                  name: {{ include "cmsnesia.fullname" . | quote }}
