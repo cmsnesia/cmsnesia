@@ -48,6 +48,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
     query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate
         .count(query, Category.class)
         .map(count -> count == null ? false : count == ids.size());
