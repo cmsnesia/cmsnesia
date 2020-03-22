@@ -27,10 +27,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping(value = "storeage")
+@RequestMapping(value = "storage")
 @Api(
-    value = "Storeage API",
-    tags = {"Storeage API"})
+    value = "Storage API",
+    tags = {"Storage API"})
 @Slf4j
 public class StorageController {
 
