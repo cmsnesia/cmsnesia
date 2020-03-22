@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>com.cmsnesia</groupId>
-            <artifactId>cmsnesia-accounts-model</artifactId>
+            <artifactId>cmsnesia-accounts-sdk-client</artifactId>
         </dependency>
     </dependencies>
 

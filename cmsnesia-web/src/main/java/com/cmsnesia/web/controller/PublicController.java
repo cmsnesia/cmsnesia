@@ -2,24 +2,29 @@ package com.cmsnesia.web.controller;
 
 import com.cmsnesia.accounts.model.ApplicationDto;
 import com.cmsnesia.accounts.model.Session;
+import com.cmsnesia.accounts.sdk.client.PublicService;
+import com.cmsnesia.accounts.sdk.client.fallback.DefaultPublicServiceFallback;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.*;
 import com.cmsnesia.web.util.ConstantKeys;
+import feign.Retryer;
+import feign.hystrix.HystrixFeign;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.ribbon.LoadBalancingTarget;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +44,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PublicController {
 
-  private final DiscoveryClient discoveryClient;
   private final CategoryService categoryService;
   private final CategoryGroupService categoryGroupService;
   private final PageService pageService;
@@ -343,31 +347,14 @@ public class PublicController {
 
   @GetMapping("/services")
   public Flux<List<Map<String, Object>>> services() {
-    return Flux.fromStream(
-        discoveryClient.getServices().stream()
-            .map(
-                serviceId -> {
-                  Map<String, Object> service = new HashMap<>();
-                  List<Map<String, Object>> instances =
-                      discoveryClient.getInstances(serviceId).stream()
-                          .map(
-                              serviceInstance -> {
-                                Map<String, Object> instance = new HashMap<>();
-                                instance.put("host", serviceInstance.getHost());
-                                instance.put("instanceId", serviceInstance.getInstanceId());
-                                instance.put("metaData", serviceInstance.getMetadata());
-                                instance.put("scheme", serviceInstance.getScheme());
-                                return instance;
-                              })
-                          .collect(Collectors.toList());
-                  service.put("serviceId", serviceId);
-                  service.put("instances", instances);
-                  return instances;
-                }));
-  }
-
-  @GetMapping("/description")
-  public Mono<String> description() {
-    return Mono.just(discoveryClient.description());
+    PublicService publicService =
+        HystrixFeign.builder()
+            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder())
+            .retryer(new Retryer.Default())
+            .target(
+                LoadBalancingTarget.create(PublicService.class, "http://cmsnesia-accounts"),
+                new DefaultPublicServiceFallback());
+    return publicService.services();
   }
 }
