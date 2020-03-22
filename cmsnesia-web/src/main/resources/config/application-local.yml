@@ -9,6 +9,10 @@ spring:
       uri: 'mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false'
   codec:
     max-in-memory-size: 5MB
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
 
 cmsnesia:
   token:

@@ -3,20 +3,12 @@ package com.cmsnesia.web.controller;
 import com.cmsnesia.accounts.model.ApplicationDto;
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.accounts.sdk.client.PublicService;
-import com.cmsnesia.accounts.sdk.client.fallback.DefaultPublicServiceFallback;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.*;
 import com.cmsnesia.web.util.ConstantKeys;
-import feign.Feign;
-import feign.Retryer;
-import feign.hystrix.HystrixFeign;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.ribbon.LoadBalancingTarget;
-import feign.ribbon.RibbonClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -24,9 +16,12 @@ import io.swagger.annotations.ApiOperation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreaker;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +29,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactivefeign.cloud2.CloudReactiveFeign;
+import reactivefeign.cloud2.ReactiveFeignCircuitBreakerFactory;
+import reactivefeign.webclient.WebReactiveFeign;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -347,14 +345,14 @@ public class PublicController {
     return profileService.find(session, null);
   }
 
+  private final LoadBalancerClientFactory clientFactory;
+
   @GetMapping("/services")
-  public Flux<List<Map<String, Object>>> services() {
+  public Flux<Map<String, Object>> services() {
     PublicService publicService =
-        Feign.builder()
-            .client(RibbonClient.create())
-            .decoder(new JacksonDecoder())
-            .encoder(new JacksonEncoder())
-            .target(LoadBalancingTarget.create(PublicService.class, "http://cmsnesia-accounts"));
+        CloudReactiveFeign.<PublicService>builder(WebReactiveFeign.builder())
+            .enableLoadBalancer(clientFactory)
+            .target(PublicService.class, "http://cmsnesia-accounts");
     return publicService.services();
   }
 }
