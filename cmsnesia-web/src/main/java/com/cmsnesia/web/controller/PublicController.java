@@ -10,11 +10,13 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.QueryPageRequest;
 import com.cmsnesia.service.*;
 import com.cmsnesia.web.util.ConstantKeys;
+import feign.Feign;
 import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.ribbon.LoadBalancingTarget;
+import feign.ribbon.RibbonClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -348,13 +350,11 @@ public class PublicController {
   @GetMapping("/services")
   public Flux<List<Map<String, Object>>> services() {
     PublicService publicService =
-        HystrixFeign.builder()
+        Feign.builder()
+            .client(RibbonClient.create())
             .decoder(new JacksonDecoder())
             .encoder(new JacksonEncoder())
-            .retryer(new Retryer.Default())
-            .target(
-                LoadBalancingTarget.create(PublicService.class, "http://cmsnesia-accounts"),
-                new DefaultPublicServiceFallback());
+            .target(LoadBalancingTarget.create(PublicService.class, "http://cmsnesia-accounts"));
     return publicService.services();
   }
 }
