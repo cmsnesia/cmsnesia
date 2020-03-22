@@ -35,7 +35,7 @@ public class PageController {
 
   @ApiOperation(value = "Get page by ID", response = PageDto.class, notes = "Result<PageDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<PageDto>> findById(@RequestParam("id") String id) {
@@ -51,7 +51,7 @@ public class PageController {
   @PostMapping("/find")
   @ApiOperation(value = "List page", response = PageDto.class, notes = "Page<PageDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -78,7 +78,7 @@ public class PageController {
 
   @ApiOperation(value = "Add Page", response = PageDto.class, notes = "Result<PageDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<PageDto>> add(@RequestBody PageDto pageDto) {
@@ -93,7 +93,7 @@ public class PageController {
 
   @ApiOperation(value = "Edit page", response = PageDto.class, notes = "Result<PageDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<PageDto>> edit(@RequestBody PageDto pageDto) {
@@ -108,7 +108,7 @@ public class PageController {
 
   @ApiOperation(value = "Soft delete page", response = PageDto.class, notes = "Result<PageDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
   public Mono<Result<PageDto>> delete(@RequestBody IdRequest idRequest) {

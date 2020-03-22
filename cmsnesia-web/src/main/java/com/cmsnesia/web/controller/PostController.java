@@ -40,7 +40,7 @@ public class PostController {
 
   @ApiOperation(value = "Get post by ID", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<PostDto>> findById(@RequestParam("id") String id) {
@@ -55,7 +55,7 @@ public class PostController {
 
   @ApiOperation(value = "Get draft by ID", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findDraftById")
   public Mono<Result<PostDto>> findDraftById(@RequestParam("id") String id) {
@@ -71,7 +71,7 @@ public class PostController {
   @PostMapping("/find")
   @ApiOperation(value = "List post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -99,7 +99,7 @@ public class PostController {
   @PostMapping("/findDraft")
   @ApiOperation(value = "List draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -126,7 +126,7 @@ public class PostController {
 
   @ApiOperation(value = "Add post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<PostDto>> add(@RequestBody PostRequest postRequest) {
@@ -155,7 +155,7 @@ public class PostController {
 
   @ApiOperation(value = "Edit post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<PostDto>> edit(@RequestBody IdRequest idRequest) {
@@ -170,7 +170,7 @@ public class PostController {
 
   @ApiOperation(value = "Edit draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/editDraft")
   public Mono<Result<PostDto>> editDraft(@RequestBody PostEditRequest postEditRequest) {
@@ -200,7 +200,7 @@ public class PostController {
 
   @ApiOperation(value = "Soft delete post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
   public Mono<Result<PostDto>> delete(@RequestBody IdRequest idRequest) {
@@ -217,7 +217,7 @@ public class PostController {
 
   @ApiOperation(value = "Delete draft", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/deleteDraft")
   public Mono<Result<PostDto>> deleteDraft(@RequestBody IdRequest idRequest) {
@@ -234,7 +234,7 @@ public class PostController {
 
   @ApiOperation(value = "Publish post", response = PostDto.class, notes = "Result<PostDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/publish")
   public Mono<Result<PostDto>> publish(@RequestBody IdRequest idRequest) {

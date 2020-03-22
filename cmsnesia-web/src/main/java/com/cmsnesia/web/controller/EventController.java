@@ -36,7 +36,7 @@ public class EventController {
 
   @ApiOperation(value = "Get event by ID", response = EventDto.class, notes = "Result<EventDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<EventDto>> findById(@RequestParam("id") String id) {
@@ -52,7 +52,7 @@ public class EventController {
   @PostMapping("/find")
   @ApiOperation(value = "List event", response = EventDto.class, notes = "Page<EventDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -79,7 +79,7 @@ public class EventController {
 
   @ApiOperation(value = "Add event", response = Event.class, notes = "Result<EventDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<EventDto>> add(@RequestBody EventDto eventDto) {
@@ -94,7 +94,7 @@ public class EventController {
 
   @ApiOperation(value = "Edit event", response = EventDto.class, notes = "Result<EventDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<EventDto>> edit(@RequestBody EventDto eventDto) {
@@ -109,7 +109,7 @@ public class EventController {
 
   @ApiOperation(value = "Soft delete event", response = EventDto.class, notes = "Result<EventDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
   public Mono<Result<EventDto>> delete(@RequestBody IdRequest idRequest) {

@@ -41,7 +41,7 @@ public class CategoryController {
       response = CategoryDto.class,
       notes = "Result<CategoryDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<CategoryDto>> findById(@RequestParam("id") String id) {
@@ -59,7 +59,7 @@ public class CategoryController {
       response = CategoryDto.class,
       notes = "Result<Set<CategoryDto>>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/findByIds")
   public Mono<Set<CategoryDto>> findByIds(@RequestBody Set<IdRequest> ids) {
@@ -75,7 +75,7 @@ public class CategoryController {
   @PostMapping("/find")
   @ApiOperation(value = "List category", response = CategoryDto.class, notes = "Page<CategoryDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -102,7 +102,7 @@ public class CategoryController {
 
   @ApiOperation(value = "Add category", response = CategoryDto.class, notes = "Result<CategoryDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<CategoryDto>> add(@RequestBody NameRequest nameRequest) {
@@ -121,7 +121,7 @@ public class CategoryController {
       response = CategoryDto.class,
       notes = "Result<CategoryDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<CategoryDto>> edit(@RequestBody CategoryDto categoryDto) {
@@ -139,7 +139,7 @@ public class CategoryController {
       response = CategoryGroupDto.class,
       notes = "Result<CategoryDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
   public Mono<Result<CategoryDto>> delete(@RequestBody IdRequest idRequest) {

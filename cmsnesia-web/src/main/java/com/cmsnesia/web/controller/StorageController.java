@@ -42,14 +42,14 @@ public class StorageController {
       @Value("${github.accessToken}") String accessToken) {
     this.webClient =
         WebClient.builder()
-            .defaultHeader(ConstantKeys.AUTHORIZATION, "token " + accessToken)
+            .defaultHeader(ConstantKeys.X_USER_DATA, "token " + accessToken)
             .baseUrl("https://api.github.com/repos/" + owner + "/" + repo + "/contents/")
             .build();
   }
 
   @ApiOperation(value = "Request image", response = MenuDto.class, notes = "Result<MediaDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping(
       value = "upload",

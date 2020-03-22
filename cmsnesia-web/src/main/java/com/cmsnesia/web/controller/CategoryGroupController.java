@@ -38,7 +38,7 @@ public class CategoryGroupController {
       response = CategoryGroupDto.class,
       notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<CategoryGroupDto>> findById(@RequestParam("id") String id) {
@@ -57,7 +57,7 @@ public class CategoryGroupController {
       response = CategoryGroupDto.class,
       notes = "Page<CategoryGroupDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string"),
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string"),
     @ApiImplicitParam(
         name = ConstantKeys.PAGE,
         defaultValue = "0",
@@ -89,7 +89,7 @@ public class CategoryGroupController {
       response = CategoryGroupDto.class,
       notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<CategoryGroupDto>> add(@RequestBody CategoryGroupDto categoryGroupDto) {
@@ -107,7 +107,7 @@ public class CategoryGroupController {
       response = CategoryGroupDto.class,
       notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<CategoryGroupDto>> edit(@RequestBody CategoryGroupDto categoryGroupDto) {
@@ -125,7 +125,7 @@ public class CategoryGroupController {
       response = CategoryGroupDto.class,
       notes = "Result<CategoryGroupDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/delete")
   public Mono<Result<CategoryGroupDto>> delete(@RequestBody IdRequest idRequest) {

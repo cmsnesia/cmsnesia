@@ -32,7 +32,7 @@ public class ProfileController {
       response = ProfileDto.class,
       notes = "Result<ProfileDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
   public Mono<Result<ProfileDto>> findById() {
@@ -44,7 +44,7 @@ public class ProfileController {
 
   @ApiOperation(value = "Add Profile", response = ProfileDto.class, notes = "Result<ProfileDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PostMapping("/add")
   public Mono<Result<ProfileDto>> add(@RequestBody ProfileDto profileDto) {
@@ -56,7 +56,7 @@ public class ProfileController {
 
   @ApiOperation(value = "Edit profile", response = ProfileDto.class, notes = "Result<ProfileDto>")
   @ApiImplicitParams({
-    @ApiImplicitParam(name = ConstantKeys.AUTHORIZATION, paramType = "header", dataType = "string")
+    @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @PutMapping("/edit")
   public Mono<Result<ProfileDto>> edit(@RequestBody ProfileDto profileDto) {
