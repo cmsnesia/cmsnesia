@@ -32,11 +32,11 @@ import reactor.core.publisher.Mono;
     value = "Storeage API",
     tags = {"Storeage API"})
 @Slf4j
-public class StoreageController {
+public class StorageController {
 
   private final WebClient webClient;
 
-  public StoreageController(
+  public StorageController(
       @Value("${github.owner}") String owner,
       @Value("${github.repo}") String repo,
       @Value("${github.accessToken}") String accessToken) {

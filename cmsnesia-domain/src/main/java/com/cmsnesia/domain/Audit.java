@@ -13,6 +13,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -33,9 +34,9 @@ public abstract class Audit implements Serializable {
 
   private String deletedBy;
 
-  private Set<String> status;
+  @Indexed private Set<String> status;
 
-  private Set<Application> applications;
+  @Indexed private Set<Application> applications;
 
   public void audit(Audit audit) {
     if (Objects.nonNull(audit.getCreatedAt())) {
