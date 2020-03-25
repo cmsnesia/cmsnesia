@@ -1,7 +1,7 @@
-package com.cmsnesia.service.repository;
+package com.cmsnesia.domain.repository;
 
 import com.cmsnesia.domain.CategoryGroup;
-import com.cmsnesia.service.repository.custom.CategoryGroupRepoCustom;
+import com.cmsnesia.domain.repository.custom.CategoryGroupRepoCustom;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 public interface CategoryGroupRepo

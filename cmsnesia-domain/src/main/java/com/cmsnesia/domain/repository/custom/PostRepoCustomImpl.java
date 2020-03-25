@@ -1,11 +1,10 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
 import com.mongodb.client.result.UpdateResult;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,7 +66,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     Query query = new Query();
 
     query.addCriteria(Criteria.where("id").is(id.getId()));
-    query.addCriteria(Criteria.where("applications.id").is(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").is(Session.applicationIds(session)));
     return reactiveMongoTemplate
         .exists(query, Post.class)
         .flatMap(
@@ -92,7 +91,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
       query.addCriteria(Criteria.where("id").ne(id));
     }
     query.addCriteria(Criteria.where("title").is(name));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Post.class);
   }
@@ -101,7 +100,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Post.class);
   }
@@ -112,7 +111,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(Arrays.asList(PostStatus.PUBLISHED.name())));
 

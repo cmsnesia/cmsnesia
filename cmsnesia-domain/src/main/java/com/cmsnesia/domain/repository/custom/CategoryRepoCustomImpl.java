@@ -1,10 +1,9 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     Query query = new Query();
     query.addCriteria(
         Criteria.where("id").in(ids.stream().map(IdRequest::getId).collect(Collectors.toSet())));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     return reactiveMongoTemplate.find(query, Category.class);
   }
 
@@ -58,7 +57,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate
         .count(query, Category.class)
@@ -72,7 +71,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
       query.addCriteria(Criteria.where("id").ne(id));
     }
     query.addCriteria(Criteria.where("name").is(name));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Category.class);
   }
@@ -83,7 +82,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

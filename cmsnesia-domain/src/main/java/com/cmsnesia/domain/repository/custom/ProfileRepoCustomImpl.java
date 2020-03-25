@@ -1,11 +1,10 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Profile;
 import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.enums.MediaType;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +22,13 @@ public class ProfileRepoCustomImpl implements ProfileRepoCustom {
   @Override
   public Mono<Boolean> exists(Session session) {
     Query query = new Query();
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     return reactiveMongoTemplate.exists(query, Profile.class);
   }
 
   public Mono<Profile> find(Session session, IdRequest idRequest) {
     Query query = new Query();
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     if (idRequest != null && StringUtils.hasText(idRequest.getId())) {
       query.addCriteria(Criteria.where("id").is(idRequest.getId()));
     }

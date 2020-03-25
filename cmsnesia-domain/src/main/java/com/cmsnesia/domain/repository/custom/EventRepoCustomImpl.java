@@ -1,17 +1,16 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Event;
 import com.cmsnesia.model.EventDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
-import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -68,7 +67,7 @@ public class EventRepoCustomImpl implements EventRepoCustom {
           query.addCriteria(Criteria.where("id").ne(id));
       }
       query.addCriteria(Criteria.where("name").is(name));
-      query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+      query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
       query.addCriteria(Criteria.where("deletedAt").exists(false));
       return reactiveMongoTemplate.exists(query, Event.class);
   }
@@ -79,7 +78,7 @@ public class EventRepoCustomImpl implements EventRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 
@@ -90,7 +89,7 @@ public class EventRepoCustomImpl implements EventRepoCustom {
         Pattern regex = Pattern.compile(dto.getName(), Pattern.CASE_INSENSITIVE);
         query.addCriteria(Criteria.where("name").regex(regex));
       }
-      if (!Collections.isEmpty(dto.getTypes())) {
+      if (!CollectionUtils.isEmpty(dto.getTypes())) {
         query.addCriteria(Criteria.where("types").in(dto.getTypes()));
       }
     }

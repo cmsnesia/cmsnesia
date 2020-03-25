@@ -1,17 +1,17 @@
 package com.cmsnesia.domain.validator;
 
-import com.cmsnesia.domain.validator.impl.EmailCollectionValidator;
+import com.cmsnesia.domain.validator.impl.PasswordMustSecureImpl;
 import java.lang.annotation.*;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailCollectionValidator.class)
+@Constraint(validatedBy = PasswordMustSecureImpl.class)
 @Documented
-public @interface EmailCollection {
+public @interface PasswordMustSecure {
 
-  String message() default "Invalid emails";
+  String message() default "Your password isn't secure, please provide secure password instead";
 
   Class<?>[] groups() default {};
 

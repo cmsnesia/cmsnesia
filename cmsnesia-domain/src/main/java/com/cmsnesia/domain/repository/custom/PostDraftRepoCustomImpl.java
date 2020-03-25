@@ -1,11 +1,10 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -48,7 +47,7 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
   @Override
   public Mono<PostDraft> deleteById(Session session, IdRequest idRequest) {
     Query query = new Query(Criteria.where("id").is(idRequest.getId()));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     return reactiveMongoTemplate.findAndRemove(query, PostDraft.class);
   }
 
@@ -59,7 +58,7 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
       query.addCriteria(Criteria.where("id").is(id));
     }
     query.addCriteria(Criteria.where("title").is(name));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, PostDraft.class);
   }
@@ -68,7 +67,7 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
   public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, PostDraft.class);
   }
@@ -79,7 +78,7 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     query.addCriteria(Criteria.where("status").is(PostStatus.UNPUBLISHED));
 

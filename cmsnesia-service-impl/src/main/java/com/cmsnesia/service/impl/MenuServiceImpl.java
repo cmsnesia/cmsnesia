@@ -9,9 +9,8 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.MenuService;
-import com.cmsnesia.service.repository.CategoryRepo;
-import com.cmsnesia.service.repository.MenuRepo;
-import com.cmsnesia.service.util.Sessions;
+import com.cmsnesia.domain.repository.CategoryRepo;
+import com.cmsnesia.domain.repository.MenuRepo;
 import io.jsonwebtoken.lang.Collections;
 
 import java.util.*;
@@ -56,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
                             menu.setId(UUID.randomUUID().toString());
                             menu.setCreatedAt(new Date());
                             menu.setCreatedBy(session.getId());
-                            menu.setApplications(Sessions.applications(session));
+                            menu.setApplications(Session.applications(session));
                             return menuRepo
                                 .save(menu)
                                 .map(menuAssembler::fromEntity)

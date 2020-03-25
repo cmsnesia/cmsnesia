@@ -8,7 +8,7 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryGroupService;
-import com.cmsnesia.service.repository.CategoryGroupRepo;
+import com.cmsnesia.domain.repository.CategoryGroupRepo;
 import com.cmsnesia.service.util.Sessions;
 
 import java.util.*;
@@ -38,7 +38,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
                 categoryGroup.setId(UUID.randomUUID().toString());
                 categoryGroup.setCreatedBy(session.getId());
                 categoryGroup.setCreatedAt(new Date());
-                categoryGroup.setApplications(Sessions.applications(session));
+                categoryGroup.setApplications(Session.applications(session));
                 return categoryGroupRepo
                     .save(categoryGroup)
                     .map(categoryGroupAssembler::fromEntity)

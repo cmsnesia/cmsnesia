@@ -8,8 +8,8 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
-import com.cmsnesia.service.repository.CategoryRepo;
-import com.cmsnesia.service.repository.PostRepo;
+import com.cmsnesia.domain.repository.CategoryRepo;
+import com.cmsnesia.domain.repository.PostRepo;
 import com.cmsnesia.service.util.Sessions;
 
 import java.util.*;
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
                 category.setId(UUID.randomUUID().toString());
                 category.setCreatedBy(session.getId());
                 category.setCreatedAt(new Date());
-                category.setApplications(Sessions.applications(session));
+                category.setApplications(Session.applications(session));
                 return categoryRepo
                     .save(category)
                     .map(categoryAssembler::fromEntity)

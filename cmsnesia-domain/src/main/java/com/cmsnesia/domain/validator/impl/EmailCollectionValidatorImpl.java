@@ -1,19 +1,24 @@
 package com.cmsnesia.domain.validator.impl;
 
 import com.cmsnesia.domain.model.Email;
-import com.cmsnesia.domain.validator.EmailCollection;
 import java.util.Collection;
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import org.springframework.util.StringUtils;
 
-public class EmailCollectionValidator
-    implements ConstraintValidator<EmailCollection, Collection<Email>> {
+import com.cmsnesia.domain.validator.AbstractReactiveConstraintValidator;
+import com.cmsnesia.domain.validator.EmailCollectionMustValid;
+import org.springframework.util.StringUtils;
+import reactor.core.publisher.Mono;
+
+public class EmailCollectionValidatorImpl
+    extends AbstractReactiveConstraintValidator<EmailCollectionMustValid, Collection<Email>> {
 
   @Override
-  public boolean isValid(Collection<Email> values, ConstraintValidatorContext context) {
+  public Mono<Boolean> validate(
+      Collection<Email> values,
+      EmailCollectionMustValid annotation,
+      ConstraintValidatorContext context) {
     if (values == null || values.isEmpty()) {
-      return false;
+      return Mono.just(false);
     }
     boolean noneMatch =
         values.stream()
@@ -22,15 +27,11 @@ public class EmailCollectionValidator
                   if (email.getTypes().isEmpty()) {
                     return true;
                   } else {
-                    email.getTypes().stream()
-                        .noneMatch(
-                            type -> {
-                              return !StringUtils.isEmpty(type);
-                            });
+                    email.getTypes().stream().noneMatch(type -> !StringUtils.isEmpty(type));
                   }
                   return !StringUtils.isEmpty(email.getAddress())
                       || !StringUtils.isEmpty(email.getStatus());
                 });
-    return !noneMatch;
+    return Mono.just(!noneMatch);
   }
 }

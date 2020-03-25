@@ -24,6 +24,10 @@
             <artifactId>cmsnesia-service-spec</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.cmsnesia</groupId>
+            <artifactId>cmsnesia-domain</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>

@@ -12,8 +12,8 @@ import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.service.PostService;
-import com.cmsnesia.service.repository.PostDraftRepo;
-import com.cmsnesia.service.repository.PostRepo;
+import com.cmsnesia.domain.repository.PostDraftRepo;
+import com.cmsnesia.domain.repository.PostRepo;
 import com.cmsnesia.service.util.Sessions;
 import java.util.*;
 import java.util.function.Function;
@@ -85,7 +85,7 @@ public class PostServiceImpl implements PostService {
                                       postDraft
                                           .getTags()
                                           .forEach(tag -> tag.setCreatedBy(session.getId()));
-                                      postDraft.setApplications(Sessions.applications(session));
+                                      postDraft.setApplications(Session.applications(session));
                                       return postDraftRepo
                                           .save(postDraft)
                                           .map(postAssembler::fromDraft)
@@ -116,7 +116,7 @@ public class PostServiceImpl implements PostService {
                     .flatMap(
                         post -> {
                           PostDraft postDraft = postAssembler.fromPost(post);
-                          postDraft.setApplications(Sessions.applications(session));
+                          postDraft.setApplications(Session.applications(session));
                           return postDraftRepo.save(postDraft);
                         })
                     .flatMap(
@@ -371,7 +371,7 @@ public class PostServiceImpl implements PostService {
                                                             });
                                                   });
                                               exitingPost.setApplications(
-                                                  Sessions.applications(session));
+                                                  Session.applications(session));
                                               return postRepo
                                                   .save(exitingPost)
                                                   .flatMap(

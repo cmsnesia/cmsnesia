@@ -1,11 +1,10 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Page;
 import com.cmsnesia.model.AuthorDto;
 import com.cmsnesia.model.PageDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,7 +47,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   @Override
   public Mono<Page> findAbout(Session session) {
     Query query = new Query();
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("name").is("About"));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.findOne(query, Page.class);
@@ -61,7 +60,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
       query.addCriteria(Criteria.where("id").ne(id));
     }
     query.addCriteria(Criteria.where("name").is(name));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Page.class);
   }
@@ -70,7 +69,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Page.class);
   }
@@ -81,7 +80,7 @@ public class PageRepoCustomImpl implements PageRepoCustom {
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 

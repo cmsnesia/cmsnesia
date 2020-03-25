@@ -9,7 +9,7 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.PageService;
-import com.cmsnesia.service.repository.PageRepo;
+import com.cmsnesia.domain.repository.PageRepo;
 import com.cmsnesia.service.util.Sessions;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class PageServiceImpl implements PageService {
                                 .build())
                         .stream()
                         .collect(Collectors.toSet()));
-                page.setApplications(Sessions.applications(session));
+                page.setApplications(Session.applications(session));
                 return pageRepo
                     .save(page)
                     .map(pageAssembler::fromEntity)

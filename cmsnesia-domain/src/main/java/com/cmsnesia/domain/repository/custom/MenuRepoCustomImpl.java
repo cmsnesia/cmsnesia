@@ -1,12 +1,9 @@
-package com.cmsnesia.service.repository.custom;
+package com.cmsnesia.domain.repository.custom;
 
 import com.cmsnesia.accounts.model.Session;
-import com.cmsnesia.domain.Category;
-import com.cmsnesia.domain.CategoryGroup;
-import com.cmsnesia.model.CategoryGroupDto;
+import com.cmsnesia.domain.Menu;
+import com.cmsnesia.model.MenuDto;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.util.Sessions;
-import io.jsonwebtoken.lang.Collections;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -21,29 +18,29 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
+public class MenuRepoCustomImpl implements MenuRepoCustom {
 
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<CategoryGroup> find(Session session, IdRequest id) {
-    Query query = buildQuery(session, CategoryGroupDto.builder().id(id.getId()).build());
-    return reactiveMongoTemplate.findOne(query, CategoryGroup.class);
+  public Mono<Menu> find(Session session, IdRequest id) {
+    Query query = buildQuery(session, MenuDto.builder().id(id.getId()).build());
+    return reactiveMongoTemplate.findOne(query, Menu.class);
   }
 
   @Override
-  public Flux<CategoryGroup> find(Session session, CategoryGroupDto dto, Pageable pageable) {
+  public Flux<Menu> find(Session session, MenuDto dto, Pageable pageable) {
     Query query = buildQuery(session, dto);
     if (pageable.isPaged()) {
       query.with(pageable);
     }
-    return reactiveMongoTemplate.find(query, CategoryGroup.class);
+    return reactiveMongoTemplate.find(query, Menu.class);
   }
 
   @Override
-  public Mono<Long> countFind(Session session, CategoryGroupDto dto) {
+  public Mono<Long> countFind(Session session, MenuDto dto) {
     Query query = buildQuery(session, dto);
-    return reactiveMongoTemplate.count(query, CategoryGroup.class);
+    return reactiveMongoTemplate.count(query, Menu.class);
   }
 
   @Override
@@ -53,27 +50,27 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
       query.addCriteria(Criteria.where("id").ne(id));
     }
     query.addCriteria(Criteria.where("name").is(name));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
-    return reactiveMongoTemplate.exists(query, Category.class);
+    return reactiveMongoTemplate.exists(query, Menu.class);
   }
 
   @Override
   public Mono<Boolean> exists(Session session, Set<String> ids) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").in(ids));
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
-    return reactiveMongoTemplate.exists(query, CategoryGroup.class);
+    return reactiveMongoTemplate.exists(query, Menu.class);
   }
 
-  private Query buildQuery(Session session, CategoryGroupDto dto) {
+  private Query buildQuery(Session session, MenuDto dto) {
 
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));
 
-    query.addCriteria(Criteria.where("applications.id").in(Sessions.applicationIds(session)));
+    query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
 
     query.addCriteria(Criteria.where("deletedAt").exists(false));
 
@@ -84,10 +81,6 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
         Pattern regex = Pattern.compile(dto.getName(), Pattern.CASE_INSENSITIVE);
         query.addCriteria(Criteria.where("name").regex(regex));
       }
-    }
-
-    if (!Collections.isEmpty(dto.getCategoryIds())) {
-      query.addCriteria(Criteria.where("categoryIds").in(dto.getCategoryIds()));
     }
 
     return query;

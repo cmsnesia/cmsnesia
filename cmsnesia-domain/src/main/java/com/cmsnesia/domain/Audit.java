@@ -1,11 +1,12 @@
 package com.cmsnesia.domain;
 
-import com.cmsnesia.domain.model.Application;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
+
+import com.cmsnesia.accounts.model.ApplicationDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +37,7 @@ public abstract class Audit implements Serializable {
 
   @Indexed private Set<String> status;
 
-  @Indexed private Set<Application> applications;
+  @Indexed private Set<ApplicationDto> applications;
 
   public void audit(Audit audit) {
     if (Objects.nonNull(audit.getCreatedAt())) {

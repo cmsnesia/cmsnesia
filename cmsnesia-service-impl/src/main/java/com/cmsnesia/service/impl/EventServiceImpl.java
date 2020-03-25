@@ -8,7 +8,7 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.EventService;
-import com.cmsnesia.service.repository.EventRepo;
+import com.cmsnesia.domain.repository.EventRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

@@ -8,7 +8,7 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.ProfileService;
-import com.cmsnesia.service.repository.ProfileRepo;
+import com.cmsnesia.domain.repository.ProfileRepo;
 import com.cmsnesia.service.util.Sessions;
 import java.util.Date;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class ProfileServiceImpl implements ProfileService {
               profile.setId(UUID.randomUUID().toString());
               profile.setCreatedBy(session.getId());
               profile.setCreatedAt(new Date());
-              profile.setApplications(Sessions.applications(session));
+              profile.setApplications(Session.applications(session));
               return profileRepo
                   .save(profile)
                   .map(

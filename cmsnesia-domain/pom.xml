@@ -28,6 +28,14 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.cmsnesia</groupId>
+            <artifactId>cmsnesia-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cmsnesia</groupId>
+            <artifactId>cmsnesia-accounts-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
