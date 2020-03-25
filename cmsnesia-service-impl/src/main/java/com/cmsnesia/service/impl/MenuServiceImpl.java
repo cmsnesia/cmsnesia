@@ -91,7 +91,7 @@ public class MenuServiceImpl implements MenuService {
                         exists -> {
                           if (exists) {
                             return menuRepo
-                                .find(session, IdRequest.builder().id(dto.getId()).build())
+                                .find(session, dto.getId())
                                 .flatMap(
                                     menu -> {
                                       Menu save = menuAssembler.fromDto(dto);
@@ -120,7 +120,7 @@ public class MenuServiceImpl implements MenuService {
             exists -> {
               if (exists) {
                 return menuRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         menu -> {
                           Menu save = menuAssembler.fromDto(dto);
@@ -155,7 +155,7 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public Mono<Result<MenuDto>> find(Session session, IdRequest idRequest) {
     return menuRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(menuAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

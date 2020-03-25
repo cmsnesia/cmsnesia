@@ -10,7 +10,6 @@ import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.PageService;
 import com.cmsnesia.domain.repository.PageRepo;
-import com.cmsnesia.service.util.Sessions;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +63,7 @@ public class PageServiceImpl implements PageService {
             exists -> {
               if (!exists) {
                 return pageRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         page -> {
                           Page save = pageAssembler.fromDto(dto);
@@ -102,7 +101,7 @@ public class PageServiceImpl implements PageService {
             exists -> {
               if (exists) {
                 return pageRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         page -> {
                           page.setDeletedAt(new Date());
@@ -136,7 +135,7 @@ public class PageServiceImpl implements PageService {
   @Override
   public Mono<Result<PageDto>> find(Session session, IdRequest idRequest) {
     return pageRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(page -> pageAssembler.fromEntity(page))
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

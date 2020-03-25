@@ -59,7 +59,7 @@ public class EventServiceImpl implements EventService {
             exists -> {
               if (!exists) {
                 return eventRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         event -> {
                           Event save = eventAssembler.fromDto(dto);
@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
             exists -> {
               if (exists) {
                 return eventRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         event -> {
                           event.setDeletedBy(session.getId());
@@ -122,7 +122,7 @@ public class EventServiceImpl implements EventService {
   @Override
   public Mono<Result<EventDto>> find(Session session, IdRequest idRequest) {
     return eventRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(eventAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

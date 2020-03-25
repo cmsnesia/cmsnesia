@@ -36,7 +36,6 @@
         <module>cmsnesia-service-impl</module>
         <module>cmsnesia-sdk-client</module>
         <module>cmsnesia-web</module>
-        <module>cmsnesia-tests</module>
     </modules>
 
     <repositories>

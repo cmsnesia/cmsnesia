@@ -10,7 +10,6 @@ import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
 import com.cmsnesia.domain.repository.CategoryRepo;
 import com.cmsnesia.domain.repository.PostRepo;
-import com.cmsnesia.service.util.Sessions;
 
 import java.util.*;
 import java.util.function.Function;
@@ -62,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
             exists -> {
               if (!exists) {
                 return categoryRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         (Function<Category, Mono<Result<CategoryDto>>>)
                             category -> {
@@ -96,7 +95,7 @@ public class CategoryServiceImpl implements CategoryService {
             exists -> {
               if (exists) {
                 return categoryRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         (Function<Category, Mono<Result<CategoryDto>>>)
                             category -> {
@@ -132,14 +131,17 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public Mono<Result<CategoryDto>> find(Session session, IdRequest idRequest) {
     return categoryRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(categoryAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
 
   @Override
   public Mono<Set<CategoryDto>> findByIds(Session session, Set<IdRequest> ids) {
-    return categoryRepo.find(session, ids).collectList().map(categoryAssembler::fromEntity);
+    return categoryRepo
+        .find(session, ids.stream().map(IdRequest::getId).collect(Collectors.toSet()))
+        .collectList()
+        .map(categoryAssembler::fromEntity);
   }
 
   @Override

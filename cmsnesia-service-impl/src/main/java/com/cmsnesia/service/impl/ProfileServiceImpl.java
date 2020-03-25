@@ -89,7 +89,7 @@ public class ProfileServiceImpl implements ProfileService {
   @Override
   public Mono<Result<ProfileDto>> find(Session session, IdRequest idRequest) {
     return profileRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(profile -> Result.build(profileAssembler.fromEntity(profile), StatusCode.DATA_FOUND));
   }
 }

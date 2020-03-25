@@ -9,7 +9,6 @@ import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryGroupService;
 import com.cmsnesia.domain.repository.CategoryGroupRepo;
-import com.cmsnesia.service.util.Sessions;
 
 import java.util.*;
 
@@ -57,7 +56,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
             exists -> {
               if (!exists) {
                 return categoryGroupRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         categoryGroup -> {
                           CategoryGroup save = categoryGroupAssembler.fromDto(dto);
@@ -83,7 +82,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
             exists -> {
               if (exists) {
                 return categoryGroupRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         categoryGroup ->
                             categoryGroupRepo
@@ -116,7 +115,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
   @Override
   public Mono<Result<CategoryGroupDto>> find(Session session, IdRequest idRequest) {
     return categoryGroupRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(categoryGroupAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }

@@ -11,10 +11,12 @@ import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.service.CategoryService;
+import com.cmsnesia.service.command.CommandExecutor;
 import com.cmsnesia.service.PostService;
 import com.cmsnesia.domain.repository.PostDraftRepo;
 import com.cmsnesia.domain.repository.PostRepo;
-import com.cmsnesia.service.util.Sessions;
+import com.cmsnesia.service.command.post.CreatePostCommand;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,72 +37,11 @@ public class PostServiceImpl implements PostService {
   private final PostDraftRepo postDraftRepo;
   private final CategoryService categoryService;
 
+  private final CommandExecutor commandExecutor;
+
   @Override
   public Mono<Result<PostDto>> add(Session session, PostDto dto) {
-    return postRepo
-        .exists(session, null, dto.getTitle())
-        .flatMap(
-            exists -> {
-              if (!exists) {
-                PostDraft postDraft = postAssembler.fromPostDto(dto);
-
-                postDraft.setId(UUID.randomUUID().toString());
-
-                postDraft.setCreatedBy(session.getId());
-                postDraft.setCreatedAt(new Date());
-                postDraft.setStatus(
-                    Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
-                        .collect(Collectors.toSet()));
-
-                postDraft.getTags().forEach(tag -> tag.setCreatedBy(session.getId()));
-
-                Set<IdRequest> categoryIds =
-                    dto.getCategories().stream()
-                        .map(categoryDto -> IdRequest.builder().id(categoryDto.getId()).build())
-                        .collect(Collectors.toSet());
-                return categoryService
-                    .exists(session, categoryIds)
-                    .flatMap(
-                        categotyIsExist -> {
-                          if (categotyIsExist != null
-                              && categotyIsExist.getData() != null
-                              && categotyIsExist.getData()) {
-                            return categoryService
-                                .findByIds(session, categoryIds)
-                                .flatMap(
-                                    categoryDtos -> {
-                                      postDraft
-                                          .getCategories()
-                                          .forEach(
-                                              category -> {
-                                                categoryDtos.forEach(
-                                                    categoryDto -> {
-                                                      if (categoryDto
-                                                          .getId()
-                                                          .equals(category.getId())) {
-                                                        category.setName(categoryDto.getName());
-                                                      }
-                                                    });
-                                              });
-                                      postDraft
-                                          .getTags()
-                                          .forEach(tag -> tag.setCreatedBy(session.getId()));
-                                      postDraft.setApplications(Session.applications(session));
-                                      return postDraftRepo
-                                          .save(postDraft)
-                                          .map(postAssembler::fromDraft)
-                                          .map(
-                                              result ->
-                                                  Result.build(result, StatusCode.SAVE_SUCCESS));
-                                    });
-                          } else {
-                            return Mono.just(Result.build(StatusCode.SAVE_FAILED));
-                          }
-                        });
-              } else {
-                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
-              }
-            });
+    return Mono.from(commandExecutor.execute(CreatePostCommand.class, session, dto));
   }
 
   @Transactional
@@ -112,7 +53,7 @@ public class PostServiceImpl implements PostService {
             exists -> {
               if (!exists) {
                 return postRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         post -> {
                           PostDraft postDraft = postAssembler.fromPost(post);
@@ -139,7 +80,7 @@ public class PostServiceImpl implements PostService {
             exists -> {
               if (!exists) {
                 return postDraftRepo
-                    .find(session, IdRequest.builder().id(dto.getId()).build())
+                    .find(session, dto.getId())
                     .flatMap(
                         (Function<PostDraft, Mono<Result<PostDto>>>)
                             postDraft -> {
@@ -187,9 +128,7 @@ public class PostServiceImpl implements PostService {
                                                     return postRepo
                                                         .findAndModifyStatus(
                                                             session,
-                                                            IdRequest.builder()
-                                                                .id(save.getId())
-                                                                .build(),
+                                                            save.getId(),
                                                             new HashSet<>(
                                                                 Arrays.asList(
                                                                     PostStatus.PUBLISHED,
@@ -230,7 +169,7 @@ public class PostServiceImpl implements PostService {
             exist -> {
               if (exist) {
                 return postRepo
-                    .find(authDto, IdRequest.builder().id(dto.getId()).build())
+                    .find(authDto, dto.getId())
                     .flatMap(
                         (Function<Post, Mono<Result<PostDto>>>)
                             post -> {
@@ -291,7 +230,7 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> find(Session session, IdRequest idRequest) {
     return postRepo
-        .find(session, idRequest)
+        .find(session, idRequest.getId())
         .map(postAssembler::fromEntity)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
@@ -299,7 +238,7 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> findDraft(Session authDto, IdRequest idRequest) {
     return postDraftRepo
-        .find(authDto, idRequest)
+        .find(authDto, idRequest.getId())
         .map(postAssembler::fromDraft)
         .map(result -> Result.build(result, StatusCode.DATA_FOUND));
   }
@@ -313,14 +252,14 @@ public class PostServiceImpl implements PostService {
             exists -> {
               if (exists) {
                 return postDraftRepo
-                    .find(session, id)
+                    .find(session, id.getId())
                     .flatMap(
                         postDraft -> {
                           Post newPost = postAssembler.fromDto(postAssembler.fromDraft(postDraft));
                           newPost.setCreatedAt(new Date());
                           newPost.setCreatedBy(session.getId());
                           return postRepo
-                              .find(session, id)
+                              .find(session, id.getId())
                               .defaultIfEmpty(newPost)
                               .flatMap(
                                   post -> {
@@ -403,14 +342,12 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> deleteDraft(Session session, PostDto dto) {
     return postDraftRepo
-        .deleteById(session, IdRequest.builder().id(dto.getId()).build())
+        .deleteById(session, dto.getId())
         .flatMap(
             postDraft ->
                 postRepo
                     .findAndModifyStatus(
-                        session,
-                        IdRequest.builder().id(dto.getId()).build(),
-                        new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
+                        session, dto.getId(), new HashSet<>(Arrays.asList(PostStatus.PUBLISHED)))
                     .map(
                         post ->
                             Result.build(

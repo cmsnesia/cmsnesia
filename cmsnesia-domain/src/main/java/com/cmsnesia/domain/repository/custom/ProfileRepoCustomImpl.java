@@ -26,11 +26,11 @@ public class ProfileRepoCustomImpl implements ProfileRepoCustom {
     return reactiveMongoTemplate.exists(query, Profile.class);
   }
 
-  public Mono<Profile> find(Session session, IdRequest idRequest) {
+  public Mono<Profile> find(Session session, String idRequest) {
     Query query = new Query();
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
-    if (idRequest != null && StringUtils.hasText(idRequest.getId())) {
-      query.addCriteria(Criteria.where("id").is(idRequest.getId()));
+    if (idRequest != null && StringUtils.hasText(idRequest)) {
+      query.addCriteria(Criteria.where("id").is(idRequest));
     }
     return reactiveMongoTemplate
         .findOne(query, Profile.class)

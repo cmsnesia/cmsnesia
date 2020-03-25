@@ -3,7 +3,6 @@ package com.cmsnesia.domain.repository.custom;
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Event;
 import com.cmsnesia.model.EventDto;
-import com.cmsnesia.model.request.IdRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,13 +23,13 @@ public class EventRepoCustomImpl implements EventRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Event> find(Session session, IdRequest id) {
-    Query query = buildQuery(session, EventDto.builder().id(id.getId()).build());
+  public Mono<Event> find(Session session, String id) {
+    Query query = buildQuery(session, EventDto.builder().id(id).build());
     return reactiveMongoTemplate.findOne(query, Event.class);
   }
 
   @Override
-  public Flux<Event> find(Session session, Set<IdRequest> ids) {
+  public Flux<Event> find(Session session, Set<String> ids) {
     Query query = buildQuery(session, EventDto.builder().build());
     query.addCriteria(Criteria.where("id").in(ids));
     return reactiveMongoTemplate.find(query, Event.class);

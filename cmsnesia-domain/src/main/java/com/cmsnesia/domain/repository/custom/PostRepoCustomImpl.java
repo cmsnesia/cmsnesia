@@ -4,7 +4,6 @@ import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.*;
-import com.cmsnesia.model.request.IdRequest;
 import com.mongodb.client.result.UpdateResult;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +29,8 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Post> find(Session authDto, IdRequest id) {
-    Query query = buildQuery(authDto, PostDto.builder().id(id.getId()).build());
+  public Mono<Post> find(Session authDto, String id) {
+    Query query = buildQuery(authDto, PostDto.builder().id(id).build());
     Update update = new Update();
     update.inc("viewCount", 1);
     return reactiveMongoTemplate.findAndModify(query, update, Post.class);
@@ -62,10 +61,10 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   }
 
   @Override
-  public Mono<Post> findAndModifyStatus(Session session, IdRequest id, Set<PostStatus> postStatus) {
+  public Mono<Post> findAndModifyStatus(Session session, String id, Set<PostStatus> postStatus) {
     Query query = new Query();
 
-    query.addCriteria(Criteria.where("id").is(id.getId()));
+    query.addCriteria(Criteria.where("id").is(id));
     query.addCriteria(Criteria.where("applications.id").is(Session.applicationIds(session)));
     return reactiveMongoTemplate
         .exists(query, Post.class)
@@ -79,7 +78,7 @@ public class PostRepoCustomImpl implements PostRepoCustom {
                 return reactiveMongoTemplate.findAndModify(
                     query, update, FindAndModifyOptions.options().returnNew(true), Post.class);
               } else {
-                return Mono.just(Post.builder().id(id.getId()).build());
+                return Mono.just(Post.builder().id(id).build());
               }
             });
   }

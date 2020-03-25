@@ -4,7 +4,6 @@ import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.PostDraft;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.model.PostDto;
-import com.cmsnesia.model.request.IdRequest;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -24,8 +23,8 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<PostDraft> find(Session session, IdRequest id) {
-    Query query = buildQuery(session, PostDto.builder().id(id.getId()).build());
+  public Mono<PostDraft> find(Session session, String id) {
+    Query query = buildQuery(session, PostDto.builder().id(id).build());
     return reactiveMongoTemplate.findOne(query, PostDraft.class);
   }
 
@@ -45,8 +44,8 @@ public class PostDraftRepoCustomImpl implements PostDraftRepoCustom {
   }
 
   @Override
-  public Mono<PostDraft> deleteById(Session session, IdRequest idRequest) {
-    Query query = new Query(Criteria.where("id").is(idRequest.getId()));
+  public Mono<PostDraft> deleteById(Session session, String idRequest) {
+    Query query = new Query(Criteria.where("id").is(idRequest));
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     return reactiveMongoTemplate.findAndRemove(query, PostDraft.class);
   }

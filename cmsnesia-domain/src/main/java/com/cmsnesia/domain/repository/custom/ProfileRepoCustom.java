@@ -9,5 +9,5 @@ public interface ProfileRepoCustom {
 
   Mono<Boolean> exists(Session session);
 
-  Mono<Profile> find(Session session, IdRequest idRequest);
+  Mono<Profile> find(Session session, String id);
 }

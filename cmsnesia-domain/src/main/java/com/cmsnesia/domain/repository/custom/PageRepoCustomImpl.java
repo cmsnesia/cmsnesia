@@ -4,7 +4,6 @@ import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Page;
 import com.cmsnesia.model.AuthorDto;
 import com.cmsnesia.model.PageDto;
-import com.cmsnesia.model.request.IdRequest;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -24,8 +23,8 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Page> find(Session authDto, IdRequest id) {
-    Query query = buildQuery(authDto, PageDto.builder().id(id.getId()).build());
+  public Mono<Page> find(Session authDto, String id) {
+    Query query = buildQuery(authDto, PageDto.builder().id(id).build());
     return reactiveMongoTemplate.findOne(query, Page.class);
   }
 

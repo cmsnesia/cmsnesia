@@ -4,7 +4,6 @@ import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Category;
 import com.cmsnesia.domain.CategoryGroup;
 import com.cmsnesia.model.CategoryGroupDto;
-import com.cmsnesia.model.request.IdRequest;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -25,8 +24,8 @@ public class CategoryGroupRepoCustomImpl implements CategoryGroupRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<CategoryGroup> find(Session session, IdRequest id) {
-    Query query = buildQuery(session, CategoryGroupDto.builder().id(id.getId()).build());
+  public Mono<CategoryGroup> find(Session session, String id) {
+    Query query = buildQuery(session, CategoryGroupDto.builder().id(id).build());
     return reactiveMongoTemplate.findOne(query, CategoryGroup.class);
   }
 

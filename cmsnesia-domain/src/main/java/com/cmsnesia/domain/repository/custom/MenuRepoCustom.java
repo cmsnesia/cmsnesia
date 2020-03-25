@@ -3,7 +3,6 @@ package com.cmsnesia.domain.repository.custom;
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Menu;
 import com.cmsnesia.model.MenuDto;
-import com.cmsnesia.model.request.IdRequest;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,7 +11,7 @@ import java.util.Set;
 
 public interface MenuRepoCustom {
 
-  Mono<Menu> find(Session session, IdRequest id);
+  Mono<Menu> find(Session session, String id);
 
   Flux<Menu> find(Session session, MenuDto dto, Pageable pageable);
 

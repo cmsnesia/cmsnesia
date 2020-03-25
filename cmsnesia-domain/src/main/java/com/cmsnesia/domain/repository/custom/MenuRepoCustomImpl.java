@@ -3,7 +3,6 @@ package com.cmsnesia.domain.repository.custom;
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Menu;
 import com.cmsnesia.model.MenuDto;
-import com.cmsnesia.model.request.IdRequest;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,8 +22,8 @@ public class MenuRepoCustomImpl implements MenuRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Menu> find(Session session, IdRequest id) {
-    Query query = buildQuery(session, MenuDto.builder().id(id.getId()).build());
+  public Mono<Menu> find(Session session, String id) {
+    Query query = buildQuery(session, MenuDto.builder().id(id).build());
     return reactiveMongoTemplate.findOne(query, Menu.class);
   }
 

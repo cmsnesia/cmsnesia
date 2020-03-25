@@ -3,7 +3,6 @@ package com.cmsnesia.domain.repository.custom;
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.domain.Page;
 import com.cmsnesia.model.PageDto;
-import com.cmsnesia.model.request.IdRequest;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,7 +11,7 @@ import java.util.Set;
 
 public interface PageRepoCustom {
 
-  Mono<Page> find(Session session, IdRequest id);
+  Mono<Page> find(Session session, String id);
 
   Flux<Page> find(Session session, PageDto dto, Pageable pageable);
 
