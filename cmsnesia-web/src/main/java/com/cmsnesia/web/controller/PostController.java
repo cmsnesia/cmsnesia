@@ -2,9 +2,7 @@ package com.cmsnesia.web.controller;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.PostAssembler;
-import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
-import com.cmsnesia.model.TagDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.request.PostEditRequest;
@@ -16,7 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -163,26 +160,12 @@ public class PostController {
   })
   @PutMapping("/editDraft")
   public Mono<Result<PostDto>> editDraft(@RequestBody PostEditRequest postEditRequest) {
-    PostDto postDto =
-        PostDto.builder()
-            .id(postEditRequest.getId())
-            .title(postEditRequest.getTitle())
-            .content(postEditRequest.getContent())
-            .medias(postEditRequest.getMedias())
-            .tags(
-                postEditRequest.getTags().stream()
-                    .map(tagDto -> TagDto.builder().name(tagDto.getName()).build())
-                    .collect(Collectors.toSet()))
-            .categories(
-                postEditRequest.getCategories().stream()
-                    .map(id -> CategoryDto.builder().id(id.getId()).build())
-                    .collect(Collectors.toSet()))
-            .build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
+              PostDto postDto = postAssembler.fromEditRequest(postEditRequest);
               return postService.editDraft(session, postDto);
             });
   }

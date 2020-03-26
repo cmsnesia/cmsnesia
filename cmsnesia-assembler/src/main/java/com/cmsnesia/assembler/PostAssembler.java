@@ -7,6 +7,7 @@ import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
+import com.cmsnesia.model.request.PostEditRequest;
 import com.cmsnesia.model.request.PostRequest;
 import com.cmsnesia.model.util.DateTimeUtils;
 import java.util.*;
@@ -108,6 +109,26 @@ public class PostAssembler extends Assembler<Post, PostDto> {
                     .collect(Collectors.toSet()))
             .categories(
                 postRequest.getCategories().stream()
+                    .map(id -> CategoryDto.builder().id(id.getId()).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    return postDto;
+  }
+
+  public PostDto fromEditRequest(PostEditRequest postEditRequest) {
+    PostDto postDto =
+        PostDto.builder()
+            .id(postEditRequest.getId())
+            .title(postEditRequest.getTitle())
+            .content(postEditRequest.getContent())
+            .medias(postEditRequest.getMedias())
+            .link(postEditRequest.getLink())
+            .tags(
+                postEditRequest.getTags().stream()
+                    .map(tagDto -> TagDto.builder().name(tagDto.getName()).build())
+                    .collect(Collectors.toSet()))
+            .categories(
+                postEditRequest.getCategories().stream()
                     .map(id -> CategoryDto.builder().id(id.getId()).build())
                     .collect(Collectors.toSet()))
             .build();

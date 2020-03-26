@@ -17,6 +17,7 @@ public class PostEditRequest {
   private String id;
   private String title;
   private String content;
+  private String link;
 
   private Set<MediaDto> medias;
   private Set<TagDto> tags;
