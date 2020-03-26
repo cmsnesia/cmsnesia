@@ -10,7 +10,8 @@ public interface Command<R, T> {
 
   Publisher<T> execute(Session session, R request);
 
-  Mono<Void> validate(Object request);
+  Mono<Boolean
+          > validate(Object request);
 
   @Getter
   @AllArgsConstructor
