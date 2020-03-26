@@ -73,7 +73,9 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> find(Session session, IdRequest idRequest) {
-    return Mono.from(commandExecutor.execute(FindById.class, session, idRequest));
+    return Mono.from(
+        commandExecutor.execute(
+            FindByIdOrLink.class, session, PostDto.builder().id(idRequest.getId()).build()));
   }
 
   @Override
@@ -90,5 +92,10 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> deleteDraft(Session session, PostDto dto) {
     return Mono.from(commandExecutor.execute(DeleteDraftCommand.class, session, dto));
+  }
+
+  @Override
+  public Mono<Result<PostDto>> findByIdOrLink(Session session, PostDto dto) {
+    return Mono.from(commandExecutor.execute(FindByIdOrLink.class, session, dto));
   }
 }

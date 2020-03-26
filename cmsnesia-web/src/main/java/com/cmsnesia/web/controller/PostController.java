@@ -42,13 +42,15 @@ public class PostController {
     @ApiImplicitParam(name = ConstantKeys.X_USER_DATA, paramType = "header", dataType = "string")
   })
   @GetMapping("/findById")
-  public Mono<Result<PostDto>> findById(@RequestParam("id") String id) {
+  public Mono<Result<PostDto>> findByIdOrLink(
+      @RequestParam("id") String id, @RequestParam(value = "link", required = false) String link) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
-              return postService.find(session, IdRequest.builder().id(id).build());
+              return postService.findByIdOrLink(
+                  session, PostDto.builder().id(id).link(link).build());
             });
   }
 

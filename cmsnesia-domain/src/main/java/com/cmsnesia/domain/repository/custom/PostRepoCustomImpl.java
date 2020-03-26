@@ -29,8 +29,10 @@ public class PostRepoCustomImpl implements PostRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Post> find(Session authDto, String id) {
-    Query query = buildQuery(authDto, PostDto.builder().id(id).build());
+  public Mono<Post> find(Session authDto, String id, String link) {
+    Query query = buildQuery(authDto, PostDto.builder().build());
+    query.addCriteria(
+        new Criteria().orOperator(Criteria.where("id").is(id), Criteria.where("link").is(link)));
     Update update = new Update();
     update.inc("viewCount", 1);
     return reactiveMongoTemplate.findAndModify(query, update, Post.class);

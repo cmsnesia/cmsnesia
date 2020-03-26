@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 public interface PostRepoCustom {
 
-  Mono<Post> find(Session session, String id);
+  Mono<Post> find(Session session, String id, String link);
 
   Flux<Post> find(Session session, PostDto dto, Pageable pageable);
 
