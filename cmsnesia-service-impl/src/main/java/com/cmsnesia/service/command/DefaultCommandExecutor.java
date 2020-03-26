@@ -1,7 +1,6 @@
 package com.cmsnesia.service.command;
 
 import com.cmsnesia.accounts.model.Session;
-import com.cmsnesia.model.api.Result;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.reactivestreams.Publisher;
@@ -10,10 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.io.Serializable;
-import java.util.Set;
 
 @Component
 public class DefaultCommandExecutor
@@ -28,7 +24,7 @@ public class DefaultCommandExecutor
 
   @SneakyThrows
   @Override
-  public <R, T extends Serializable> Publisher<Result<T>> execute(
+  public <R, T> Publisher<T> execute(
       Class<? extends Command<R, T>> commandClass, Session session, R request) {
     Command<R, T> command = applicationContext.getBean(commandClass);
     return command.execute(session, request);

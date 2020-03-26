@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class CreatePostCommand implements Command<PostDto, PostDto> {
+public class CreateCommand implements Command<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;
@@ -31,23 +31,19 @@ public class CreatePostCommand implements Command<PostDto, PostDto> {
 
   @Override
   public Mono<Result<PostDto>> execute(Session session, PostDto dto) {
-    Mono<Boolean> postTitleIsExist = postTitleIsExist(session, dto);
-    Mono<Boolean> postLinkIsExist = postLinkIsExist(session, dto);
+    Mono<Boolean> postIsExist = postIsExist(session, dto);
     Mono<Set<Category>> categoryList = findCategories(session, dto);
-    return Mono.zip(postTitleIsExist, postLinkIsExist, categoryList)
+    return Mono.zip(postIsExist, categoryList)
         .flatMap(
             tuple -> {
               if (tuple.getT1()) {
                 return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
-              if (tuple.getT2()) {
-                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
-              }
-              if (tuple.getT3().size() != dto.getCategories().size()) {
-                return Mono.just(Result.build(StatusCode.DATA_FOUND));
+              if (tuple.getT2().size() != dto.getCategories().size()) {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
               }
 
-              Set<Category> categories = tuple.getT3();
+              Set<Category> categories = tuple.getT2();
 
               PostDraft postDraft = postAssembler.fromPostDto(dto);
               postDraft.setId(UUID.randomUUID().toString());
@@ -70,12 +66,8 @@ public class CreatePostCommand implements Command<PostDto, PostDto> {
             });
   }
 
-  private Mono<Boolean> postTitleIsExist(Session session, PostDto postDto) {
-    return postRepo.exists(session, null, postDto.getTitle(), null);
-  }
-
-  private Mono<Boolean> postLinkIsExist(Session session, PostDto postDto) {
-    return postRepo.exists(session, null, null, postDto.getLink());
+  private Mono<Boolean> postIsExist(Session session, PostDto postDto) {
+    return postRepo.exists(session, null, postDto.getTitle(), postDto.getLink());
   }
 
   private Mono<Set<Category>> findCategories(Session session, PostDto postDto) {

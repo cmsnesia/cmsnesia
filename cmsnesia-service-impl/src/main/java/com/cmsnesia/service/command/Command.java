@@ -1,12 +1,18 @@
 package com.cmsnesia.service.command;
 
 import com.cmsnesia.accounts.model.Session;
-import com.cmsnesia.model.api.Result;
+import lombok.*;
 import org.reactivestreams.Publisher;
+import org.springframework.data.domain.Pageable;
 
-import java.io.Serializable;
+public interface Command<R, T> {
 
-public interface Command<R, T extends Serializable> {
+  Publisher<T> execute(Session session, R request);
 
-  Publisher<Result<T>> execute(Session session, R request);
+  @Getter
+  @AllArgsConstructor
+  class PageableRequest<T> {
+    private T data;
+    private Pageable pageable;
+  }
 }
