@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> edit(Session session, PostDto dto) {
     return postRepo
-        .exists(session, dto.getId(), dto.getTitle())
+        .exists(session, dto.getId(), dto.getTitle(), null)
         .flatMap(
             exists -> {
               if (!exists) {
@@ -75,7 +75,7 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Result<PostDto>> editDraft(Session session, PostDto dto) {
     return postRepo
-        .exists(session, dto.getId(), dto.getTitle())
+        .exists(session, dto.getId(), dto.getTitle(), null)
         .flatMap(
             exists -> {
               if (!exists) {

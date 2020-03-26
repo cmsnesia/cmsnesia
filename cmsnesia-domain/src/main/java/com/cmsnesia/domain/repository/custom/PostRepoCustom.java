@@ -23,7 +23,7 @@ public interface PostRepoCustom {
 
   Mono<Post> findAndModifyStatus(Session session, String id, Set<PostStatus> postStatus);
 
-  Mono<Boolean> exists(Session session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name, String link);
 
   Mono<Boolean> exists(Session session, Set<String> ids);
 }

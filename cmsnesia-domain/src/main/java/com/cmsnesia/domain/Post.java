@@ -6,6 +6,8 @@ import com.cmsnesia.domain.model.Media;
 import com.cmsnesia.domain.model.Tag;
 import java.util.Set;
 import javax.validation.constraints.*;
+
+import com.cmsnesia.domain.validator.UrlMustValid;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -21,6 +23,9 @@ public class Post extends Audit {
 
   @Id private String id;
 
+  @UrlMustValid(message = "Invalid URL")
+  private String link;
+
   @NotBlank(message = "Post title must be not blank")
   @Size(max = 100, message = "Maximum size of post title is 100")
   @Indexed
@@ -29,13 +34,17 @@ public class Post extends Audit {
   @NotBlank(message = "Post content must be not blank")
   private String content;
 
-  @NotEmpty private Set<Author> authors;
+  @NotEmpty(message = "Authors is required")
+  private Set<Author> authors;
 
-  @NotNull private Set<Media> medias;
+  @NotNull(message = "Medias must be not null")
+  private Set<Media> medias;
 
-  @NotEmpty private Set<Tag> tags;
+  @NotEmpty(message = "Tags is required")
+  private Set<Tag> tags;
 
-  @NotEmpty private Set<Category> categories;
+  @NotEmpty(message = "Categories is required")
+  private Set<Category> categories;
 
   @Min(value = 0, message = "Post view count must be greater or equal to 0")
   private Long viewCount;

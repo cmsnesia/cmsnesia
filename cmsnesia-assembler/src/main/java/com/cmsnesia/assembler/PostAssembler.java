@@ -7,6 +7,7 @@ import com.cmsnesia.domain.model.Tag;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
+import com.cmsnesia.model.request.PostRequest;
 import com.cmsnesia.model.util.DateTimeUtils;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
     Post post =
         Post.builder()
             .id(dto.getId())
+            .link(dto.getLink())
             .title(dto.getTitle())
             .content(dto.getContent())
             .authors(
@@ -65,6 +67,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   public PostDto fromEntity(@Nonnull Post entity) {
     return PostDto.builder()
         .id(entity.getId())
+        .link(entity.getLink())
         .title(entity.getTitle())
         .content(entity.getContent())
         .authors(
@@ -92,6 +95,25 @@ public class PostAssembler extends Assembler<Post, PostDto> {
         : entities.stream().map(this::fromEntity).collect(Collectors.toSet());
   }
 
+  public PostDto fromRequest(PostRequest postRequest) {
+    PostDto postDto =
+        PostDto.builder()
+            .title(postRequest.getTitle())
+            .link(postRequest.getLink())
+            .content(postRequest.getContent())
+            .medias(postRequest.getMedias())
+            .tags(
+                postRequest.getTags().stream()
+                    .map(tag -> TagDto.builder().name(tag.getName()).build())
+                    .collect(Collectors.toSet()))
+            .categories(
+                postRequest.getCategories().stream()
+                    .map(id -> CategoryDto.builder().id(id.getId()).build())
+                    .collect(Collectors.toSet()))
+            .build();
+    return postDto;
+  }
+
   public PostDto fromDraft(PostDraft postDraft) {
     Set<TagDto> tagDtos = new HashSet<>();
     if (postDraft.getTags() != null) {
@@ -108,6 +130,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
     }
     return PostDto.builder()
         .id(postDraft.getId())
+        .link(postDraft.getLink())
         .title(postDraft.getTitle())
         .content(postDraft.getContent())
         .medias(mediaAssembler.fromEntity(postDraft.getMedias()))
@@ -126,6 +149,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
     }
     return PostDraft.builder()
         .id(postDto.getId())
+        .link(postDto.getLink())
         .title(postDto.getTitle())
         .content(postDto.getContent())
         .medias(mediaAssembler.fromDto(postDto.getMedias()))
@@ -137,6 +161,7 @@ public class PostAssembler extends Assembler<Post, PostDto> {
   public PostDraft fromPost(Post post) {
     return PostDraft.builder()
         .id(post.getId())
+        .link(post.getLink())
         .title(post.getTitle())
         .content(post.getContent())
         .tags(post.getTags())
@@ -172,26 +197,12 @@ public class PostAssembler extends Assembler<Post, PostDto> {
     }
     return tags.stream()
         .map(
-            tag -> {
-              return TagDto.builder()
-                  .name(tag.getName())
-                  .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
-                  .createdBy(tag.getCreatedBy())
-                  .build();
-            })
+            tag ->
+                TagDto.builder()
+                    .name(tag.getName())
+                    .createdAt(DateTimeUtils.toString(tag.getCreatedAt()))
+                    .createdBy(tag.getCreatedBy())
+                    .build())
         .collect(Collectors.toSet());
   }
-
-  //    public PostDraft toDraft(PostDto postDto) {
-  //        PostDraft postDraft = PostDraft.builder()
-  //                .postId(postDto.getId())
-  //                .title(postDto.getTitle())
-  //                .content(postDto.getContent())
-  //                .medias(mediaAssembler.fromDto(postDto.getMedias()))
-  //                .tags(tagAssembler.fromDto(postDto.getTags()))
-  //                .categories(categoryAssembler.fromDto(postDto.getCategories()))
-  //                .build();
-  //        return postDraft;
-  //    }
-
 }

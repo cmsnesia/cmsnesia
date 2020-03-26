@@ -31,19 +31,23 @@ public class CreatePostCommand implements Command<PostDto, PostDto> {
 
   @Override
   public Mono<Result<PostDto>> execute(Session session, PostDto dto) {
-    Mono<Boolean> postIsExist = postTitleIsExist(session, dto);
+    Mono<Boolean> postTitleIsExist = postTitleIsExist(session, dto);
+    Mono<Boolean> postLinkIsExist = postLinkIsExist(session, dto);
     Mono<Set<Category>> categoryList = findCategories(session, dto);
-    return Mono.zip(postIsExist, categoryList)
+    return Mono.zip(postTitleIsExist, postLinkIsExist, categoryList)
         .flatMap(
             tuple -> {
               if (tuple.getT1()) {
                 return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
-              if (tuple.getT2().size() != dto.getCategories().size()) {
+              if (tuple.getT2()) {
+                return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
+              }
+              if (tuple.getT3().size() != dto.getCategories().size()) {
                 return Mono.just(Result.build(StatusCode.DATA_FOUND));
               }
 
-              Set<Category> categories = tuple.getT2();
+              Set<Category> categories = tuple.getT3();
 
               PostDraft postDraft = postAssembler.fromPostDto(dto);
               postDraft.setId(UUID.randomUUID().toString());
@@ -67,7 +71,11 @@ public class CreatePostCommand implements Command<PostDto, PostDto> {
   }
 
   private Mono<Boolean> postTitleIsExist(Session session, PostDto postDto) {
-    return postRepo.exists(session, null, postDto.getTitle());
+    return postRepo.exists(session, null, postDto.getTitle(), null);
+  }
+
+  private Mono<Boolean> postLinkIsExist(Session session, PostDto postDto) {
+    return postRepo.exists(session, null, null, postDto.getLink());
   }
 
   private Mono<Set<Category>> findCategories(Session session, PostDto postDto) {

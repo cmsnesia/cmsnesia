@@ -16,6 +16,7 @@ public class PostRequest {
 
   private String title;
   private String content;
+  private String link;
 
   private Set<MediaDto> medias;
   private Set<TagDto> tags;

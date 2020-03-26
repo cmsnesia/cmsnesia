@@ -1,6 +1,7 @@
 package com.cmsnesia.web.controller;
 
 import com.cmsnesia.accounts.model.Session;
+import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.TagDto;
@@ -36,6 +37,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PostController {
 
+  private final PostAssembler postAssembler;
   private final PostService postService;
 
   @ApiOperation(value = "Get post by ID", response = PostDto.class, notes = "Result<PostDto>")
@@ -130,25 +132,12 @@ public class PostController {
   })
   @PostMapping("/add")
   public Mono<Result<PostDto>> add(@RequestBody PostRequest postRequest) {
-    PostDto postDto =
-        PostDto.builder()
-            .title(postRequest.getTitle())
-            .content(postRequest.getContent())
-            .medias(postRequest.getMedias())
-            .tags(
-                postRequest.getTags().stream()
-                    .map(tag -> TagDto.builder().name(tag.getName()).build())
-                    .collect(Collectors.toSet()))
-            .categories(
-                postRequest.getCategories().stream()
-                    .map(id -> CategoryDto.builder().id(id.getId()).build())
-                    .collect(Collectors.toSet()))
-            .build();
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
+              PostDto postDto = postAssembler.fromRequest(postRequest);
               return postService.add(session, postDto);
             });
   }

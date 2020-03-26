@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class PostDto extends BaseDto {
 
   private String id;
+  private String link;
   private String title;
   private String content;
 
