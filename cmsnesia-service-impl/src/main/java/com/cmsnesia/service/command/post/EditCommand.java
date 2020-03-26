@@ -11,7 +11,7 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
-import com.cmsnesia.service.command.Command;
+import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class EditCommand implements Command<PostDto, Result<PostDto>> {
+public class EditCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;
@@ -51,7 +51,7 @@ public class EditCommand implements Command<PostDto, Result<PostDto>> {
                       post -> {
                         PostDraft postDraft = postAssembler.fromPost(post);
                         postDraft.setApplications(Session.applications(session));
-                        return postDraftRepo.save(postDraft);
+                        return validate(post).flatMap(o -> postDraftRepo.save(postDraft));
                       })
                   .map(
                       postDraft -> {

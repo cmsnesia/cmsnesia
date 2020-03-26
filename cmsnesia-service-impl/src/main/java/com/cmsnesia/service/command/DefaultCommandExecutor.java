@@ -5,17 +5,14 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Validator;
-
 @Component
 public class DefaultCommandExecutor
     implements CommandExecutor, ApplicationContextAware, InitializingBean {
-
-  @Setter private Validator validator;
 
   @Setter private ApplicationContext applicationContext;
 

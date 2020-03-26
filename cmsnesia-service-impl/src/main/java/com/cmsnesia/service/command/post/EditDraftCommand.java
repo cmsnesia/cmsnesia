@@ -13,7 +13,7 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
-import com.cmsnesia.service.command.Command;
+import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class EditDraftCommand implements Command<PostDto, Result<PostDto>> {
+public class EditDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;
@@ -43,7 +43,6 @@ public class EditDraftCommand implements Command<PostDto, Result<PostDto>> {
     return Mono.zip(postIsExist, categoryList)
         .flatMap(
             tuple -> {
-
               if (tuple.getT1()) {
                 return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
@@ -73,11 +72,16 @@ public class EditDraftCommand implements Command<PostDto, Result<PostDto>> {
 
                         return updated.flatMap(
                             post ->
-                                postDraftRepo
-                                    .save(save)
-                                    .map(postAssembler::fromDraft)
-                                    .map(
-                                        postDto -> Result.build(postDto, StatusCode.SAVE_SUCCESS)));
+                                validate(save)
+                                    .flatMap(
+                                        o ->
+                                            postDraftRepo
+                                                .save(save)
+                                                .map(postAssembler::fromDraft)
+                                                .map(
+                                                    postDto ->
+                                                        Result.build(
+                                                            postDto, StatusCode.SAVE_SUCCESS))));
                       });
             });
   }

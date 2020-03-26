@@ -1,6 +1,5 @@
 package com.cmsnesia.domain.validator;
 
-import com.cmsnesia.domain.validator.impl.PasswordMustSecureImpl;
 import com.cmsnesia.domain.validator.impl.UrlMustValidImpl;
 
 import javax.validation.Constraint;

@@ -12,7 +12,7 @@ import com.cmsnesia.model.CategoryDto;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
-import com.cmsnesia.service.command.Command;
+import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class CreateCommand implements Command<PostDto, Result<PostDto>> {
+public class CreateCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;
@@ -59,10 +59,13 @@ public class CreateCommand implements Command<PostDto, Result<PostDto>> {
 
               postDraft.setApplications(Session.applications(session));
 
-              return postDraftRepo
-                  .save(postDraft)
-                  .map(postAssembler::fromDraft)
-                  .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS));
+              return validate(postDraft)
+                  .flatMap(
+                      o ->
+                          postDraftRepo
+                              .save(postDraft)
+                              .map(postAssembler::fromDraft)
+                              .map(result -> Result.build(result, StatusCode.SAVE_SUCCESS)));
             });
   }
 

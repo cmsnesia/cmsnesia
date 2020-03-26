@@ -9,7 +9,7 @@ import com.cmsnesia.domain.repository.PostRepo;
 import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
-import com.cmsnesia.service.command.Command;
+import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class DeleteCommand implements Command<PostDto, Result<PostDto>> {
+public class DeleteCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostRepo postRepo;
   private final PostDraftRepo postDraftRepo;

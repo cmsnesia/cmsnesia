@@ -5,6 +5,7 @@ import com.cmsnesia.assembler.PostAssembler;
 import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.repository.PostRepo;
 import com.cmsnesia.model.PostDto;
+import com.cmsnesia.service.command.AbstractCommand;
 import com.cmsnesia.service.command.Command;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,8 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class FindAllCommand implements Command<Command.PageableRequest<PostDto>, Page<PostDto>> {
+public class FindAllCommand
+    extends AbstractCommand<Command.PageableRequest<PostDto>, Page<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;

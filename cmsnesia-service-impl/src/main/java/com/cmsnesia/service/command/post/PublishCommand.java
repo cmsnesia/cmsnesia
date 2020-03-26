@@ -12,7 +12,7 @@ import com.cmsnesia.model.PostDto;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
-import com.cmsnesia.service.command.Command;
+import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class PublishCommand implements Command<IdRequest, Result<PostDto>> {
+public class PublishCommand extends AbstractCommand<IdRequest, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostRepo postRepo;
