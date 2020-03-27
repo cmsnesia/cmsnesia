@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.Date;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryDeleteCommand")
 public class DeleteCommand extends AbstractCommand<CategoryDto, Result<CategoryDto>> {
 
   private final CategoryAssembler categoryAssembler;

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryEditCommand")
 public class EditCommand extends AbstractCommand<CategoryDto, Result<CategoryDto>> {
 
   private final CategoryAssembler categoryAssembler;

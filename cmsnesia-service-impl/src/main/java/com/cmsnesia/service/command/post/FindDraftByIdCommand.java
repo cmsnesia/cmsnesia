@@ -14,8 +14,8 @@ import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Service
-public class FindDraftById extends AbstractCommand<IdRequest, Result<PostDto>> {
+@Service("postFindDraftByIdCommand")
+public class FindDraftByIdCommand extends AbstractCommand<IdRequest, Result<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostDraftRepo postDraftRepo;

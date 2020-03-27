@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryFindAllCommand")
 public class FindAllCommand
     extends AbstractCommand<Command.PageableRequest<CategoryDto>, Page<CategoryDto>> {
 

@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Service("postEditCommand")
 public class EditCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;

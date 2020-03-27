@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryMustExistCommand")
 public class MustExistCommand extends AbstractCommand<Set<IdRequest>, Result<Boolean>> {
 
   private final CategoryRepo categoryRepo;
@@ -24,8 +24,9 @@ public class MustExistCommand extends AbstractCommand<Set<IdRequest>, Result<Boo
     return categoryRepo
         .exists(session, request.stream().map(IdRequest::getId).collect(Collectors.toSet()))
         .map(
-            result -> result
-                ? Result.build(true, StatusCode.DATA_FOUND)
-                : Result.build(false, StatusCode.DATA_NOT_FOUND));
+            result ->
+                result
+                    ? Result.build(true, StatusCode.DATA_FOUND)
+                    : Result.build(false, StatusCode.DATA_NOT_FOUND));
   }
 }

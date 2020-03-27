@@ -68,19 +68,19 @@ public class PostServiceImpl implements PostService {
   @Override
   public Mono<Page<PostDto>> findDraft(Session session, PostDto dto, Pageable pageable) {
     Command.PageableRequest<PostDto> request = new Command.PageableRequest<PostDto>(dto, pageable);
-    return Mono.from(commandExecutor.execute(FindAllDraft.class, session, request));
+    return Mono.from(commandExecutor.execute(FindAllDraftCommand.class, session, request));
   }
 
   @Override
   public Mono<Result<PostDto>> find(Session session, IdRequest idRequest) {
     return Mono.from(
         commandExecutor.execute(
-            FindByIdOrLink.class, session, PostDto.builder().id(idRequest.getId()).build()));
+            FindByIdOrLinkCommand.class, session, PostDto.builder().id(idRequest.getId()).build()));
   }
 
   @Override
   public Mono<Result<PostDto>> findDraft(Session session, IdRequest idRequest) {
-    return Mono.from(commandExecutor.execute(FindDraftById.class, session, idRequest));
+    return Mono.from(commandExecutor.execute(FindDraftByIdCommand.class, session, idRequest));
   }
 
   @Transactional
@@ -96,6 +96,6 @@ public class PostServiceImpl implements PostService {
 
   @Override
   public Mono<Result<PostDto>> findByIdOrLink(Session session, PostDto dto) {
-    return Mono.from(commandExecutor.execute(FindByIdOrLink.class, session, dto));
+    return Mono.from(commandExecutor.execute(FindByIdOrLinkCommand.class, session, dto));
   }
 }

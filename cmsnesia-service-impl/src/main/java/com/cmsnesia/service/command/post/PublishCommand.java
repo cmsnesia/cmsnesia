@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Service("postPublishCommand")
 public class PublishCommand extends AbstractCommand<IdRequest, Result<PostDto>> {
 
   private final PostAssembler postAssembler;

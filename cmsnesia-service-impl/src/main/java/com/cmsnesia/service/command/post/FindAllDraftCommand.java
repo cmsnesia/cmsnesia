@@ -17,8 +17,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Service
-public class FindAllDraft extends AbstractCommand<Command.PageableRequest<PostDto>, Page<PostDto>> {
+@Service("postFindAllDraftCommand")
+public class FindAllDraftCommand extends AbstractCommand<Command.PageableRequest<PostDto>, Page<PostDto>> {
 
   private final PostAssembler postAssembler;
   private final PostDraftRepo postDraftRepo;

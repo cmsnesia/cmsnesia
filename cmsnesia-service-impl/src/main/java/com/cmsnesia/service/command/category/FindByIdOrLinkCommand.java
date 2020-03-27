@@ -12,8 +12,8 @@ import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Service
-public class FindByIdOrLink extends AbstractCommand<CategoryDto, Result<CategoryDto>> {
+@Service("categoryFindByIdOrLinkCommand")
+public class FindByIdOrLinkCommand extends AbstractCommand<CategoryDto, Result<CategoryDto>> {
 
   private final CategoryAssembler categoryAssembler;
   private final CategoryRepo categoryRepo;

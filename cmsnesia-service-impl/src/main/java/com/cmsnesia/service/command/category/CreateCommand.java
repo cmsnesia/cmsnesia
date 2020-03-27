@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryCreateCommand")
 public class CreateCommand extends AbstractCommand<CategoryDto, Result<CategoryDto>> {
 
   private final CategoryAssembler categoryAssembler;

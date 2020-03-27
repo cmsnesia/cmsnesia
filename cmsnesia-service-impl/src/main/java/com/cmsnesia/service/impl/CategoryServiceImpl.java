@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
   public Mono<Result<CategoryDto>> find(Session session, IdRequest idRequest) {
     return Mono.from(
         commandExecutor.execute(
-            FindByIdOrLink.class, session, CategoryDto.builder().id(idRequest.getId()).build()));
+            FindByIdOrLinkCommand.class, session, CategoryDto.builder().id(idRequest.getId()).build()));
   }
 
   @Override

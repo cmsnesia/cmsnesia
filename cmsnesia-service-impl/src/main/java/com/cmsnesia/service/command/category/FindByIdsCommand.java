@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Service("categoryFindByIdsCommand")
 public class FindByIdsCommand extends AbstractCommand<Set<IdRequest>, Set<CategoryDto>> {
 
   private final CategoryAssembler categoryAssembler;

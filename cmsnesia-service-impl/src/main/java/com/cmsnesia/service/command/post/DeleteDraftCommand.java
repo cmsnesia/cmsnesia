@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 @RequiredArgsConstructor
-@Service
+@Service("postDeleteDraftCommand")
 public class DeleteDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostAssembler postAssembler;

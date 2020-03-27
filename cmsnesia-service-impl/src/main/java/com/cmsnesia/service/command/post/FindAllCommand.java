@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @AllArgsConstructor
-@Service
+@Service("postFindAllCommand")
 public class FindAllCommand
     extends AbstractCommand<Command.PageableRequest<PostDto>, Page<PostDto>> {
 

@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Service("postDeleteCommand")
 public class DeleteCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   private final PostRepo postRepo;
