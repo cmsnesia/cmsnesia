@@ -2,6 +2,7 @@ package com.cmsnesia.service.command.post;
 
 import com.cmsnesia.accounts.model.Session;
 import com.cmsnesia.assembler.PostAssembler;
+import com.cmsnesia.domain.Post;
 import com.cmsnesia.domain.model.enums.PostStatus;
 import com.cmsnesia.domain.repository.CategoryRepo;
 import com.cmsnesia.domain.repository.PostDraftRepo;
@@ -13,6 +14,7 @@ import com.cmsnesia.service.command.AbstractCommand;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -31,10 +33,10 @@ public class DeleteCommand extends AbstractCommand<PostDto, Result<PostDto>> {
   public Publisher<Result<PostDto>> execute(Session session, PostDto dto) {
     return postRepo
         .find(session, dto.getId(), dto.getLink())
-        .defaultIfEmpty(null)
+        .defaultIfEmpty(Post.builder().build())
         .flatMap(
             post -> {
-              if (post == null) {
+              if (StringUtils.isEmpty(post.getId())) {
                 return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
               } else {
                 post.setDeletedBy(session.getId());

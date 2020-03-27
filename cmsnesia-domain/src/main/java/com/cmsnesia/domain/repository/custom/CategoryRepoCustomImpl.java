@@ -23,9 +23,10 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
 
   @Override
   public Mono<Category> find(Session session, String id, String link) {
-    Query query = buildQuery(session, CategoryDto.builder().build());
-    query.addCriteria(
-        new Criteria().orOperator(Criteria.where("id").is(id), Criteria.where("link").is(link)));
+    Query query = buildQuery(session, CategoryDto.builder().id(id).build());
+    if (!StringUtils.isEmpty(link)) {
+      query.addCriteria(Criteria.where("link").is(link));
+    }
     return reactiveMongoTemplate.findOne(query, Category.class);
   }
 
