@@ -70,9 +70,7 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
     }
-    if (!StringUtils.isEmpty(link)) {
-      query.addCriteria(Criteria.where("link").is(link));
-    }
+    query.addCriteria(Criteria.where("link").is(link));
     query.addCriteria(Criteria.where("name").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));

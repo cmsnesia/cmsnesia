@@ -31,18 +31,14 @@ public class PostServiceImpl implements PostService {
   @Transactional
   @Override
   public Mono<Result<PostDto>> edit(Session session, PostDto dto) {
-    Mono<Result<PostDto>> draftSaved =
-        Mono.from(commandExecutor.execute(EditCommand.class, session, dto));
-    Mono<Result<PostDto>> postSaved =
-        Mono.from(commandExecutor.execute(EditDraftCommand.class, session, dto));
-    return Mono.zip(draftSaved, postSaved)
-        .map(
-            tuple -> {
-              if (tuple.getT1().getStatusCode() == StatusCode.SAVE_SUCCESS
-                  && tuple.getT2().getStatusCode() == StatusCode.SAVE_SUCCESS) {
-                return tuple.getT2();
+    return Mono.from(commandExecutor.execute(EditCommand.class, session, dto))
+        .flatMap(
+            postDtoResult -> {
+              if (postDtoResult.getStatusCode() == StatusCode.SAVE_SUCCESS) {
+                PostDto postDto = postDtoResult.getData();
+                return Mono.from(commandExecutor.execute(EditDraftCommand.class, session, postDto));
               } else {
-                return Result.build(StatusCode.SAVE_FAILED);
+                return Mono.just(Result.build(StatusCode.SAVE_FAILED));
               }
             });
   }

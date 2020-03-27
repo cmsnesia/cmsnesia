@@ -39,8 +39,7 @@ public class EditDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> 
   @Transactional
   @Override
   public Publisher<Result<PostDto>> execute(Session session, PostDto dto) {
-    return postRepo
-        .exists(session, null, dto.getTitle(), dto.getLink())
+    return postIsExist(session, dto)
         .flatMap(
             exists -> {
               if (!exists) {
@@ -112,6 +111,10 @@ public class EditDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> 
                                 .name(category.getName())
                                 .build())
                     .collect(Collectors.toSet()));
+  }
+
+  private Mono<Boolean> postIsExist(Session session, PostDto postDto) {
+    return categoryRepo.exists(session, postDto.getId(), postDto.getTitle(), postDto.getLink());
   }
 
   private Mono<Post> updatePostStatus(Session session, PostDto postDto) {

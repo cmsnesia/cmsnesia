@@ -30,7 +30,7 @@ public class EditCommand extends AbstractCommand<CategoryDto, Result<CategoryDto
   @Transactional
   @Override
   public Publisher<Result<CategoryDto>> execute(Session session, CategoryDto dto) {
-    Mono<Boolean> categoryIdExist = postIsExist(session, dto);
+    Mono<Boolean> categoryIdExist = categoryIsExist(session, dto);
     return categoryIdExist.flatMap(
         exists -> {
           if (!exists) {
@@ -67,7 +67,7 @@ public class EditCommand extends AbstractCommand<CategoryDto, Result<CategoryDto
         });
   }
 
-  private Mono<Boolean> postIsExist(Session session, CategoryDto categoryDto) {
+  private Mono<Boolean> categoryIsExist(Session session, CategoryDto categoryDto) {
     return categoryRepo.exists(session, null, categoryDto.getName(), categoryDto.getLink());
   }
 
