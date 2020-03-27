@@ -29,34 +29,27 @@ public class DeleteCommand extends AbstractCommand<PostDto, Result<PostDto>> {
 
   @Override
   public Publisher<Result<PostDto>> execute(Session session, PostDto dto) {
-    Mono<Boolean> postIsExist = postIsExist(session, dto);
-    return postIsExist.flatMap(
-        exist -> {
-          if (exist) {
-            return postRepo
-                .find(session, dto.getId())
-                .flatMap(
-                    post -> {
-                      post.setDeletedBy(session.getId());
-                      post.setDeletedAt(new Date());
-                      post.setStatus(
-                          Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
-                              .collect(Collectors.toSet()));
-                      return postRepo
-                          .save(post)
-                          .flatMap(
-                              saved ->
-                                  postDraftRepo
-                                      .deleteById(post.getId())
-                                      .map(result -> Result.build(dto, StatusCode.DELETE_SUCCESS)));
-                    });
-          } else {
-            return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
-          }
-        });
-  }
-
-  private Mono<Boolean> postIsExist(Session session, PostDto postDto) {
-    return postRepo.exists(session, new HashSet<>(Arrays.asList(postDto.getId())));
+    return postRepo
+        .find(session, dto.getId(), dto.getLink())
+        .defaultIfEmpty(null)
+        .flatMap(
+            post -> {
+              if (post == null) {
+                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+              } else {
+                post.setDeletedBy(session.getId());
+                post.setDeletedAt(new Date());
+                post.setStatus(
+                    Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                        .collect(Collectors.toSet()));
+                return postRepo
+                    .save(post)
+                    .flatMap(
+                        saved ->
+                            postDraftRepo
+                                .deleteById(post.getId())
+                                .map(result -> Result.build(dto, StatusCode.DELETE_SUCCESS)));
+              }
+            });
   }
 }

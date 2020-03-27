@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 public interface CategoryRepoCustom {
 
-  Mono<Category> find(Session session, String id);
+  Mono<Category> find(Session session, String id, String link);
 
   Flux<Category> find(Session session, Set<String> ids);
 
@@ -20,5 +20,5 @@ public interface CategoryRepoCustom {
 
   Mono<Boolean> exists(Session session, Set<String> ids);
 
-  Mono<Boolean> exists(Session session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name, String link);
 }

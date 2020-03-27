@@ -46,7 +46,7 @@ public class EditCommand extends AbstractCommand<PostDto, Result<PostDto>> {
               }
 
               return postRepo
-                  .find(session, dto.getId())
+                  .find(session, dto.getId(), dto.getLink())
                   .flatMap(
                       post -> {
                         PostDraft postDraft = postAssembler.fromPost(post);

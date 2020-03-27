@@ -48,7 +48,7 @@ public class PublishCommand extends AbstractCommand<IdRequest, Result<PostDto>> 
                           newPost.setCreatedAt(new Date());
                           newPost.setCreatedBy(session.getId());
                           return postRepo
-                              .find(session, id.getId())
+                              .find(session, id.getId(), id.getId())
                               .defaultIfEmpty(newPost)
                               .flatMap(
                                   post -> {

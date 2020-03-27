@@ -15,8 +15,7 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public Category fromDto(@Nonnull CategoryDto dto) {
-    Category category = Category.builder().id(dto.getId()).name(dto.getName()).build();
-    return category;
+    return Category.builder().id(dto.getId()).name(dto.getName()).link(dto.getLink()).build();
   }
 
   @Nonnull
@@ -30,7 +29,11 @@ public class CategoryAssembler extends Assembler<Category, CategoryDto> {
   @Nonnull
   @Override
   public CategoryDto fromEntity(@Nonnull Category entity) {
-    return CategoryDto.builder().id(entity.getId()).name(entity.getName()).build();
+    return CategoryDto.builder()
+        .id(entity.getId())
+        .name(entity.getName())
+        .link(entity.getLink())
+        .build();
   }
 
   @Nonnull

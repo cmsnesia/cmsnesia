@@ -2,6 +2,8 @@ package com.cmsnesia.domain;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import com.cmsnesia.domain.validator.UrlMustValid;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -21,4 +23,7 @@ public class Category extends Audit {
   @Size(max = 50)
   @Indexed
   private String name;
+
+  @UrlMustValid(message = "Invalid URL")
+  private String link;
 }

@@ -22,8 +22,10 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Category> find(Session session, String id) {
-    Query query = buildQuery(session, CategoryDto.builder().id(id).build());
+  public Mono<Category> find(Session session, String id, String link) {
+    Query query = buildQuery(session, CategoryDto.builder().build());
+    query.addCriteria(
+        new Criteria().orOperator(Criteria.where("id").is(id), Criteria.where("link").is(link)));
     return reactiveMongoTemplate.findOne(query, Category.class);
   }
 
@@ -62,10 +64,13 @@ public class CategoryRepoCustomImpl implements CategoryRepoCustom {
   }
 
   @Override
-  public Mono<Boolean> exists(Session session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name, String link) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
+    }
+    if (!StringUtils.isEmpty(link)) {
+      query.addCriteria(Criteria.where("link").is(link));
     }
     query.addCriteria(Criteria.where("name").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));

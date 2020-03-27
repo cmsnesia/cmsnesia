@@ -13,4 +13,5 @@ public class CategoryDto extends BaseDto {
 
   private String id;
   private String name;
+  private String link;
 }
