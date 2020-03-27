@@ -92,12 +92,10 @@ public class PostRepoCustomImpl implements PostRepoCustom {
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
     }
-    if (!StringUtils.isEmpty(name)) {
-      query.addCriteria(Criteria.where("title").is(name));
-    }
     if (!StringUtils.isEmpty(link)) {
       query.addCriteria(Criteria.where("link").is(name));
     }
+    query.addCriteria(Criteria.where("title").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Post.class);
