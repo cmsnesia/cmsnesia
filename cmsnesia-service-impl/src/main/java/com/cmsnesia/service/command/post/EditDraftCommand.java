@@ -60,8 +60,8 @@ public class EditDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> 
                                       } else {
                                         PostDraft save = postAssembler.fromPostDto(dto);
 
-                                        postDraft.setCategories(categories);
-                                        postDraft.setStatus(
+                                        save.setCategories(categories);
+                                        save.setStatus(
                                             Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
                                                 .collect(Collectors.toSet()));
 
