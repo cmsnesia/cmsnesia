@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -38,56 +39,61 @@ public class EditDraftCommand extends AbstractCommand<PostDto, Result<PostDto>> 
   @Transactional
   @Override
   public Publisher<Result<PostDto>> execute(Session session, PostDto dto) {
-    Mono<Boolean> postIsExist = postIsExist(session, dto);
-    Mono<Set<Category>> categoryList = findCategories(session, dto);
-    return Mono.zip(postIsExist, categoryList)
+    return postRepo
+        .exists(session, null, dto.getTitle(), dto.getLink())
         .flatMap(
-            tuple -> {
-              if (tuple.getT1()) {
+            exists -> {
+              if (!exists) {
+                return postDraftRepo
+                    .find(session, dto.getId())
+                    .defaultIfEmpty(PostDraft.builder().build())
+                    .flatMap(
+                        postDraft -> {
+                          if (StringUtils.isEmpty(postDraft.getId())) {
+                            return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+                          } else {
+                            return findCategories(session, dto)
+                                .flatMap(
+                                    categories -> {
+                                      if (categories.size() != dto.getCategories().size()) {
+                                        return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+                                      } else {
+                                        PostDraft save = postAssembler.fromPostDto(dto);
+
+                                        postDraft.setCategories(categories);
+                                        postDraft.setStatus(
+                                            Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
+                                                .collect(Collectors.toSet()));
+
+                                        save.audit(postDraft);
+
+                                        save.setModifiedBy(session.getId());
+                                        save.setModifiedAt(new Date());
+
+                                        Mono<Post> updated = updatePostStatus(session, dto);
+
+                                        return updated.flatMap(
+                                            post ->
+                                                validate(save)
+                                                    .flatMap(
+                                                        o ->
+                                                            postDraftRepo
+                                                                .save(save)
+                                                                .map(postAssembler::fromDraft)
+                                                                .map(
+                                                                    postDto ->
+                                                                        Result.build(
+                                                                            postDto,
+                                                                            StatusCode
+                                                                                .SAVE_SUCCESS))));
+                                      }
+                                    });
+                          }
+                        });
+              } else {
                 return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
               }
-              if (tuple.getT2().size() != dto.getCategories().size()) {
-                return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
-              }
-
-              return postDraftRepo
-                  .find(session, dto.getId())
-                  .flatMap(
-                      postDraft -> {
-                        Set<Category> categories = tuple.getT2();
-
-                        PostDraft save = postAssembler.fromPostDto(dto);
-
-                        postDraft.setCategories(categories);
-                        postDraft.setStatus(
-                            Arrays.asList(PostStatus.UNPUBLISHED.name()).stream()
-                                .collect(Collectors.toSet()));
-
-                        save.audit(postDraft);
-
-                        save.setModifiedBy(session.getId());
-                        save.setModifiedAt(new Date());
-
-                        Mono<Post> updated = updatePostStatus(session, dto);
-
-                        return updated.flatMap(
-                            post ->
-                                validate(save)
-                                    .flatMap(
-                                        o ->
-                                            postDraftRepo
-                                                .save(save)
-                                                .map(postAssembler::fromDraft)
-                                                .map(
-                                                    postDto ->
-                                                        Result.build(
-                                                            postDto, StatusCode.SAVE_SUCCESS))));
-                      });
             });
-  }
-
-  private Mono<Boolean> postIsExist(Session session, PostDto postDto) {
-    return postRepo.exists(session, new HashSet<>(Arrays.asList(postDto.getId())));
   }
 
   private Mono<Set<Category>> findCategories(Session session, PostDto postDto) {

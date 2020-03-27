@@ -14,12 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 @Service("categoryEditCommand")
@@ -38,34 +36,39 @@ public class EditCommand extends AbstractCommand<CategoryDto, Result<CategoryDto
           if (!exists) {
             return categoryRepo
                 .find(session, dto.getId(), dto.getLink())
+                .defaultIfEmpty(Category.builder().build())
                 .flatMap(
                     category -> {
-                      Category save = categoryAssembler.fromDto(dto);
-                      save.audit(category);
-                      save.setModifiedBy(session.getId());
-                      save.setModifiedAt(new Date());
-                      Mono<Category> saved = categoryRepo.save(save);
-                      Mono<UpdateResult> updated = modifyPostCategory(session, dto);
-                      return Mono.zip(saved, updated)
-                          .map(
-                              tuple -> {
-                                if (tuple.getT1() != null && tuple.getT2() != null) {
-                                  return Result.build(
-                                      categoryAssembler.fromEntity(tuple.getT1()),
-                                      StatusCode.SAVE_SUCCESS);
-                                } else {
-                                  return Result.build(StatusCode.SAVE_FAILED);
-                                }
-                              });
+                      if (StringUtils.isEmpty(category.getId())) {
+                        return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+                      } else {
+                        Category save = categoryAssembler.fromDto(dto);
+                        save.audit(category);
+                        save.setModifiedBy(session.getId());
+                        save.setModifiedAt(new Date());
+                        Mono<Category> saved = categoryRepo.save(save);
+                        Mono<UpdateResult> updated = modifyPostCategory(session, dto);
+                        return Mono.zip(saved, updated)
+                            .map(
+                                tuple -> {
+                                  if (tuple.getT1() != null && tuple.getT2() != null) {
+                                    return Result.build(
+                                        categoryAssembler.fromEntity(tuple.getT1()),
+                                        StatusCode.SAVE_SUCCESS);
+                                  } else {
+                                    return Result.build(StatusCode.SAVE_FAILED);
+                                  }
+                                });
+                      }
                     });
           } else {
-            return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
+            return Mono.just(Result.build(StatusCode.DUPLICATE_DATA_EXCEPTION));
           }
         });
   }
 
   private Mono<Boolean> postIsExist(Session session, CategoryDto categoryDto) {
-    return categoryRepo.exists(session, new HashSet<>(Arrays.asList(categoryDto.getId())));
+    return categoryRepo.exists(session, null, categoryDto.getName(), categoryDto.getLink());
   }
 
   public Mono<UpdateResult> modifyPostCategory(Session session, CategoryDto categoryDto) {
