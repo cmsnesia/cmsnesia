@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 @Service("categoryEditCommand")
@@ -58,7 +59,7 @@ public class EditCommand extends AbstractCommand<CategoryDto, Result<CategoryDto
                               });
                     });
           } else {
-            return Mono.just(Result.build(StatusCode.SAVE_FAILED));
+            return Mono.just(Result.build(StatusCode.DATA_NOT_FOUND));
           }
         });
   }
