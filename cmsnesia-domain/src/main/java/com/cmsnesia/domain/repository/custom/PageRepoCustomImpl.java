@@ -23,8 +23,11 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Page> find(Session authDto, String id) {
+  public Mono<Page> find(Session authDto, String id, String link) {
     Query query = buildQuery(authDto, PageDto.builder().id(id).build());
+    if (!StringUtils.isEmpty(link)) {
+      query.addCriteria(Criteria.where("link").is(link));
+    }
     return reactiveMongoTemplate.findOne(query, Page.class);
   }
 
@@ -53,12 +56,13 @@ public class PageRepoCustomImpl implements PageRepoCustom {
   }
 
   @Override
-  public Mono<Boolean> exists(Session session, String id, String name) {
+  public Mono<Boolean> exists(Session session, String id, String name, String link) {
     Query query = new Query();
     if (!StringUtils.isEmpty(id)) {
       query.addCriteria(Criteria.where("id").ne(id));
     }
     query.addCriteria(Criteria.where("name").is(name));
+    query.addCriteria(Criteria.where("link").is(name));
     query.addCriteria(Criteria.where("applications.id").in(Session.applicationIds(session)));
     query.addCriteria(Criteria.where("deletedAt").exists(false));
     return reactiveMongoTemplate.exists(query, Page.class);

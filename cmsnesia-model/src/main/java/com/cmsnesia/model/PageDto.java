@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class PageDto extends BaseDto {
 
   private String id;
+  private String link;
   private String name;
   private String content;
 

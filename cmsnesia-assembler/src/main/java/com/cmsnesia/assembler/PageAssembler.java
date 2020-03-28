@@ -23,6 +23,7 @@ public class PageAssembler extends Assembler<Page, PageDto> {
     Page post =
         Page.builder()
             .id(dto.getId())
+            .link(dto.getLink())
             .name(dto.getName())
             .content(dto.getContent())
             .authors(
@@ -46,6 +47,7 @@ public class PageAssembler extends Assembler<Page, PageDto> {
   public PageDto fromEntity(@Nonnull Page entity) {
     return PageDto.builder()
         .id(entity.getId())
+        .link(entity.getLink())
         .name(entity.getName())
         .content(entity.getContent())
         .authors(

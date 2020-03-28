@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface PageRepoCustom {
 
-  Mono<Page> find(Session session, String id);
+  Mono<Page> find(Session session, String id, String link);
 
   Flux<Page> find(Session session, PageDto dto, Pageable pageable);
 
@@ -19,7 +19,7 @@ public interface PageRepoCustom {
 
   Mono<Page> findAbout(Session session);
 
-  Mono<Boolean> exists(Session session, String id, String name);
+  Mono<Boolean> exists(Session session, String id, String name, String link);
 
   Mono<Boolean> exists(Session session, Set<String> ids);
 }
